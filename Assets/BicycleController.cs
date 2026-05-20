@@ -18,8 +18,11 @@ public class BicycleController : MonoBehaviour
     public float airPropulsionInfluence = 0.2f;
 
     [Header("--- 壁の跳ね返り設定 ---")]
-    [Header("跳ね返りの強さ（大きくすると強く弾かれる）")]
     public float wallBounceForce = 3.0f;
+
+    [Header("--- リスポーン設定 ---")]
+    [Header("この高さより下に落ちたらリスポーンする")]
+    public float respawnThresholdY = -10.0f;
 
     [Header("--- 自転車の可動パーツ ---")]
     public Transform handlebar;
@@ -36,10 +39,18 @@ public class BicycleController : MonoBehaviour
     private Vector3 airVelocityVector;
     private bool wasGroundedLastFrame = true;
 
+    // ★ゲーム開始時の「初期位置」と「初期の向き」を覚えておくための変数
+    private Vector3 startPosition;
+    private Quaternion startRotation;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         boxCollider = GetComponent<BoxCollider>();
+
+        // ★ゲームが始まった瞬間の立ち位置と向きを記憶しておく
+        startPosition = transform.position;
+        startRotation = transform.rotation;
     }
 
     void Update()
@@ -67,7 +78,7 @@ public class BicycleController : MonoBehaviour
         }
 
         // 共通で使う「水平方向の正面ベクトル」をあらかじめ計算
-        Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        Vector3 flatVelocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
         Vector3 flatForward = new Vector3(transform.forward.x, 0f, transform.forward.z).normalized;
         float realHorizontalSpeed = Vector3.Dot(flatVelocity, flatForward);
 
@@ -93,7 +104,7 @@ public class BicycleController : MonoBehaviour
 
             // 地面の移動速度をRigidbodyに適用
             Vector3 moveDirection = transform.forward * currentSpeed;
-            rb.linearVelocity = new Vector3(moveDirection.x, rb.linearVelocity.y, moveDirection.z);
+            rb.velocity = new Vector3(moveDirection.x, rb.velocity.y, moveDirection.z);
         }
         else
         {
@@ -115,17 +126,24 @@ public class BicycleController : MonoBehaviour
             }
 
             // 空中慣性ベクトルを物理の横移動に適用
-            rb.linearVelocity = new Vector3(airVelocityVector.x, rb.linearVelocity.y, airVelocityVector.z);
+            rb.velocity = new Vector3(airVelocityVector.x, rb.velocity.y, airVelocityVector.z);
         }
 
         // --- 4. スペースキーでジャンプ ---
         if (Input.GetKeyDown(KeyCode.Space) && grounded)
         {
-            airVelocityVector = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+            airVelocityVector = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
 
-        // --- 5. ハンドルの回転ギミック ---
+        // --- 5. 【新機能】マップ外への落下チェック（リスポーン） ---
+        // もし現在の高さ（transform.position.y）が設定値（-10mなど）より低くなったら
+        if (transform.position.y < respawnThresholdY)
+        {
+            Respawn();
+        }
+
+        // --- 6. ハンドルの回転ギミック ---
         if (handlebar != null)
         {
             float targetSteerAngle = turnInput * maxSteerAngle;
@@ -133,7 +151,7 @@ public class BicycleController : MonoBehaviour
             handlebar.localRotation = Quaternion.Euler(0, currentSteerAngle, 0);
         }
 
-        // --- 6. タイヤの回転ギミック ---
+        // --- 7. タイヤの回転ギミック ---
         float wheelRotation = currentSpeed * wheelRotationSpeed * Time.deltaTime * Mathf.Rad2Deg;
 
         if (frontWheel != null)
@@ -148,24 +166,20 @@ public class BicycleController : MonoBehaviour
         wasGroundedLastFrame = grounded;
     }
 
-    // --- 壁にぶつかった瞬間に小さく跳ね返る処理 ---
-    private void OnCollisionEnter(Collision collision)
+    // --- ★新機能！リスポーン（初期位置へワープ）処理★ ---
+    private void Respawn()
     {
-        if (IsGrounded()) return;
+        // 1. 位置と向きをゲーム開始時の状態に戻す
+        transform.position = startPosition;
+        transform.rotation = startRotation;
 
-        ContactPoint contact = collision.contacts[0];
-        Vector3 bounceDirection = contact.normal;
+        // 2. 物理的な勢い（落下速度や進む速度）を完全にゼロにする
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero; // 回転の勢いもストップ
 
-        bounceDirection.y = 0;
-        bounceDirection.Normalize();
-
-        float impactSpeed = Mathf.Max(Mathf.Abs(currentSpeed), 2.0f);
-        Vector3 bounceForce = bounceDirection * impactSpeed * wallBounceForce;
-
-        rb.AddForce(bounceForce, ForceMode.Impulse);
-
-        currentSpeed = -currentSpeed * 0.2f; 
-        airVelocityVector = bounceDirection * (airVelocityVector.magnitude * 0.2f);
+        // 3. 内部の速度データや空中慣性もリセットしてその場に静止させる
+        currentSpeed = 0f;
+        airVelocityVector = Vector3.zero;
     }
 
     // 地面に着地しているかチェックする関数
