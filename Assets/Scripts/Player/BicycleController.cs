@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro; // ★UI（TextMeshPro）を扱うために必要！
 
 public class BicycleController : MonoBehaviour
 {
@@ -18,12 +19,14 @@ public class BicycleController : MonoBehaviour
     public float airPropulsionInfluence = 0.2f;
 
     [Header("--- 壁の跳ね返り設定 ---")]
-    [Header("跳ね返りの強さ（大きくすると強く弾かれる）")]
     public float wallBounceForce = 3.0f;
 
     [Header("--- リスポーン設定 ---")]
-    [Header("この高さより下に落ちたらリスポーンする")]
     public float respawnThresholdY = -10.0f;
+
+    [Header("--- UI設定 ---")]
+    [Header("速度を表示するTextMeshProテキスト")]
+    public TextMeshProUGUI speedText; // ★ここにインスペクターから文字オブジェクトを入れます
 
     [Header("--- 自転車の可動パーツ ---")]
     public Transform handlebar;
@@ -155,6 +158,15 @@ public class BicycleController : MonoBehaviour
             backWheel.localRotation *= Quaternion.AngleAxis(wheelRotation, Vector3.right);
         }
 
+        // --- ★新機能！速度メーターのテキスト更新★ ---
+        if (speedText != null)
+        {
+            // 実際の速度（絶対値）をきれいに四捨五入して整数（km/h風）にする
+            // 今回は分かりやすく実際の物理的な最高速に合わせて10倍などの補正をかけてもOKです
+            int displaySpeed = Mathf.RoundToInt(Mathf.Abs(currentSpeed) * 3.0f); // 3倍してそれっぽい速度感に
+            speedText.text = "SPEED: " + displaySpeed + " km/h";
+        }
+
         wasGroundedLastFrame = grounded;
     }
 
@@ -170,20 +182,16 @@ public class BicycleController : MonoBehaviour
         airVelocityVector = Vector3.zero;
     }
 
-    // --- ★改良版：衝突時の跳ね返り処理★ ---
     private void OnCollisionEnter(Collision collision)
     {
         ContactPoint contact = collision.contacts[0];
         Vector3 bounceDirection = contact.normal;
 
-        // ★修正点：ぶつかった面が「ほぼ真横（壁）」であるときだけ跳ね返る（床の傾斜を無視する）
-        // 法線のY成分が0.5以上＝ほぼ上を向いている面（床）なので、その場合は跳ね返り処理をスルー
         if (Mathf.Abs(bounceDirection.y) > 0.5f) return;
 
         bounceDirection.y = 0;
         bounceDirection.Normalize();
 
-        // 衝撃を計算して弾き飛ばす
         float impactSpeed = Mathf.Max(Mathf.Abs(currentSpeed), 2.0f);
         Vector3 bounceForce = bounceDirection * impactSpeed * wallBounceForce;
 
