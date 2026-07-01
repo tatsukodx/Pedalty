@@ -115,3 +115,5 @@ ProfilerCaptures/
 # エディタが自動生成するソリューション・プロジェクトファイルを無視
 *.slnx
 *.csproj
+
+UnityRoadMaster/
