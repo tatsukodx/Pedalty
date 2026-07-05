@@ -105,3 +105,15 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# VS Codeの設定を無視
+.vscode/
+
+# プロファイラーのキャプチャデータを無視
+ProfilerCaptures/
+
+# エディタが自動生成するソリューション・プロジェクトファイルを無視
+*.slnx
+*.csproj
+
+UnityRoadMaster/

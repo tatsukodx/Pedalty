@@ -42,9 +42,18 @@ public class BicycleController : MonoBehaviour
 
     private Vector3 airVelocityVector;
     private bool wasGroundedLastFrame = true;
+    private bool isBraking = false; // ★外部から制御するブレーキフラグ
+
+    [HideInInspector] public float externalMoveInput = 0f;
+    [HideInInspector] public bool useExternalInput = false;
 
     private Vector3 startPosition;
     private Quaternion startRotation;
+
+    public void ApplyBrake(bool brake)
+    {
+        isBraking = brake;
+    }
 
     void Start()
     {
@@ -59,7 +68,7 @@ public class BicycleController : MonoBehaviour
     {
         bool grounded = IsGrounded();
 
-        float moveInput = Input.GetAxis("Vertical"); 
+        float moveInput = useExternalInput ? externalMoveInput : Input.GetAxis("Vertical"); 
         float turnInput = Input.GetAxis("Horizontal"); 
 
         // --- 1. 自転車本体の左右旋回（向き変更） ---
@@ -85,7 +94,12 @@ public class BicycleController : MonoBehaviour
         // --- 3. 慣性・移動・空中推進力の計算 ---
         if (grounded)
         {
-            if (moveInput != 0)
+            if (isBraking)
+            {
+                // ★ブレーキ時は通常の3倍の減速率で速度を0に近づける
+                currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, deceleration * 3f * Time.deltaTime);
+            }
+            else if (moveInput != 0)
             {
                 float targetSpeed = moveInput * maxSpeed;
                 currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, acceleration * Time.deltaTime);
@@ -106,7 +120,12 @@ public class BicycleController : MonoBehaviour
         }
         else
         {
-            if (moveInput != 0)
+            if (isBraking)
+            {
+                // ★空中でもブレーキが少し効くようにする（必要に応じて調整）
+                currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, deceleration * 2f * Time.deltaTime);
+            }
+            else if (moveInput != 0)
             {
                 Vector3 airForce = transform.forward * moveInput * (acceleration * airPropulsionInfluence) * Time.deltaTime;
                 airVelocityVector += airForce;
