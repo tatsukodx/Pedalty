@@ -23,6 +23,7 @@ public class ArduinoConnection : MonoBehaviour
     // 最新のボタン状態を保持（InputManagerから参照される）
     public volatile bool RightPressed = false;
     public volatile bool LeftPressed = false;
+    public volatile int MagnetInterval = 0; // 0=停止、それ以外=ms間隔
 
     void Start()
     {
@@ -126,11 +127,22 @@ public class ArduinoConnection : MonoBehaviour
 
     void ParseLine(string line)
     {
-        string[] parts = line.Trim().Split(',');
-        if (parts.Length >= 2)
+        line = line.Trim();
+        if (line.StartsWith("MAGNET,"))
         {
-            if (int.TryParse(parts[0], out int r)) RightPressed = (r == 1);
-            if (int.TryParse(parts[1], out int l)) LeftPressed  = (l == 1);
+            string[] parts = line.Split(',');
+            if (parts.Length >= 2 && int.TryParse(parts[1], out int ms))
+            {
+                MagnetInterval = ms;
+            }
+            return;
+        }
+
+        string[] btnParts = line.Split(',');
+        if (btnParts.Length >= 2)
+        {
+            if (int.TryParse(btnParts[0], out int r)) RightPressed = (r == 1);
+            if (int.TryParse(btnParts[1], out int l)) LeftPressed  = (l == 1);
         }
     }
 

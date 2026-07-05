@@ -4564,7 +4564,7 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 686831285}
+      addedObject: {fileID: 1095637884}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
       insertIndex: -1
@@ -4575,6 +4575,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
       insertIndex: -1
       addedObject: {fileID: 415440745}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 415440746}
   m_SourcePrefab: {fileID: 100100000, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
 --- !u!1 &415440740 stripped
 GameObject:
@@ -4639,6 +4642,8 @@ MonoBehaviour:
   frontWheel: {fileID: 179660212}
   backWheel: {fileID: 1810568584}
   wheelRotationSpeed: 1
+  externalMoveInput: 0
+  useExternalInput: 0
 --- !u!65 &415440745
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4660,6 +4665,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0.7, z: 0}
+--- !u!114 &415440746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 415440740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcacc064fb780ee44951b51fc329661b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WheelSpeedConverter
+  arduinoConnection: {fileID: 635817984}
+  bicycleController: {fileID: 415440744}
+  wheelCircumference: 1.5
+  maxSpeedKmh: 36
+  smoothFactor: 3
 --- !u!1001 &416701881
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6176,7 +6198,7 @@ Transform:
   m_LocalScale: {x: 2.5, y: 0.05, z: 80}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 698358890}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &611187984
 BoxCollider:
@@ -6608,8 +6630,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArduinoConnection
   portName: COM3
   baudRate: 115200
+  isArduinoMode: 1
   RightPressed: 0
   LeftPressed: 0
+  MagnetInterval: 0
 --- !u!4 &635817985
 Transform:
   m_ObjectHideFlags: 0
@@ -6642,7 +6666,7 @@ MonoBehaviour:
   OnBellRing:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 686831284}
+      - m_Target: {fileID: 1095637883}
         m_TargetAssemblyTypeName: BellController, Assembly-CSharp
         m_MethodName: RingBell
         m_Mode: 1
@@ -10693,7 +10717,7 @@ Transform:
   m_LocalScale: {x: 2.5, y: 0.05, z: 80}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 698358890}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1062313220
 BoxCollider:
@@ -10993,6 +11017,50 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 425224604}
   m_SourcePrefab: {fileID: 100100000, guid: 61c90ccd67ff728469bdcf9849269ad6, type: 3}
+--- !u!1 &1095637882
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1095637884}
+  - component: {fileID: 1095637883}
+  m_Layer: 0
+  m_Name: Bell
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1095637883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1095637882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60f3a89549d58cc48a6311058a7ffe86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BellController
+--- !u!4 &1095637884
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1095637882}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -70.87041, y: 6.6544905, z: 60.60299}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 415440741}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1097745077 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: f65d01a310db1b74582d89cdcb63fe4b, type: 3}
@@ -13335,7 +13403,7 @@ Transform:
   m_LocalScale: {x: 1.5, y: 0.05, z: 80}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 698358890}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1301050734
 BoxCollider:
@@ -14567,7 +14635,7 @@ Transform:
   m_LocalScale: {x: 3.5, y: 0.05, z: 80}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 698358890}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1429849044
 BoxCollider:
@@ -15941,7 +16009,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2050600570}
-  - {fileID: 698358890}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1547976756
@@ -18186,7 +18253,7 @@ Transform:
   m_LocalScale: {x: 0.08, y: 0.02, z: 80}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 698358890}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1712052837
 BoxCollider:
@@ -21427,7 +21494,7 @@ Transform:
   m_LocalScale: {x: 1.5, y: 0.05, z: 80}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 698358890}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1978429810
 BoxCollider:
@@ -22520,7 +22587,7 @@ Transform:
   m_LocalScale: {x: 3.5, y: 0.05, z: 80}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 698358890}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &2076334428
 BoxCollider:
@@ -23460,3 +23527,13 @@ SceneRoots:
   - {fileID: 869912519}
   - {fileID: 1678739350}
   - {fileID: 96957289}
+  - {fileID: 611187983}
+  - {fileID: 635817985}
+  - {fileID: 1062313219}
+  - {fileID: 1301050733}
+  - {fileID: 1429849043}
+  - {fileID: 1545575769}
+  - {fileID: 1712052836}
+  - {fileID: 1978429809}
+  - {fileID: 2076334427}
+  - {fileID: 2131919618}

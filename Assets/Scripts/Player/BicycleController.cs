@@ -44,6 +44,9 @@ public class BicycleController : MonoBehaviour
     private bool wasGroundedLastFrame = true;
     private bool isBraking = false; // ★外部から制御するブレーキフラグ
 
+    [HideInInspector] public float externalMoveInput = 0f;
+    [HideInInspector] public bool useExternalInput = false;
+
     private Vector3 startPosition;
     private Quaternion startRotation;
 
@@ -65,7 +68,7 @@ public class BicycleController : MonoBehaviour
     {
         bool grounded = IsGrounded();
 
-        float moveInput = Input.GetAxis("Vertical"); 
+        float moveInput = useExternalInput ? externalMoveInput : Input.GetAxis("Vertical"); 
         float turnInput = Input.GetAxis("Horizontal"); 
 
         // --- 1. 自転車本体の左右旋回（向き変更） ---
