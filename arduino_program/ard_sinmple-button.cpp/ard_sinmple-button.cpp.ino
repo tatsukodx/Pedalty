@@ -1,7 +1,7 @@
 // ===== ピン定義 =====
-#define RIGHT  3   // 右ボタン（D3）
-#define LEFT   4   // 左ボタン（D4）
-#define MAGNET 2   // マグネットセンサ（D2）・割り込み使用
+#define RIGHT 3  // 右ボタン（D3）
+#define LEFT 4   // 左ボタン（D4）
+#define MAGNET 2 // マグネットセンサ（D2）・割り込み使用
 
 // ===== マグネットセンサ用 =====
 volatile bool magnetTriggered = false;
@@ -10,7 +10,8 @@ unsigned long interval = 0;
 
 void calcVelocity() {
   unsigned long now = millis();
-  if (now - lastTriggerTime < 10) return; // チャタリング対策
+  if (now - lastTriggerTime < 10)
+    return; // チャタリング対策
   interval = now - lastTriggerTime;
   lastTriggerTime = now;
   magnetTriggered = true;
@@ -20,8 +21,8 @@ void calcVelocity() {
 void setup() {
   Serial.begin(115200);
 
-  pinMode(RIGHT,  INPUT);
-  pinMode(LEFT,   INPUT);
+  pinMode(RIGHT, INPUT);
+  pinMode(LEFT, INPUT);
   pinMode(MAGNET, INPUT_PULLUP);
 
   attachInterrupt(digitalPinToInterrupt(MAGNET), calcVelocity, FALLING);
@@ -52,4 +53,3 @@ void loop() {
 
   delay(50);
 }
-
