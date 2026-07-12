@@ -11614,7 +11614,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1889574121}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
       insertIndex: -1
@@ -45805,6 +45808,95 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4243100736330820217, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
   m_PrefabInstance: {fileID: 1231092007}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1749143477
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1749143480}
+  - component: {fileID: 1749143479}
+  - component: {fileID: 1749143478}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1749143478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1749143477}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 999628616febca448a3f15a9c4a294ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InputManager
+  arduino: {fileID: 1749143479}
+  isMenuState: 0
+  OnBellRing:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1889574120}
+        m_TargetAssemblyTypeName: BellController, Assembly-CSharp
+        m_MethodName: RingBell
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnBrake:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMenuNext:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMenuBack:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &1749143479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1749143477}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 990f335ca03887349b9b5f14cfaf32e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ArduinoConnection
+  portName: COM3
+  baudRate: 115200
+  isArduinoMode: 1
+  RightPressed: 0
+  LeftPressed: 0
+  MagnetInterval: 0
+--- !u!4 &1749143480
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1749143477}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1751244324 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: e3c71c50de390ec4190b877211ba0717, type: 3}
@@ -49755,6 +49847,50 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 812957121}
   m_SourcePrefab: {fileID: 100100000, guid: e3c71c50de390ec4190b877211ba0717, type: 3}
+--- !u!1 &1889574119
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1889574121}
+  - component: {fileID: 1889574120}
+  m_Layer: 0
+  m_Name: Bell
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1889574120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1889574119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60f3a89549d58cc48a6311058a7ffe86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BellController
+--- !u!4 &1889574121
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1889574119}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 415440741}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1891389424 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: 4c3178e7d9864a349a71f8e4bc19a179, type: 3}
