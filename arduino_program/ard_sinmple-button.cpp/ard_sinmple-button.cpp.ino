@@ -6,13 +6,18 @@
 // ===== マグネットセンサ用 =====
 volatile bool magnetTriggered = false;
 volatile unsigned long lastTriggerTime = 0;
-unsigned long interval = 0;
+volatile unsigned long triggerInterval = 0;
+
+unsigned long ledOffTime = 0;
+bool stoppedSent = true;
 
 void calcVelocity() {
   unsigned long now = millis();
-  if (now - lastTriggerTime < 10)
+  if (lastTriggerTime != 0 && now - lastTriggerTime < 50)
     return; // チャタリング対策
-  interval = now - lastTriggerTime;
+
+  // 初回検出時は1秒間隔として扱い、最初の1回から走り始めるようにする
+  triggerInterval = lastTriggerTime == 0 ? 1000 : now - lastTriggerTime;
   lastTriggerTime = now;
   magnetTriggered = true;
 }
@@ -24,6 +29,7 @@ void setup() {
   pinMode(RIGHT, INPUT);
   pinMode(LEFT, INPUT);
   pinMode(MAGNET, INPUT_PULLUP);
+  pinMode(LED_BUILTIN, OUTPUT);
 
   attachInterrupt(digitalPinToInterrupt(MAGNET), calcVelocity, FALLING);
 }
@@ -38,17 +44,30 @@ void loop() {
   Serial.println(l);
 
   // --- マグネット送信 ---
-  // 2秒間反応なし → 停止とみなす
-  if (millis() - lastTriggerTime > 2000) {
-    interval = 0;
-  }
+  // 割り込みで更新される値を安全にコピーする
+  noInterrupts();
+  bool triggered = magnetTriggered;
+  unsigned long interval = triggerInterval;
+  unsigned long lastTrigger = lastTriggerTime;
+  magnetTriggered = false;
+  interrupts();
 
-  if (magnetTriggered) {
-    magnetTriggered = false;
+  if (triggered) {
     Serial.print("MAGNET,");
     Serial.println(interval);
-  } else if (interval == 0) {
+    stoppedSent = false;
+
+    // 磁石を検出したことをArduino本体のLEDで確認できるようにする
+    digitalWrite(LED_BUILTIN, HIGH);
+    ledOffTime = millis() + 80;
+  } else if (!stoppedSent && lastTrigger != 0 && millis() - lastTrigger > 2000) {
     Serial.println("MAGNET,0");
+    stoppedSent = true;
+  }
+
+  if (ledOffTime != 0 && (long)(millis() - ledOffTime) >= 0) {
+    digitalWrite(LED_BUILTIN, LOW);
+    ledOffTime = 0;
   }
 
   delay(50);
