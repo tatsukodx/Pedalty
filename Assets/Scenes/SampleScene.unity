@@ -1068,7 +1068,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ba3873c7f3840c34d847d3ddbf8869b7, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
 --- !u!65 &33149340
@@ -1509,7 +1509,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -9138,12 +9138,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraController
   target: {fileID: 415440741}
-  distance: 5
-  height: 2
-  mouseSensitivity: 3
   rotationLerpSpeed: 3
-  firstPersonHeight: 1.8
-  firstPersonForward: 0.2
+  firstPersonHeight: 2
+  firstPersonForward: 0
 --- !u!1001 &330947845
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11701,23 +11698,6 @@ MonoBehaviour:
   wheelRotationSpeed: 1
   externalMoveInput: 0
   useExternalInput: 0
---- !u!114 &415440746
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 415440740}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dcacc064fb780ee44951b51fc329661b, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::WheelSpeedConverter
-  arduinoConnection: {fileID: 1749143479}
-  bicycleController: {fileID: 415440744}
-  wheelCircumference: 1.5
-  maxSpeedKmh: 36
-  smoothFactor: 3
 --- !u!65 &415440745
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11739,6 +11719,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0.7, z: 0}
+--- !u!114 &415440746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 415440740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcacc064fb780ee44951b51fc329661b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WheelSpeedConverter
+  arduinoConnection: {fileID: 1749143479}
+  bicycleController: {fileID: 415440744}
+  wheelCircumference: 1.5
+  maxSpeedKmh: 36
+  smoothFactor: 3
 --- !u!4 &416060335 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4243100736330820217, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
@@ -14718,7 +14715,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -15150,7 +15147,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -20450,7 +20447,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -22670,6 +22667,7 @@ MonoBehaviour:
   laneSensorRadius: 1
   obstacleCheckDistance: 6
   obstacleCheckRadius: 1.2
+  mass: 10000
 --- !u!65 &856471709
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -26737,7 +26735,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -28442,7 +28440,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -30825,7 +30823,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -30968,7 +30966,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -35913,7 +35911,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -45912,7 +45910,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 990f335ca03887349b9b5f14cfaf32e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArduinoConnection
-  portName: COM3
   baudRate: 115200
   isArduinoMode: 1
   RightPressed: 0
@@ -47711,7 +47708,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -52077,7 +52074,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -55931,7 +55928,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
