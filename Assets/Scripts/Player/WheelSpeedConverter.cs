@@ -12,6 +12,7 @@ public class WheelSpeedConverter : MonoBehaviour
     public float smoothFactor = 3f;         // 滑らか係数
 
     private float smoothedTargetKmh = 0f;
+    private int lastLoggedPulseCount = 0;
 
     void Start()
     {
@@ -35,6 +36,12 @@ public class WheelSpeedConverter : MonoBehaviour
                 float intervalSec = arduinoConnection.MagnetInterval / 1000f;
                 float speedMs = wheelCircumference / intervalSec;
                 targetKmh = speedMs * 3.6f;
+
+                if (arduinoConnection.MagnetPulseCount != lastLoggedPulseCount)
+                {
+                    lastLoggedPulseCount = arduinoConnection.MagnetPulseCount;
+                    Debug.Log($"磁気センサ検出: 間隔={arduinoConnection.MagnetInterval}ms, 目標速度={targetKmh:F1}km/h");
+                }
             }
 
             // 0 のとき（停止中）もスムーズに0へ近づける

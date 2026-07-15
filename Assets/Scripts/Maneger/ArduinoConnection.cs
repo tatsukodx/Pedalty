@@ -6,7 +6,7 @@ using UnityEngine;
 public class ArduinoConnection : MonoBehaviour
 {
     [Header("シリアル通信設定")]
-    [SerializeField] string portName = "COM3";
+    const string portName = "COM4";
     [SerializeField] int baudRate = 115200;
 
     [Header("モード設定")]
@@ -24,6 +24,7 @@ public class ArduinoConnection : MonoBehaviour
     public volatile bool RightPressed = false;
     public volatile bool LeftPressed = false;
     public volatile int MagnetInterval = 0; // 0=停止、それ以外=ms間隔
+    [NonSerialized] public volatile int MagnetPulseCount = 0;
 
     void Start()
     {
@@ -134,6 +135,7 @@ public class ArduinoConnection : MonoBehaviour
             if (parts.Length >= 2 && int.TryParse(parts[1], out int ms))
             {
                 MagnetInterval = ms;
+                if (ms > 0) MagnetPulseCount++;
             }
             return;
         }
