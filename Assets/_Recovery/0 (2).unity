@@ -2321,7 +2321,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDelay: 0.5
-  leftTurnDelay: 0.6
+  leftTurnDelay: 0.5
   rightTurnDelay: 1
 --- !u!65 &75610557
 BoxCollider:
@@ -8044,7 +8044,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDelay: 0.5
-  leftTurnDelay: 0.6
+  leftTurnDelay: 0.5
   rightTurnDelay: 1
 --- !u!65 &287867544
 BoxCollider:
@@ -15335,7 +15335,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDelay: 0.5
-  leftTurnDelay: 0.6
+  leftTurnDelay: 0.5
   rightTurnDelay: 1
 --- !u!65 &580389901
 BoxCollider:
@@ -18820,7 +18820,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDelay: 0.5
-  leftTurnDelay: 0.6
+  leftTurnDelay: 0.5
   rightTurnDelay: 1
 --- !u!65 &727530893
 BoxCollider:
@@ -23796,7 +23796,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDelay: 0.5
-  leftTurnDelay: 0.6
+  leftTurnDelay: 0.5
   rightTurnDelay: 1
 --- !u!65 &873389803
 BoxCollider:
@@ -36135,7 +36135,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDelay: 0.5
-  leftTurnDelay: 0.6
+  leftTurnDelay: 0.5
   rightTurnDelay: 1
 --- !u!65 &1374207896
 BoxCollider:
@@ -41156,7 +41156,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDelay: 0.5
-  leftTurnDelay: 0.6
+  leftTurnDelay: 0.5
   rightTurnDelay: 1
 --- !u!65 &1581119739
 BoxCollider:
@@ -42720,7 +42720,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDelay: 0.5
-  leftTurnDelay: 0.6
+  leftTurnDelay: 0.5
   rightTurnDelay: 1
 --- !u!65 &1621321579
 BoxCollider:
