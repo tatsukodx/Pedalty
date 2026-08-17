@@ -1,5 +1,5 @@
 using UnityEngine;
-using TMPro; // ★UI（TextMeshPro）を扱うために必要！
+using TMPro;
 
 public class BicycleController : MonoBehaviour
 {
@@ -26,7 +26,7 @@ public class BicycleController : MonoBehaviour
 
     [Header("--- UI設定 ---")]
     [Header("速度を表示するTextMeshProテキスト")]
-    public TextMeshProUGUI speedText; // ★ここにインスペクターから文字オブジェクトを入れます
+    public TextMeshProUGUI speedText;
 
     [Header("--- 自転車の可動パーツ ---")]
     public Transform handlebar;
@@ -42,7 +42,7 @@ public class BicycleController : MonoBehaviour
 
     private Vector3 airVelocityVector;
     private bool wasGroundedLastFrame = true;
-    private bool isBraking = false; // ★外部から制御するブレーキフラグ
+    private bool isBraking = false; // InputManagerのOnBrakeから制御する
 
     [HideInInspector] public float externalMoveInput = 0f;
     [HideInInspector] public bool useExternalInput = false;
@@ -71,7 +71,6 @@ public class BicycleController : MonoBehaviour
         float moveInput = useExternalInput ? externalMoveInput : Input.GetAxis("Vertical"); 
         float turnInput = Input.GetAxis("Horizontal"); 
 
-        // --- 1. 自転車本体の左右旋回（向き変更） ---
         if (Mathf.Abs(currentSpeed) > 0.1f || !grounded)
         {
             float turnRotation = turnInput * turnSpeed * Time.deltaTime;
@@ -80,7 +79,7 @@ public class BicycleController : MonoBehaviour
             transform.Rotate(0, turnRotation, 0);
         }
 
-        // --- 2. 着地した「瞬間」の速度引き継ぎ処理 ---
+        // 着地した瞬間に空中の速度を引き継ぐ
         if (grounded && !wasGroundedLastFrame)
         {
             float speedInForwardDirection = Vector3.Dot(airVelocityVector, transform.forward);
@@ -91,12 +90,11 @@ public class BicycleController : MonoBehaviour
         Vector3 flatForward = new Vector3(transform.forward.x, 0f, transform.forward.z).normalized;
         float realHorizontalSpeed = Vector3.Dot(flatVelocity, flatForward);
 
-        // --- 3. 慣性・移動・空中推進力の計算 ---
         if (grounded)
         {
             if (isBraking)
             {
-                // ★ブレーキ時は通常の3倍の減速率で速度を0に近づける
+                // ブレーキ時は通常の3倍の減速率
                 currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, deceleration * 3f * Time.deltaTime);
             }
             else if (moveInput != 0)
@@ -109,7 +107,7 @@ public class BicycleController : MonoBehaviour
                 currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, deceleration * Time.deltaTime);
             }
 
-            // 地面での壁衝突時の速度同期
+            // 壁にぶつかって実速度が落ちたぶんを currentSpeed へ反映する
             if (Mathf.Abs(currentSpeed) > 1.5f && Mathf.Abs(realHorizontalSpeed) < Mathf.Abs(currentSpeed) - 1.5f)
             {
                 currentSpeed = Mathf.MoveTowards(currentSpeed, realHorizontalSpeed, acceleration * 3f * Time.deltaTime);
@@ -122,7 +120,7 @@ public class BicycleController : MonoBehaviour
         {
             if (isBraking)
             {
-                // ★空中でもブレーキが少し効くようにする（必要に応じて調整）
+                // 空中でもブレーキを少しだけ効かせる
                 currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, deceleration * 2f * Time.deltaTime);
             }
             else if (moveInput != 0)
@@ -144,20 +142,17 @@ public class BicycleController : MonoBehaviour
             rb.linearVelocity = new Vector3(airVelocityVector.x, rb.linearVelocity.y, airVelocityVector.z);
         }
 
-        // --- 4. スペースキーでジャンプ ---
         if (Input.GetKeyDown(KeyCode.Space) && grounded)
         {
             airVelocityVector = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
 
-        // --- 5. マップ外への落下チェック（リスポーン） ---
         if (transform.position.y < respawnThresholdY)
         {
             Respawn();
         }
 
-        // --- 6. ハンドルの回転ギミック ---
         if (handlebar != null)
         {
             float targetSteerAngle = turnInput * maxSteerAngle;
@@ -165,7 +160,6 @@ public class BicycleController : MonoBehaviour
             handlebar.localRotation = Quaternion.Euler(0, currentSteerAngle, 0);
         }
 
-        // --- 7. タイヤの回転ギミック ---
         float wheelRotation = currentSpeed * wheelRotationSpeed * Time.deltaTime * Mathf.Rad2Deg;
 
         if (frontWheel != null)
@@ -177,12 +171,10 @@ public class BicycleController : MonoBehaviour
             backWheel.localRotation *= Quaternion.AngleAxis(wheelRotation, Vector3.right);
         }
 
-        // --- ★新機能！速度メーターのテキスト更新★ ---
+        // currentSpeed は m/s なので 3.6 倍が km/h になる
         if (speedText != null)
         {
-            // 実際の速度（絶対値）をきれいに四捨五入して整数（km/h風）にする
-            // 今回は分かりやすく実際の物理的な最高速に合わせて10倍などの補正をかけてもOKです
-            int displaySpeed = Mathf.RoundToInt(Mathf.Abs(currentSpeed) * 3.0f); // 3倍してそれっぽい速度感に
+            int displaySpeed = Mathf.RoundToInt(Mathf.Abs(currentSpeed) * 3.6f);
             speedText.text = "SPEED: " + displaySpeed + " km/h";
         }
 

@@ -19,7 +19,7 @@ public class CarSpawner : MonoBehaviour
         {
             timer = 0f;
 
-            int currentCount = GameObject.FindObjectsOfType<CarController>().Length;
+            int currentCount = FindObjectsByType<CarController>().Length;
 
             if (currentCount < maxCarCount && spawnPoints.Length > 0 && baseCarPrefab != null && carModels.Length > 0)
             {
