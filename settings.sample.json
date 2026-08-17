@@ -9,5 +9,9 @@
     "maxSpeedKmh": 40.0,
     "smoothFactor": 3.0,
     "pulseTimeoutSec": 2.5,
+    "potMin": 200,
+    "potCenter": 512,
+    "potMax": 820,
+    "potInvert": false,
     "bellVolume": 1.0
 }

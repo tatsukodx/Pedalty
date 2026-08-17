@@ -118,3 +118,5 @@ ProfilerCaptures/
 
 Assets/_Recovery
 CLAUDE.md
+# 較正値は自転車の組み付けごとに変わるのでコミットしない（settings.sample.json を参照）
+settings.json
