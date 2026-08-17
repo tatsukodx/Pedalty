@@ -24,6 +24,10 @@ public class BicycleController : MonoBehaviour
     [Header("--- リスポーン設定 ---")]
     public float respawnThresholdY = -10.0f;
 
+    [Header("--- デバッグ（机上テスト用） ---")]
+    [Tooltip("停止中でもハンドル操作で車体を旋回させる。ペダルを漕がずにポテンショメータを確認するための設定。\n本番では必ずオフに戻すこと（停止中に旋回するのは自転車として不自然なため）")]
+    public bool allowSteerWhileStopped = false;
+
     [Header("--- UI設定 ---")]
     [Header("速度を表示するTextMeshProテキスト")]
     public TextMeshProUGUI speedText;
@@ -47,6 +51,9 @@ public class BicycleController : MonoBehaviour
     [HideInInspector] public float externalMoveInput = 0f;
     [HideInInspector] public bool useExternalInput = false;
 
+    [HideInInspector] public float externalSteerInput = 0f; // -1..1
+    [HideInInspector] public bool useExternalSteer = false;
+
     private Vector3 startPosition;
     private Quaternion startRotation;
 
@@ -69,9 +76,10 @@ public class BicycleController : MonoBehaviour
         bool grounded = IsGrounded();
 
         float moveInput = useExternalInput ? externalMoveInput : Input.GetAxis("Vertical"); 
-        float turnInput = Input.GetAxis("Horizontal"); 
+        float turnInput = useExternalSteer ? externalSteerInput : Input.GetAxis("Horizontal");
 
-        if (Mathf.Abs(currentSpeed) > 0.1f || !grounded)
+        // 停止中は旋回しない（実際の自転車と同じ）。ただし机上テスト時のみ解除できる
+        if (Mathf.Abs(currentSpeed) > 0.1f || !grounded || allowSteerWhileStopped)
         {
             float turnRotation = turnInput * turnSpeed * Time.deltaTime;
             if (grounded && currentSpeed < 0) turnRotation *= -1; 

@@ -20,6 +20,12 @@ public class AppSettings
     public float smoothFactor = 3f;
     public float pulseTimeoutSec = 2.5f;       // この秒数パルスが来なければ停止扱い
 
+    [Header("ハンドル角（ポテンショメータ）")]
+    public int potMin = 200;        // 切れ角一方の生値
+    public int potCenter = 512;     // 直進時の生値
+    public int potMax = 820;        // 切れ角他方の生値
+    public bool potInvert = false;  // 左右反転（較正時に自動判定）
+
     [Header("ベル")]
     public float bellVolume = 1.0f;
 
@@ -38,7 +44,7 @@ public class AppSettings
                 var s = JsonUtility.FromJson<AppSettings>(File.ReadAllText(FilePath));
                 if (s != null)
                 {
-                    Debug.Log($"[Settings] 読込 {FilePath} / port={s.portName} 周長={s.wheelCircumference}m 倍率={s.speedMultiplier}");
+                    Debug.Log($"[Settings] 読込 {FilePath} / port={s.portName} 周長={s.wheelCircumference}m 倍率={s.speedMultiplier} pot={s.potMin}/{s.potCenter}/{s.potMax}");
                     return s;
                 }
             }

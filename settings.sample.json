@@ -1,0 +1,17 @@
+{
+    "portName": "AUTO",
+    "baudRate": 115200,
+    "forceKeyboardMode": false,
+    "logSerialLines": false,
+    "wheelCircumference": 2.096,
+    "magnetsPerWheel": 1,
+    "speedMultiplier": 2.0,
+    "maxSpeedKmh": 40.0,
+    "smoothFactor": 3.0,
+    "pulseTimeoutSec": 2.5,
+    "potMin": 200,
+    "potCenter": 512,
+    "potMax": 820,
+    "potInvert": false,
+    "bellVolume": 1.0
+}

@@ -31,6 +31,14 @@ public class ArduinoConnection : MonoBehaviour
   public volatile int MagnetInterval = 0; // 0=停止、それ以外=ms間隔
   [NonSerialized] public volatile int MagnetPulseCount = 0;
 
+  // ハンドル角の生値（HandleAngleConverterから参照される）
+  public volatile int PotRaw = -1; // -1 = 未受信
+  public volatile bool PotAvailable = false;
+
+  // 受信スレッドが書き、メインスレッドが読むので volatile が必要
+  volatile int lastPotTick = 0;
+  const int POT_TIMEOUT_MS = 1000;
+
   public string ConnectedPortName { get; private set; } = "";
 
   int readErrorCount = 0;
@@ -144,16 +152,20 @@ public class ArduinoConnection : MonoBehaviour
 
       foreach (string raw in buffer.Split('\n'))
       {
-        string line = raw.Trim();
-        if (line.StartsWith("MAGNET,")) return true;
-
-        string[] parts = line.Split(',');
-        if (parts.Length == 2 && int.TryParse(parts[0], out _) && int.TryParse(parts[1], out _)) return true;
+        if (IsPedaltyLine(raw.Trim())) return true;
       }
 
       Thread.Sleep(20);
     }
     return false;
+  }
+
+  static bool IsPedaltyLine(string line)
+  {
+    if (line.StartsWith("MAGNET,") || line.StartsWith("POT,")) return true;
+
+    string[] parts = line.Split(',');
+    return parts.Length == 2 && int.TryParse(parts[0], out _) && int.TryParse(parts[1], out _);
   }
 
   void Update()
@@ -163,6 +175,13 @@ public class ArduinoConnection : MonoBehaviour
     {
       RightPressed = Input.GetKey(KeyCode.K);
       LeftPressed = Input.GetKey(KeyCode.J);
+    }
+
+    // POT 行は無条件に定期送信されるので、途絶＝断線とみなせる
+    if (PotAvailable && unchecked(Environment.TickCount - lastPotTick) > POT_TIMEOUT_MS)
+    {
+      PotAvailable = false;
+      Debug.LogWarning("[Arduino] POT 受信が途絶しました → キーボード操舵へ");
     }
 
     FlushLogs();
@@ -264,6 +283,18 @@ public class ArduinoConnection : MonoBehaviour
       {
         MagnetInterval = ms;
         if (ms > 0) MagnetPulseCount++;
+      }
+      return;
+    }
+
+    if (line.StartsWith("POT,"))
+    {
+      // 通信化けした異常値をそのまま流すと操舵が暴れるので範囲を検査する
+      if (int.TryParse(line.Substring(4), out int v) && v >= 0 && v <= 1023)
+      {
+        PotRaw = v;
+        PotAvailable = true;
+        lastPotTick = Environment.TickCount;
       }
       return;
     }
