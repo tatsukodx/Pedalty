@@ -1,9 +1,35 @@
-// ===== ピン定義 =====
-#define RIGHT 3  // 右ボタン（D3）
-#define LEFT 4   // 左ボタン（D4）
-#define MAGNET 2 // マグネットセンサ（D2）・割り込み使用
+#define RIGHT 3  // 右ボタン
+#define LEFT 4   // 左ボタン
+#define MAGNET 2 // マグネットセンサ・割り込み使用
 
-// ===== マグネットセンサ用 =====
+// 全ピン内蔵プルアップ（ピン↔GND接続）。離している=HIGH、押している=LOW
+#define IS_PRESSED(v) ((v) == LOW)
+
+#define BUTTON_DEBOUNCE_MS 30
+
+bool rightState = false;
+bool leftState = false;
+bool rightRaw = false;
+bool leftRaw = false;
+unsigned long rightChangedAt = 0;
+unsigned long leftChangedAt = 0;
+
+// 値が BUTTON_DEBOUNCE_MS の間変化しなかったときだけ状態を確定させる
+bool debounce(bool raw, bool &lastRaw, bool &state, unsigned long &changedAt)
+{
+  unsigned long now = millis();
+  if (raw != lastRaw)
+  {
+    lastRaw = raw;
+    changedAt = now;
+  }
+  else if (raw != state && now - changedAt >= BUTTON_DEBOUNCE_MS)
+  {
+    state = raw;
+  }
+  return state;
+}
+
 volatile bool magnetTriggered = false;
 volatile unsigned long lastTriggerTime = 0;
 volatile unsigned long triggerInterval = 0;
@@ -11,7 +37,8 @@ volatile unsigned long triggerInterval = 0;
 unsigned long ledOffTime = 0;
 bool stoppedSent = true;
 
-void calcVelocity() {
+void calcVelocity()
+{
   unsigned long now = millis();
   if (lastTriggerTime != 0 && now - lastTriggerTime < 50)
     return; // チャタリング対策
@@ -22,28 +49,27 @@ void calcVelocity() {
   magnetTriggered = true;
 }
 
-// ===== セットアップ =====
-void setup() {
+void setup()
+{
   Serial.begin(115200);
 
-  pinMode(RIGHT, INPUT);
-  pinMode(LEFT, INPUT);
+  pinMode(RIGHT, INPUT_PULLUP);
+  pinMode(LEFT, INPUT_PULLUP);
   pinMode(MAGNET, INPUT_PULLUP);
   pinMode(LED_BUILTIN, OUTPUT);
 
   attachInterrupt(digitalPinToInterrupt(MAGNET), calcVelocity, FALLING);
 }
 
-// ===== メインループ =====
-void loop() {
-  // --- ボタン送信 ---
-  int r = digitalRead(RIGHT);
-  int l = digitalRead(LEFT);
-  Serial.print(r);
+void loop()
+{
+  // 押=1 / 離=0 で送信
+  bool r = debounce(IS_PRESSED(digitalRead(RIGHT)), rightRaw, rightState, rightChangedAt);
+  bool l = debounce(IS_PRESSED(digitalRead(LEFT)), leftRaw, leftState, leftChangedAt);
+  Serial.print(r ? 1 : 0);
   Serial.print(",");
-  Serial.println(l);
+  Serial.println(l ? 1 : 0);
 
-  // --- マグネット送信 ---
   // 割り込みで更新される値を安全にコピーする
   noInterrupts();
   bool triggered = magnetTriggered;
@@ -52,20 +78,23 @@ void loop() {
   magnetTriggered = false;
   interrupts();
 
-  if (triggered) {
+  if (triggered)
+  {
     Serial.print("MAGNET,");
     Serial.println(interval);
     stoppedSent = false;
 
-    // 磁石を検出したことをArduino本体のLEDで確認できるようにする
     digitalWrite(LED_BUILTIN, HIGH);
     ledOffTime = millis() + 80;
-  } else if (!stoppedSent && lastTrigger != 0 && millis() - lastTrigger > 2000) {
+  }
+  else if (!stoppedSent && lastTrigger != 0 && millis() - lastTrigger > 2000)
+  {
     Serial.println("MAGNET,0");
     stoppedSent = true;
   }
 
-  if (ledOffTime != 0 && (long)(millis() - ledOffTime) >= 0) {
+  if (ledOffTime != 0 && (long)(millis() - ledOffTime) >= 0)
+  {
     digitalWrite(LED_BUILTIN, LOW);
     ledOffTime = 0;
   }

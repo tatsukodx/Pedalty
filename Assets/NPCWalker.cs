@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class NPCWalker : MonoBehaviour
 {
-    public float moveSpeed = 2f; 
+    public float moveSpeed = 2f;
     private Vector3 targetDirection; 
     private Vector3 currentMoveDirection; 
     private Rigidbody rb;
@@ -13,7 +13,7 @@ public class NPCWalker : MonoBehaviour
     public float avoidForce = 0.5f;    
 
     [Header("安全設定")]
-    public float birthSafetyTime = 0.5f; // すり替え処理が完了するのを待つための短い安全時間
+    public float birthSafetyTime = 0.5f; // 見た目の差し替えが終わるまで動かさない時間
     private float ageTimer = 0f;
 
     public void SetDirection(Vector3 direction)
@@ -40,27 +40,22 @@ public class NPCWalker : MonoBehaviour
     {
         if (isHit) return;
 
-        // 生まれてからの時間をカウント
         ageTimer += Time.fixedDeltaTime;
 
-        // 見た目のすり替え（1フレーム待機など）が終わるまではその場で少し待つ
         if (ageTimer < birthSafetyTime)
         {
             rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
             return;
         }
 
-        // 前方のNPCを避ける処理
         AvoidOtherNPCs();
 
-        // 進行方向に向かってスムーズに向きを変える
         if (currentMoveDirection != Vector3.zero)
         {
             Quaternion targetRot = Quaternion.LookRotation(currentMoveDirection);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.fixedDeltaTime * 5f);
         }
 
-        // 移動速度を計算して適用
         Vector3 moveVelocity = currentMoveDirection * moveSpeed;
         rb.linearVelocity = new Vector3(moveVelocity.x, rb.linearVelocity.y, moveVelocity.z);
     }
@@ -89,14 +84,12 @@ public class NPCWalker : MonoBehaviour
 
     void Update()
     {
-        // マップ外に落ちた時の即消滅判定
         if (transform.position.y < -10f)
         {
             Destroy(gameObject);
         }
     }
 
-    // 自転車にぶつかった時の処理
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.GetComponent<BicycleController>() != null)
@@ -114,13 +107,11 @@ public class NPCWalker : MonoBehaviour
                     rb.AddForce(flyDirection * 2.0f, ForceMode.Impulse);
                 }
 
-                // 3秒後に消滅
                 Destroy(gameObject, 3f);
             }
         }
     }
 
-    // DeadZoneに触れた時の消滅処理
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Respawn") || (other.transform.parent != null && other.transform.parent.name == "DeadZone"))
