@@ -2292,7 +2292,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 4
+  leftTurnDistance: 5
   rightTurnDistance: 8
 --- !u!65 &75610557
 BoxCollider:
@@ -11064,6 +11064,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
       insertIndex: -1
       addedObject: {fileID: 415440746}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 415440747}
   m_SourcePrefab: {fileID: 100100000, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
 --- !u!1 &415440740 stripped
 GameObject:
@@ -11165,9 +11168,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WheelSpeedConverter
   arduinoConnection: {fileID: 1749143479}
   bicycleController: {fileID: 415440744}
-  wheelCircumference: 1.5
-  maxSpeedKmh: 36
-  smoothFactor: 3
+--- !u!114 &415440747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 415440740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c78fbc9bde62904d93d299e97e93ee9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLaneDetector
+  sensorRadius: 1
+  currentArea: 0
 --- !u!4 &416060335 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4243100736330820217, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
@@ -14579,7 +14593,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 4
+  leftTurnDistance: 5
   rightTurnDistance: 8
 --- !u!65 &580389901
 BoxCollider:
@@ -18027,7 +18041,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 4
+  leftTurnDistance: 5
   rightTurnDistance: 8
 --- !u!65 &727530893
 BoxCollider:
@@ -22851,7 +22865,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 4
+  leftTurnDistance: 5
   rightTurnDistance: 8
 --- !u!65 &873389803
 BoxCollider:
@@ -34524,7 +34538,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 4
+  leftTurnDistance: 5
   rightTurnDistance: 8
 --- !u!65 &1374207896
 BoxCollider:
@@ -40703,7 +40717,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 4
+  leftTurnDistance: 5
   rightTurnDistance: 8
 --- !u!65 &1621321579
 BoxCollider:
@@ -43768,6 +43782,7 @@ MonoBehaviour:
   OnMenuBack:
     m_PersistentCalls:
       m_Calls: []
+  stuckHoldSeconds: 6
 --- !u!114 &1749143479
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -43780,8 +43795,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 990f335ca03887349b9b5f14cfaf32e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArduinoConnection
-  baudRate: 115200
   isArduinoMode: 1
+  logButtonChanges: 1
   RightPressed: 0
   LeftPressed: 0
   MagnetInterval: 0
@@ -47542,6 +47557,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60f3a89549d58cc48a6311058a7ffe86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BellController
+  bellClip: {fileID: 0}
+  useGeneratedSound: 1
 --- !u!4 &1889574121
 Transform:
   m_ObjectHideFlags: 0
