@@ -2292,7 +2292,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 5
+  leftTurnDistance: 4
   rightTurnDistance: 8
 --- !u!65 &75610557
 BoxCollider:
@@ -11064,12 +11064,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
       insertIndex: -1
       addedObject: {fileID: 415440746}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 415440747}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 415440748}
   m_SourcePrefab: {fileID: 100100000, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
 --- !u!1 &415440740 stripped
 GameObject:
@@ -11128,7 +11122,6 @@ MonoBehaviour:
   airPropulsionInfluence: 0.4
   wallBounceForce: 3
   respawnThresholdY: -10
-  allowSteerWhileStopped: 1
   speedText: {fileID: 792851920}
   handlebar: {fileID: 803276567}
   maxSteerAngle: 35
@@ -11137,8 +11130,6 @@ MonoBehaviour:
   wheelRotationSpeed: 1
   externalMoveInput: 0
   useExternalInput: 0
-  externalSteerInput: 0
-  useExternalSteer: 0
 --- !u!65 &415440745
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11174,44 +11165,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WheelSpeedConverter
   arduinoConnection: {fileID: 1749143479}
   bicycleController: {fileID: 415440744}
---- !u!114 &415440747
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 415440740}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7250f1619e954814f8e580c1d6eefb04, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HandleAngleConverter
-  arduino: {fileID: 1749143479}
-  bicycle: {fileID: 415440744}
-  potMin: 200
-  potCenter: 512
-  potMax: 820
-  invert: 0
-  deadZone: 0.05
-  expo: 1.5
-  smoothTau: 0.06
-  dbgRaw: 0
-  dbgNormalized: 0
-  dbgOutput: 0
---- !u!114 &415440748
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 415440740}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c78fbc9bde62904d93d299e97e93ee9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerLaneDetector
-  sensorRadius: 1
-  currentArea: 0
+  wheelCircumference: 1.5
+  maxSpeedKmh: 36
+  smoothFactor: 3
 --- !u!4 &416060335 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4243100736330820217, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
@@ -14623,7 +14579,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 5
+  leftTurnDistance: 4
   rightTurnDistance: 8
 --- !u!65 &580389901
 BoxCollider:
@@ -18071,7 +18027,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 5
+  leftTurnDistance: 4
   rightTurnDistance: 8
 --- !u!65 &727530893
 BoxCollider:
@@ -22895,7 +22851,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 5
+  leftTurnDistance: 4
   rightTurnDistance: 8
 --- !u!65 &873389803
 BoxCollider:
@@ -34568,7 +34524,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 5
+  leftTurnDistance: 4
   rightTurnDistance: 8
 --- !u!65 &1374207896
 BoxCollider:
@@ -40747,7 +40703,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 5
+  leftTurnDistance: 4
   rightTurnDistance: 8
 --- !u!65 &1621321579
 BoxCollider:
@@ -43767,7 +43723,6 @@ GameObject:
   - component: {fileID: 1749143480}
   - component: {fileID: 1749143479}
   - component: {fileID: 1749143478}
-  - component: {fileID: 1749143481}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -43813,7 +43768,6 @@ MonoBehaviour:
   OnMenuBack:
     m_PersistentCalls:
       m_Calls: []
-  stuckHoldSeconds: 6
 --- !u!114 &1749143479
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -43826,13 +43780,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 990f335ca03887349b9b5f14cfaf32e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArduinoConnection
+  baudRate: 115200
   isArduinoMode: 1
-  logButtonChanges: 1
   RightPressed: 0
   LeftPressed: 0
   MagnetInterval: 0
-  PotRaw: -1
-  PotAvailable: 1
 --- !u!4 &1749143480
 Transform:
   m_ObjectHideFlags: 0
@@ -43848,26 +43800,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1749143481
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1749143477}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 378fe2d9b51f57e41839df1882326e71, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SteeringCalibrator
-  arduino: {fileID: 1749143479}
-  converter: {fileID: 415440747}
-  messageText: {fileID: 0}
-  rawText: {fileID: 0}
-  startKey: 282
-  confirmKey: 32
-  showOverlay: 1
-  toggleOverlayKey: 283
 --- !u!1 &1751244324 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: e3c71c50de390ec4190b877211ba0717, type: 3}
@@ -47610,7 +47542,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60f3a89549d58cc48a6311058a7ffe86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BellController
-  bellClip: {fileID: 8300000, guid: 8d54cbea393acc241b7f1ac8ccd05cdf, type: 3}
 --- !u!4 &1889574121
 Transform:
   m_ObjectHideFlags: 0
