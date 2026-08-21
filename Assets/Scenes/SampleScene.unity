@@ -14685,6 +14685,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
       insertIndex: -1
       addedObject: {fileID: 415440747}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 415440748}
   m_SourcePrefab: {fileID: 100100000, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
 --- !u!1 &415440740 stripped
 GameObject:
@@ -14743,7 +14746,7 @@ MonoBehaviour:
   airPropulsionInfluence: 0.4
   wallBounceForce: 3
   respawnThresholdY: -10
-  allowSteerWhileStopped: 0
+  allowSteerWhileStopped: 1
   speedText: {fileID: 792851920}
   handlebar: {fileID: 803276567}
   maxSteerAngle: 35
@@ -14803,6 +14806,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLaneDetector
   sensorRadius: 1
   currentArea: 0
+--- !u!114 &415440748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 415440740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7250f1619e954814f8e580c1d6eefb04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HandleAngleConverter
+  arduino: {fileID: 1749143479}
+  bicycle: {fileID: 415440744}
+  potMin: 200
+  potCenter: 512
+  potMax: 820
+  invert: 0
+  deadZone: 0.05
+  expo: 1.5
+  smoothTau: 0.06
+  dbgRaw: 0
+  dbgNormalized: 0
+  dbgOutput: 0
 --- !u!4 &416060335 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4243100736330820217, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
@@ -63534,7 +63561,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60f3a89549d58cc48a6311058a7ffe86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BellController
-  bellClip: {fileID: 0}
+  bellClip: {fileID: 8300000, guid: 8d54cbea393acc241b7f1ac8ccd05cdf, type: 3}
 --- !u!4 &1889574121
 Transform:
   m_ObjectHideFlags: 0
