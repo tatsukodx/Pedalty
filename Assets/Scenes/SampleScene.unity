@@ -1561,6 +1561,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &33149340
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3409,6 +3411,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &76096625
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4756,6 +4760,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &131912994
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5997,6 +6003,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &170684802
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9323,6 +9331,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &254631504
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11387,6 +11397,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &299315116
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -12911,6 +12923,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &347483195
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -13710,6 +13724,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &368608213
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -15380,7 +15396,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 420.08557
+      value: 413.33557
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
       propertyPath: m_LocalPosition.y
@@ -15388,7 +15404,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 61.001476
+      value: 66.50147
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e3a436e0ac6013f41999e23f2cc91370, type: 3}
       propertyPath: m_LocalRotation.w
@@ -15835,6 +15851,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1386230806}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &427861324
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -22873,6 +22891,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &669844973
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -25595,6 +25615,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &738982948
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -27596,6 +27618,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &795456626
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -27856,6 +27880,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &802065429
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -32572,6 +32598,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &910063004
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -35525,6 +35553,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &1011547933
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -40582,6 +40612,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &1159077053
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -48219,6 +48251,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1386230806}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &1374704749
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -49657,6 +49691,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1386230806}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &1424447558
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -56621,6 +56657,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &1625567183
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -59886,6 +59924,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &1728683196
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -60682,6 +60722,7 @@ MonoBehaviour:
   OnBrake:
     m_PersistentCalls:
       m_Calls: []
+  bicycleController: {fileID: 0}
   OnMenuNext:
     m_PersistentCalls:
       m_Calls: []
@@ -62337,6 +62378,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1386230806}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &1788454610
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -68449,6 +68492,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &1946893559
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -68640,6 +68685,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &1953355874
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -73974,6 +74021,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 0}
+  crossingProbeDistance: 2.5
+  crossingProbeRadius: 0.5
 --- !u!65 &2116096294
 BoxCollider:
   m_ObjectHideFlags: 0
