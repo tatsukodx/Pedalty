@@ -14,6 +14,11 @@ public class InputManager : MonoBehaviour
     public UnityEvent OnBellRing;
     public UnityEvent<bool> OnBrake; // true: ブレーキ開始, false: ブレーキ終了
 
+    [Header("ブレーキ制御")]
+    [SerializeField] BicycleController bicycleController;
+
+    public bool IsBraking { get; private set; }
+
     [Header("メニュー中イベント")]
     public UnityEvent OnMenuNext;
     public UnityEvent OnMenuBack;
@@ -33,20 +38,41 @@ public class InputManager : MonoBehaviour
     bool rightStuck = false;
     bool leftStuck = false;
 
+    void Awake()
+    {
+        if (bicycleController == null)
+        {
+            bicycleController = FindAnyObjectByType<BicycleController>();
+        }
+    }
+
     void Update()
     {
-        if (arduino == null) return;
+        bool isArduinoActive = arduino != null && arduino.isArduinoMode;
+        bool curRight = isArduinoActive && arduino.RightPressed;
+        bool curLeft = isArduinoActive && arduino.LeftPressed;
 
-        bool curRight = arduino.RightPressed;
-        bool curLeft = arduino.LeftPressed;
+        if (!isArduinoActive)
+        {
+            // キーボードモード：左クリック（Jキーも互換用）でブレーキ
+            curLeft = Input.GetMouseButton(0) || Input.GetKey(KeyCode.J);
+            curRight = Input.GetKey(KeyCode.K);
+        }
 
 #if UNITY_EDITOR
         if (Input.GetKey(KeyCode.RightArrow)) curRight = true;
         if (Input.GetKey(KeyCode.LeftArrow)) curLeft = true;
 #endif
 
-        curRight = FilterStuck(curRight, ref rightHoldTime, ref rightStuck, "右(D3)");
-        curLeft = FilterStuck(curLeft, ref leftHoldTime, ref leftStuck, "左(D4)");
+        if (isArduinoActive)
+        {
+            curRight = FilterStuck(curRight, ref rightHoldTime, ref rightStuck, "右(D3)");
+            curLeft = FilterStuck(curLeft, ref leftHoldTime, ref leftStuck, "左(D4)");
+        }
+        else
+        {
+            ResetStuckState();
+        }
 
         bool rightEdgeOn = curRight && !prevRight;
         bool leftEdgeOn = curLeft && !prevLeft;
@@ -64,7 +90,7 @@ public class InputManager : MonoBehaviour
                 }
                 else
                 {
-                    OnBrake?.Invoke(true);
+                    SetBrakeState(true);
                 }
             }
             else if (rightEdgeOn)
@@ -90,13 +116,38 @@ public class InputManager : MonoBehaviour
         {
             if (activeButton == ActiveButton.Left && !isMenuState)
             {
-                OnBrake?.Invoke(false);
+                SetBrakeState(false);
             }
             activeButton = ActiveButton.None;
         }
 
         prevRight = curRight;
         prevLeft = curLeft;
+    }
+
+    void SetBrakeState(bool braking)
+    {
+        if (IsBraking == braking) return;
+
+        IsBraking = braking;
+        bicycleController?.ApplyBrake(braking);
+        OnBrake?.Invoke(braking);
+    }
+
+    void ResetStuckState()
+    {
+        rightHoldTime = 0f;
+        leftHoldTime = 0f;
+        rightStuck = false;
+        leftStuck = false;
+    }
+
+    void OnDisable()
+    {
+        if (IsBraking)
+        {
+            SetBrakeState(false);
+        }
     }
 
     // 長時間 true のままのボタンを張り付きとみなして false を返す。一度 false に戻れば復帰する
