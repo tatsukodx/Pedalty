@@ -7,6 +7,8 @@ public class NPCWalker : MonoBehaviour
     private Vector3 currentMoveDirection; 
     private Rigidbody rb;
     private bool isHit = false; 
+    private bool isTrafficStopped = false;
+    private bool isCrossing = false;
 
     [Header("避けるための設定")]
     public float sensorDistance = 1.5f; 
@@ -15,7 +17,11 @@ public class NPCWalker : MonoBehaviour
     [Header("安全設定")]
     public float birthSafetyTime = 0.5f; // 見た目の差し替えが終わるまで動かさない時間
     private float ageTimer = 0f;
-    bool isTrafficStopped = false;
+
+    [Header("歩道の軌道修正")]
+    public float onPathSensorRadius = 0.6f;
+    public float sidewalkSearchRadius = 5f;
+    public float sidewalkCorrectionSpeed = 2f;
 
     public void SetDirection(Vector3 direction)
     {
@@ -30,8 +36,14 @@ public class NPCWalker : MonoBehaviour
         }
     }
 
-    public void SetTrafficStop(bool stop){
+    public void SetTrafficStop(bool stop)
+    {
         isTrafficStopped = stop;
+    }
+
+    public void SetCrossing(bool crossing)
+    {
+        isCrossing = crossing;
     }
 
     void Start()
@@ -45,16 +57,15 @@ public class NPCWalker : MonoBehaviour
     {
         if (isHit) return;
 
-         // 赤信号中は速度を0に維持して待機
-        if (isTrafficStopped)
+        ageTimer += Time.fixedDeltaTime;
+
+        if (ageTimer < birthSafetyTime)
         {
             rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
             return;
         }
 
-        ageTimer += Time.fixedDeltaTime;
-
-        if (ageTimer < birthSafetyTime)
+        if (isTrafficStopped)
         {
             rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
             return;
@@ -68,8 +79,49 @@ public class NPCWalker : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.fixedDeltaTime * 5f);
         }
 
-        Vector3 moveVelocity = currentMoveDirection * moveSpeed;
+        Vector3 sidewalkCorrection = ComputeSidewalkCorrection();
+        Vector3 moveVelocity = (currentMoveDirection * moveSpeed) + sidewalkCorrection;
         rb.linearVelocity = new Vector3(moveVelocity.x, rb.linearVelocity.y, moveVelocity.z);
+    }
+
+    Vector3 ComputeSidewalkCorrection()
+    {
+        if (isCrossing) return Vector3.zero;
+
+        Collider[] nearHits = Physics.OverlapSphere(transform.position, onPathSensorRadius, ~0, QueryTriggerInteraction.Collide);
+
+        foreach (Collider hit in nearHits)
+        {
+            if (hit.CompareTag("Sidewalk_L") || hit.CompareTag("Sidewalk_R") ||
+                hit.CompareTag("Road_L") || hit.CompareTag("Road_R"))
+            {
+                return Vector3.zero;
+            }
+        }
+
+        Collider[] wideHits = Physics.OverlapSphere(transform.position, sidewalkSearchRadius, ~0, QueryTriggerInteraction.Collide);
+        Collider nearestSidewalk = null;
+        float nearestDistance = float.MaxValue;
+
+        foreach (Collider hit in wideHits)
+        {
+            if (!hit.CompareTag("Sidewalk_L") && !hit.CompareTag("Sidewalk_R")) continue;
+
+            float distance = Vector3.Distance(transform.position, hit.ClosestPoint(transform.position));
+            if (distance < nearestDistance)
+            {
+                nearestDistance = distance;
+                nearestSidewalk = hit;
+            }
+        }
+
+        if (nearestSidewalk == null) return Vector3.zero;
+
+        Vector3 direction = nearestSidewalk.ClosestPoint(transform.position) - transform.position;
+        direction.y = 0f;
+
+        if (direction == Vector3.zero) return Vector3.zero;
+        return direction.normalized * sidewalkCorrectionSpeed;
     }
 
     void AvoidOtherNPCs()

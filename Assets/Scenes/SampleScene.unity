@@ -1560,6 +1560,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &33149340
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3336,7 +3337,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 5
+  leftTurnDistance: 4.5
   rightTurnDistance: 8
 --- !u!65 &75610557
 BoxCollider:
@@ -3407,6 +3408,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &76096625
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3704,7 +3706,7 @@ Transform:
   m_GameObject: {fileID: 88899608}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 46, y: 0, z: -280.5}
+  m_LocalPosition: {x: 45.5, y: 0, z: -280.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4753,6 +4755,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &131912994
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5993,6 +5996,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &170684802
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9318,6 +9322,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &254631504
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11381,6 +11386,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &299315116
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -12904,6 +12910,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &347483195
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -13702,6 +13709,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &368608213
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -15808,7 +15816,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 8.332916, y: 0, z: 8.332916}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.666625, y: 1, z: 1.666625}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 280259480}
@@ -15826,6 +15834,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 1386230806}
 --- !u!65 &427861324
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -15929,7 +15938,7 @@ Transform:
   m_GameObject: {fileID: 427956831}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 747.4891, y: 0.075, z: 108.00716}
+  m_LocalPosition: {x: 747.4891, y: 0.5749998, z: 108.00716}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -20136,7 +20145,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 5
+  leftTurnDistance: 4.5
   rightTurnDistance: 8
 --- !u!65 &580389901
 BoxCollider:
@@ -22863,6 +22872,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &669844973
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -24980,7 +24990,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 5
+  leftTurnDistance: 4.5
   rightTurnDistance: 8
 --- !u!65 &727530893
 BoxCollider:
@@ -25584,6 +25594,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &738982948
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -27584,6 +27595,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &795456626
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -27843,6 +27855,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &802065429
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -29942,108 +29955,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4243100736330820217, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
   m_PrefabInstance: {fileID: 1251037208}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &856471706
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 856471707}
-  - component: {fileID: 856471710}
-  - component: {fileID: 856471709}
-  - component: {fileID: 856471708}
-  m_Layer: 0
-  m_Name: Cars
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &856471707
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 856471706}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 255, y: 0, z: -304}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1306501737}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &856471708
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 856471706}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b155d2ee159dfc42851f82c29241ca0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CarController
-  moveSpeed: 8
-  acceleration: 6
-  turnLerpSpeed: 4
-  laneCorrectionSpeed: 4
-  laneSensorRadius: 1
-  obstacleCheckDistance: 6
-  obstacleCheckRadius: 1.2
-  mass: 10000
---- !u!65 &856471709
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 856471706}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.5, y: 2, z: 6}
-  m_Center: {x: 0, y: 1, z: 0}
---- !u!54 &856471710
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 856471706}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 80
-  m_CollisionDetection: 0
 --- !u!1001 &856950474
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -31274,7 +31185,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 5
+  leftTurnDistance: 4.5
   rightTurnDistance: 8
 --- !u!65 &873389803
 BoxCollider:
@@ -32660,6 +32571,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &910063004
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -35612,6 +35524,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &1011547933
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -40668,6 +40581,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &1159077053
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -46008,11 +45922,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1609117400}
   m_SourcePrefab: {fileID: 100100000, guid: e3c71c50de390ec4190b877211ba0717, type: 3}
---- !u!4 &1306501737 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7161170415193030183, guid: ae30a11fc4538da4abe58c84fda6f387, type: 3}
-  m_PrefabInstance: {fileID: 1267985343504428584}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1306944405 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: c3e95e72d6dba334594c3c5c37fcf18a, type: 3}
@@ -48253,7 +48162,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 5
+  leftTurnDistance: 4.5
   rightTurnDistance: 8
 --- !u!65 &1374207896
 BoxCollider:
@@ -48309,6 +48218,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 1386230806}
 --- !u!65 &1374704749
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -48397,7 +48307,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.666625, y: 1, z: 1.666625}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 280259480}
@@ -49728,7 +49638,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 8.332916, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.666625, y: 1, z: 1.666625}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 280259480}
@@ -49746,6 +49656,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 1386230806}
 --- !u!65 &1424447558
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -56638,7 +56549,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 6
-  leftTurnDistance: 5
+  leftTurnDistance: 4.5
   rightTurnDistance: 8
 --- !u!65 &1621321579
 BoxCollider:
@@ -56709,6 +56620,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &1625567183
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -59719,7 +59631,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ad069fe2978c124daf0eeb2e0326364, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarSpawner
-  baseCarPrefab: {fileID: 856471706}
+  baseCarPrefab: {fileID: 5628406413490079752, guid: 6385191d3ff0fca468efb505e5e7cd86, type: 3}
   carModels:
   - {fileID: 100010, guid: d267fbb9e36c6e4458c9a8756d725a79, type: 3}
   - {fileID: 100010, guid: 12dd350c4c7e7754b807b38a22b4d078, type: 3}
@@ -59744,8 +59656,9 @@ MonoBehaviour:
   - {x: 0, y: 0, z: 1}
   - {x: -1, y: 0, z: 0}
   - {x: 1, y: 0, z: 0}
-  spawnInterval: 1
+  spawnInterval: 4
   maxCarCount: 100
+  spawnCheckRadius: 4
 --- !u!4 &1709395598
 Transform:
   m_ObjectHideFlags: 0
@@ -59972,6 +59885,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &1728683196
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -62404,7 +62318,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 8.332916}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.666625, y: 1, z: 1.666625}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 280259480}
@@ -62422,6 +62336,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 1386230806}
 --- !u!65 &1788454610
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -68533,6 +68448,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &1946893559
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -68723,6 +68639,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &1953355874
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -74056,6 +73973,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
+  manager: {fileID: 0}
 --- !u!65 &2116096294
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -75906,12 +75824,66 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 7161170415193030183, guid: ae30a11fc4538da4abe58c84fda6f387, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 856471707}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ae30a11fc4538da4abe58c84fda6f387, type: 3}
+--- !u!1001 &8721468471252782218
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4694823046754150109, guid: 6385191d3ff0fca468efb505e5e7cd86, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 420.0349
+      objectReference: {fileID: 0}
+    - target: {fileID: 4694823046754150109, guid: 6385191d3ff0fca468efb505e5e7cd86, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4694823046754150109, guid: 6385191d3ff0fca468efb505e5e7cd86, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 31.19754
+      objectReference: {fileID: 0}
+    - target: {fileID: 4694823046754150109, guid: 6385191d3ff0fca468efb505e5e7cd86, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4694823046754150109, guid: 6385191d3ff0fca468efb505e5e7cd86, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4694823046754150109, guid: 6385191d3ff0fca468efb505e5e7cd86, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4694823046754150109, guid: 6385191d3ff0fca468efb505e5e7cd86, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4694823046754150109, guid: 6385191d3ff0fca468efb505e5e7cd86, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4694823046754150109, guid: 6385191d3ff0fca468efb505e5e7cd86, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4694823046754150109, guid: 6385191d3ff0fca468efb505e5e7cd86, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5628406413490079752, guid: 6385191d3ff0fca468efb505e5e7cd86, type: 3}
+      propertyPath: m_Name
+      value: Cars
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6385191d3ff0fca468efb505e5e7cd86, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -75926,6 +75898,7 @@ SceneRoots:
   - {fileID: 1678739350}
   - {fileID: 96957289}
   - {fileID: 1267985343504428584}
+  - {fileID: 8721468471252782218}
   - {fileID: 1709395598}
   - {fileID: 1071463268}
   - {fileID: 1234118174}
