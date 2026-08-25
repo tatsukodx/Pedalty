@@ -15,6 +15,7 @@ public class NPCWalker : MonoBehaviour
     [Header("安全設定")]
     public float birthSafetyTime = 0.5f; // 見た目の差し替えが終わるまで動かさない時間
     private float ageTimer = 0f;
+    bool isTrafficStopped = false;
 
     public void SetDirection(Vector3 direction)
     {
@@ -29,6 +30,10 @@ public class NPCWalker : MonoBehaviour
         }
     }
 
+    public void SetTrafficStop(bool stop){
+        isTrafficStopped = stop;
+    }
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -39,6 +44,13 @@ public class NPCWalker : MonoBehaviour
     void FixedUpdate()
     {
         if (isHit) return;
+
+         // 赤信号中は速度を0に維持して待機
+        if (isTrafficStopped)
+        {
+            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+            return;
+        }
 
         ageTimer += Time.fixedDeltaTime;
 
