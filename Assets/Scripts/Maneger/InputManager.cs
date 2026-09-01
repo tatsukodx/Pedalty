@@ -18,6 +18,7 @@ public class InputManager : MonoBehaviour
     [SerializeField] BicycleController bicycleController;
 
     public bool IsBraking { get; private set; }
+    public bool AnyButtonPressed { get; private set; }
 
     [Header("メニュー中イベント")]
     public UnityEvent OnMenuNext;
@@ -68,6 +69,8 @@ public class InputManager : MonoBehaviour
         {
             ResetStuckState();
         }
+
+        AnyButtonPressed = curRight || curLeft;
 
         bool rightEdgeOn = curRight && !prevRight;
         bool leftEdgeOn = curLeft && !prevLeft;
@@ -139,6 +142,7 @@ public class InputManager : MonoBehaviour
 
     void OnDisable()
     {
+        AnyButtonPressed = false;
         if (IsBraking)
         {
             SetBrakeState(false);

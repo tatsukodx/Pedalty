@@ -51,8 +51,10 @@ public sealed class GameFlowUI : MonoBehaviour
     Camera rulesMapCamera;
     RenderTexture rulesMapTexture;
     Coroutine countdownCoroutine;
+    Coroutine menuInputGuardCoroutine;
     FlowState state;
     int rulesPageIndex;
+    bool menuInputLocked;
 
     static bool reloadRequested;
     static ReloadDestination reloadDestination;
@@ -143,6 +145,8 @@ public sealed class GameFlowUI : MonoBehaviour
         {
             ShowStartMenu();
         }
+
+        BeginMenuInputGuard();
     }
 
     void Start()
@@ -384,6 +388,8 @@ public sealed class GameFlowUI : MonoBehaviour
 
     void HandleRightButton()
     {
+        if (menuInputLocked) return;
+
         switch (state)
         {
             case FlowState.StartMenu:
@@ -408,6 +414,8 @@ public sealed class GameFlowUI : MonoBehaviour
 
     void HandleLeftButton()
     {
+        if (menuInputLocked) return;
+
         switch (state)
         {
             case FlowState.StartMenu:
@@ -438,6 +446,31 @@ public sealed class GameFlowUI : MonoBehaviour
         inputManager.isMenuState = true;
         Time.timeScale = 0f;
         SetOnlyPanel(startPanel);
+    }
+
+    void BeginMenuInputGuard()
+    {
+        if (menuInputGuardCoroutine != null)
+        {
+            StopCoroutine(menuInputGuardCoroutine);
+        }
+
+        menuInputLocked = true;
+        menuInputGuardCoroutine = StartCoroutine(UnlockMenuInputAfterRelease());
+    }
+
+    IEnumerator UnlockMenuInputAfterRelease()
+    {
+        // シーンを切り替えたボタンが押されたままでも、次の画面で再入力されないようにする。
+        yield return null;
+        while (inputManager != null && inputManager.AnyButtonPressed)
+        {
+            yield return null;
+        }
+
+        yield return new WaitForSecondsRealtime(0.1f);
+        menuInputLocked = false;
+        menuInputGuardCoroutine = null;
     }
 
     void ShowRules()
@@ -526,6 +559,7 @@ public sealed class GameFlowUI : MonoBehaviour
 
     void ReloadGameScene(ReloadDestination destination)
     {
+        menuInputLocked = true;
         state = FlowState.Countdown;
         inputManager.isMenuState = true;
         bicycle.SetControlEnabled(false);
