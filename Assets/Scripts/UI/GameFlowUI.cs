@@ -1,6 +1,7 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
@@ -12,7 +13,7 @@ public sealed class GameFlowUI : MonoBehaviour
     enum FlowState
     {
         StartMenu,
-        RulesPlaceholder,
+        Rules,
         Countdown,
         Playing,
         Results
@@ -34,8 +35,47 @@ public sealed class GameFlowUI : MonoBehaviour
     TextMeshProUGUI countdownText;
     TextMeshProUGUI resultTimeText;
     TextMeshProUGUI resultFineText;
+    TextMeshProUGUI rulesTitleText;
+    TextMeshProUGUI rulesBodyText;
+    TextMeshProUGUI rulesPageText;
+    TextMeshProUGUI rulesLeftActionText;
+    TextMeshProUGUI rulesRightActionText;
+    GameObject rulesMapPlaceholder;
     Coroutine countdownCoroutine;
     FlowState state;
+    int rulesPageIndex;
+
+    static bool startWithCountdownAfterReload;
+
+    static readonly string[] RuleTitles =
+    {
+        "ゲームの目的",
+        "マップとルート",
+        "交通ルールと罰金",
+        "ゲームフィールド",
+        "自転車の操作"
+    };
+
+    static readonly string[] RuleBodies =
+    {
+        "このゲームは、スタート地点から黄色いピンで示されたゴール地点までのタイムを競う自転車ゲームです。\n\n" +
+        "ただ速く走るだけではなく、自転車の交通ルールを守ることも大切です。違反すると内容が表示され、罰金額が加算されます。\n\n" +
+        "交通ルールを守りながら、速いタイムと少ない罰金額でのゴールを目指しましょう。",
+
+        "黄色いピンがゴール地点です。走行画面には、ゴールの方向とゴールまでの距離が表示されます。\n" +
+        "交通ルールを守っていれば、どの道を通ってゴールへ向かっても構いません。",
+
+        "自転車は車道の左側を走ることが基本です。道路標識や信号など、ゲーム内で示される交通ルールを守りましょう。\n\n" +
+        "交通違反をすると、違反内容と加算される罰金額が画面に表示されます。現在の罰金総額は画面左上で確認できます。\n\n" +
+        "速さだけでなく、罰金額をできるだけ低くすることも大切です。",
+
+        "建物や道路が配置されている範囲がゲームフィールドです。フィールドの外へ出ることは禁止されています。\n\n" +
+        "道路から大きく外れないように注意してください。フィールド外へ落ちた場合は、安全のためスタート地点へ戻されます。",
+
+        "実際に自転車をこぐと、ゲーム内の自転車も前へ進みます。こぐ速さはゲーム内の速度に反映されます。\n\n" +
+        "右ボタン：ベルを鳴らす\n左ボタン：ゲーム内のブレーキ\n\n" +
+        "実物自転車のブレーキレバーはゲーム内のブレーキに連動していません。止まりたいときは、ハンドルに取り付けられた左ボタンを押してください。"
+    };
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void CreateForGameScene()
@@ -66,7 +106,7 @@ public sealed class GameFlowUI : MonoBehaviour
 
         BuildRoot();
         BuildStartPanel();
-        BuildRulesPlaceholder();
+        BuildRulesPanel();
         BuildCountdownPanel();
         BuildResultsPanel();
 
@@ -74,7 +114,15 @@ public sealed class GameFlowUI : MonoBehaviour
         inputManager.OnMenuBack?.AddListener(HandleLeftButton);
         gameTimer.Finished += HandleGoal;
 
-        ShowStartMenu();
+        if (startWithCountdownAfterReload)
+        {
+            startWithCountdownAfterReload = false;
+            StartCountdown();
+        }
+        else
+        {
+            ShowStartMenu();
+        }
     }
 
     void Start()
@@ -120,26 +168,43 @@ public sealed class GameFlowUI : MonoBehaviour
         note.text = "カウントダウンのSTART表示と同時に操作できます";
     }
 
-    void BuildRulesPlaceholder()
+    void BuildRulesPanel()
     {
-        rulesPanel = CreateFullScreenPanel("RulesPlaceholder", new Color(0.01f, 0.02f, 0.04f, 0.92f));
-        GameObject card = CreateWindow(rulesPanel.transform, "RulesWindow", new Vector2(620f, 350f));
+        rulesPanel = CreateFullScreenPanel("RulesScreen", new Color(0.01f, 0.02f, 0.04f, 0.94f));
+        GameObject card = CreateWindow(rulesPanel.transform, "RulesWindow", new Vector2(680f, 520f));
 
-        TextMeshProUGUI title = CreateText(card.transform, "RulesTitle", new Vector2(0f, 105f),
-            new Vector2(560f, 55f), 34f, TextAlignmentOptions.Center, Yellow);
-        title.text = "ルール説明";
+        rulesTitleText = CreateText(card.transform, "RulesTitle", new Vector2(0f, 205f),
+            new Vector2(620f, 52f), 32f, TextAlignmentOptions.Center, Yellow);
 
-        TextMeshProUGUI body = CreateText(card.transform, "RulesBody", new Vector2(0f, 15f),
-            new Vector2(520f, 105f), 19f, TextAlignmentOptions.Center, Color.white);
-        body.textWrappingMode = TextWrappingModes.Normal;
-        body.text = "ルールの紙芝居画面は次の実装で追加します。\n今回は開始・カウントダウン・終了画面を確認できます。";
+        rulesPageText = CreateText(card.transform, "RulesPage", new Vector2(0f, 167f),
+            new Vector2(600f, 24f), 13f, TextAlignmentOptions.Center, new Color(0.65f, 0.7f, 0.77f, 1f));
 
-        CreateChoiceCard(card.transform, "RulesBack", new Vector2(-145f, -108f), Cyan,
-            "左ボタン", "スタート画面へ戻る", "左クリック / J / ←");
+        rulesBodyText = CreateText(card.transform, "RulesBody", new Vector2(0f, 30f),
+            new Vector2(590f, 245f), 18f, TextAlignmentOptions.TopLeft, Color.white);
+        rulesBodyText.textWrappingMode = TextWrappingModes.Normal;
+        rulesBodyText.lineSpacing = 5f;
 
-        TextMeshProUGUI rightNote = CreateText(card.transform, "RulesRightNote", new Vector2(145f, -108f),
-            new Vector2(250f, 72f), 15f, TextAlignmentOptions.Center, new Color(0.58f, 0.62f, 0.68f, 1f));
-        rightNote.text = "右ボタン：今後\n次のページへ進む操作に使用";
+        rulesMapPlaceholder = new GameObject("MapImagePlaceholder", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Outline));
+        rulesMapPlaceholder.transform.SetParent(card.transform, false);
+        RectTransform mapRect = rulesMapPlaceholder.GetComponent<RectTransform>();
+        mapRect.anchorMin = new Vector2(0.5f, 0.5f);
+        mapRect.anchorMax = new Vector2(0.5f, 0.5f);
+        mapRect.pivot = new Vector2(0.5f, 0.5f);
+        mapRect.anchoredPosition = new Vector2(0f, -22f);
+        mapRect.sizeDelta = new Vector2(330f, 145f);
+        rulesMapPlaceholder.GetComponent<Image>().color = new Color(0.07f, 0.09f, 0.12f, 1f);
+        Outline mapOutline = rulesMapPlaceholder.GetComponent<Outline>();
+        mapOutline.effectColor = new Color(0.55f, 0.6f, 0.67f, 1f);
+        mapOutline.effectDistance = new Vector2(1f, -1f);
+
+        TextMeshProUGUI mapLabel = CreateText(rulesMapPlaceholder.transform, "MapPlaceholderLabel", Vector2.zero,
+            new Vector2(300f, 100f), 18f, TextAlignmentOptions.Center, new Color(0.65f, 0.7f, 0.77f, 1f));
+        mapLabel.text = "MAP IMAGE\nマップ画像をここに配置";
+
+        rulesLeftActionText = CreateChoiceCard(card.transform, "RulesLeft", new Vector2(-150f, -197f), Cyan,
+            "左ボタン", "前のページへ", "左クリック / J / ←");
+        rulesRightActionText = CreateChoiceCard(card.transform, "RulesRight", new Vector2(150f, -197f), Yellow,
+            "右ボタン", "次のページへ", "K / →");
     }
 
     void BuildCountdownPanel()
@@ -214,7 +279,7 @@ public sealed class GameFlowUI : MonoBehaviour
         return window;
     }
 
-    void CreateChoiceCard(Transform parent, string objectName, Vector2 position, Color accent,
+    TextMeshProUGUI CreateChoiceCard(Transform parent, string objectName, Vector2 position, Color accent,
         string buttonLabel, string actionLabel, string keyboardLabel)
     {
         GameObject card = new GameObject(objectName, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Outline));
@@ -242,6 +307,7 @@ public sealed class GameFlowUI : MonoBehaviour
         TextMeshProUGUI keyboard = CreateText(card.transform, "KeyboardLabel", new Vector2(0f, -36f),
             new Vector2(220f, 22f), 11f, TextAlignmentOptions.Center, new Color(0.68f, 0.72f, 0.78f, 1f));
         keyboard.text = keyboardLabel;
+        return action;
     }
 
     TextMeshProUGUI CreateText(Transform parent, string objectName, Vector2 position,
@@ -282,8 +348,19 @@ public sealed class GameFlowUI : MonoBehaviour
             case FlowState.StartMenu:
                 StartCountdown();
                 break;
+            case FlowState.Rules:
+                if (rulesPageIndex < RuleTitles.Length - 1)
+                {
+                    rulesPageIndex++;
+                    UpdateRulesPage();
+                }
+                else
+                {
+                    ShowStartMenu();
+                }
+                break;
             case FlowState.Results:
-                StartCountdown();
+                ReloadGameScene(true);
                 break;
         }
     }
@@ -293,11 +370,21 @@ public sealed class GameFlowUI : MonoBehaviour
         switch (state)
         {
             case FlowState.StartMenu:
-                ShowRulesPlaceholder();
+                ShowRules();
                 break;
-            case FlowState.RulesPlaceholder:
+            case FlowState.Rules:
+                if (rulesPageIndex > 0)
+                {
+                    rulesPageIndex--;
+                    UpdateRulesPage();
+                }
+                else
+                {
+                    ShowStartMenu();
+                }
+                break;
             case FlowState.Results:
-                ShowStartMenu();
+                ReloadGameScene(false);
                 break;
         }
     }
@@ -308,14 +395,34 @@ public sealed class GameFlowUI : MonoBehaviour
         ResetRunData();
         state = FlowState.StartMenu;
         inputManager.isMenuState = true;
+        Time.timeScale = 0f;
         SetOnlyPanel(startPanel);
     }
 
-    void ShowRulesPlaceholder()
+    void ShowRules()
     {
-        state = FlowState.RulesPlaceholder;
+        state = FlowState.Rules;
         inputManager.isMenuState = true;
+        Time.timeScale = 0f;
+        rulesPageIndex = 0;
+        UpdateRulesPage();
         SetOnlyPanel(rulesPanel);
+    }
+
+    void UpdateRulesPage()
+    {
+        rulesTitleText.text = RuleTitles[rulesPageIndex];
+        rulesBodyText.text = RuleBodies[rulesPageIndex];
+        rulesPageText.text = $"{rulesPageIndex + 1} / {RuleTitles.Length}";
+
+        bool isMapPage = rulesPageIndex == 1;
+        rulesMapPlaceholder.SetActive(isMapPage);
+        RectTransform bodyRect = rulesBodyText.rectTransform;
+        bodyRect.anchoredPosition = isMapPage ? new Vector2(0f, 103f) : new Vector2(0f, 30f);
+        bodyRect.sizeDelta = isMapPage ? new Vector2(590f, 100f) : new Vector2(590f, 245f);
+
+        rulesLeftActionText.text = rulesPageIndex == 0 ? "スタート画面へ戻る" : "前のページへ";
+        rulesRightActionText.text = rulesPageIndex == RuleTitles.Length - 1 ? "説明を終了する" : "次のページへ";
     }
 
     void StartCountdown()
@@ -324,6 +431,7 @@ public sealed class GameFlowUI : MonoBehaviour
         ResetRunData();
         state = FlowState.Countdown;
         inputManager.isMenuState = true;
+        Time.timeScale = 0f;
         SetOnlyPanel(countdownPanel);
         countdownCoroutine = StartCoroutine(CountdownSequence());
     }
@@ -344,6 +452,7 @@ public sealed class GameFlowUI : MonoBehaviour
 
         state = FlowState.Playing;
         inputManager.isMenuState = false;
+        Time.timeScale = 1f;
         bicycle.SetControlEnabled(true);
         gameTimer.BeginTiming();
 
@@ -360,6 +469,7 @@ public sealed class GameFlowUI : MonoBehaviour
         state = FlowState.Results;
         bicycle.SetControlEnabled(false);
         inputManager.isMenuState = true;
+        Time.timeScale = 0f;
 
         FineDisplayUI fineDisplay = FindAnyObjectByType<FineDisplayUI>();
         int finalFine = fineDisplay != null ? fineDisplay.CurrentFineAmount : 0;
@@ -367,6 +477,19 @@ public sealed class GameFlowUI : MonoBehaviour
         resultTimeText.text = "TIME  " + GameTimer.FormatTime(finalTime);
         resultFineText.text = $"現在の罰金総額  ￥{finalFine:N0}";
         SetOnlyPanel(resultsPanel);
+    }
+
+    void ReloadGameScene(bool beginWithCountdown)
+    {
+        state = FlowState.Countdown;
+        inputManager.isMenuState = true;
+        bicycle.SetControlEnabled(false);
+        startWithCountdownAfterReload = beginWithCountdown;
+        Time.timeScale = 1f;
+
+        Scene activeScene = SceneManager.GetActiveScene();
+        int buildIndex = activeScene.buildIndex >= 0 ? activeScene.buildIndex : 0;
+        SceneManager.LoadScene(buildIndex);
     }
 
     void ResetRunData()
@@ -399,6 +522,8 @@ public sealed class GameFlowUI : MonoBehaviour
 
     void OnDestroy()
     {
+        Time.timeScale = 1f;
+
         if (inputManager != null)
         {
             inputManager.OnMenuNext?.RemoveListener(HandleRightButton);
