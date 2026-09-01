@@ -15,7 +15,7 @@ public class NPCWalker : MonoBehaviour
     public float avoidForce = 0.5f;    
 
     [Header("安全設定")]
-    public float birthSafetyTime = 0.5f; // 見た目の差し替えが終わるまで動かさない時間
+    public float birthSafetyTime = 0.5f;
     private float ageTimer = 0f;
 
     [Header("歩道の軌道修正")]
@@ -23,12 +23,31 @@ public class NPCWalker : MonoBehaviour
     public float sidewalkSearchRadius = 5f;
     public float sidewalkCorrectionSpeed = 2f;
 
+    private bool isAtIntersection = false;
+    public bool IsAtIntersection => isAtIntersection;
 
+    public void SetAtIntersection(bool value)
+    {
+        isAtIntersection = value;
+    }
+
+    public void SetDirection(Vector3 direction)
+    {
+        if (isHit) return; 
+
+        targetDirection = SnapToCardinal(direction);
+        currentMoveDirection = targetDirection; 
+        
+        if (targetDirection != Vector3.zero)
+        {
+            transform.rotation = Quaternion.LookRotation(targetDirection);
+        }
+    }
 
     public void SetTrafficStop(bool stop)
     {
         isTrafficStopped = stop;
-        // 停止中は kinematic にして他の歩行者に押されないようにする
+
         if (rb != null)
         {
             rb.isKinematic = stop;
@@ -40,37 +59,40 @@ public class NPCWalker : MonoBehaviour
         isCrossing = crossing;
     }
 
-    public void SetDirection(Vector3 direction)
+    public void SnapAcrossPath(Vector3 nodePosition, Vector3 travelDirection, Vector3 newDirection, float maxOffset = 0.4f)
     {
-        if (isHit) return;
-
-        targetDirection = SnapToCardinal(direction);  // ← ここを変更
-        currentMoveDirection = targetDirection;
-
-        if (targetDirection != Vector3.zero)
+        Vector3 newPos = transform.position;
+        if (Mathf.Abs(travelDirection.x) > Mathf.Abs(travelDirection.z))
         {
-            transform.rotation = Quaternion.LookRotation(targetDirection);
+            newPos.x = nodePosition.x;  // 東西に進んでいる → Xをそろえる
         }
+        else
+        {
+            newPos.z = nodePosition.z;  // 南北に進んでいる → Zをそろえる
+        }
+        Vector3 perpendicular = Vector3.Cross(Vector3.up, newDirection).normalized;
+        float offset = Random.Range(-maxOffset, maxOffset);
+        newPos += perpendicular * offset;
+        transform.position = newPos;
     }
 
-    /// <summary>方向を最も近い東西南北にスナップします</summary>
     Vector3 SnapToCardinal(Vector3 dir)
     {
         if (dir == Vector3.zero) return dir;
 
         if (Mathf.Abs(dir.x) >= Mathf.Abs(dir.z))
-            return dir.x >= 0 ? Vector3.right : Vector3.left;    // 東 or 西
+            return dir.x >= 0 ? Vector3.right : Vector3.left;
         else
-            return dir.z >= 0 ? Vector3.forward : Vector3.back;  // 北 or 南
+            return dir.z >= 0 ? Vector3.forward : Vector3.back;
     }
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.isKinematic = false;
+        rb.isKinematic = false; 
         rb.useGravity = true;
-        // 歩行者同士の物理衝突を無効化（すり抜ける）
-        // AvoidOtherNPCs() のレイキャスト回避は引き続き動作する
+
+        // 歩行者同士の物理衝突を無効化
         Collider myCol = GetComponent<Collider>();
         if (myCol != null)
         {
@@ -112,41 +134,85 @@ public class NPCWalker : MonoBehaviour
         }
 
         Vector3 sidewalkCorrection = ComputeSidewalkCorrection();
-        Vector3 moveVelocity = (currentMoveDirection * moveSpeed) + sidewalkCorrection;
-        rb.linearVelocity = new Vector3(moveVelocity.x, rb.linearVelocity.y, moveVelocity.z);
+        Vector3 intendedVelocity = (currentMoveDirection * moveSpeed) + sidewalkCorrection;
+        Vector3 allowedVelocity = ClampToSidewalk(intendedVelocity);
+
+        rb.linearVelocity = new Vector3(allowedVelocity.x, rb.linearVelocity.y, allowedVelocity.z);
+    }
+
+    Vector3 ClampToSidewalk(Vector3 intendedVelocity)
+    {
+        if (isCrossing) return intendedVelocity;
+
+        // 今すでに歩道の外にいるなら、移動を制限しない（補正で戻れるように）
+        if (!IsOnSidewalk(transform.position)) return intendedVelocity;
+
+        // 歩道の上にいる → 歩道から出ないように制限
+        Vector3 fullMove = intendedVelocity * Time.fixedDeltaTime;
+        Vector3 fullPos = transform.position + fullMove;
+
+        if (IsOnSidewalk(fullPos)) return intendedVelocity;
+
+        Vector3 xOnlyPos = transform.position + new Vector3(fullMove.x, 0f, 0f);
+        Vector3 zOnlyPos = transform.position + new Vector3(0f, 0f, fullMove.z);
+
+        Vector3 allowed = Vector3.zero;
+        if (IsOnSidewalk(xOnlyPos)) allowed.x = intendedVelocity.x;
+        if (IsOnSidewalk(zOnlyPos)) allowed.z = intendedVelocity.z;
+
+        return allowed;
+    }
+
+    bool IsOnSidewalk(Vector3 position)
+    {
+        Collider[] hits = Physics.OverlapSphere(position, onPathSensorRadius, ~0, QueryTriggerInteraction.Collide);
+
+        foreach (Collider hit in hits)
+        {
+            if (hit.CompareTag("Sidewalk_L") || hit.CompareTag("Sidewalk_R"))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     Vector3 ComputeSidewalkCorrection()
     {
         if (isCrossing) return Vector3.zero;
-        // 周囲の歩道コライダーを探す
+
         Collider[] hits = Physics.OverlapSphere(
             transform.position, sidewalkSearchRadius, ~0, QueryTriggerInteraction.Collide);
+
         Collider nearestSidewalk = null;
         float nearestDist = float.MaxValue;
+
         foreach (Collider hit in hits)
         {
             if (!hit.CompareTag("Sidewalk_L") && !hit.CompareTag("Sidewalk_R")) continue;
-            // 水平距離だけで判定（Y軸の誤差を無視）
+
             Vector3 closest = hit.ClosestPoint(transform.position);
             float dist = Vector2.Distance(
                 new Vector2(transform.position.x, transform.position.z),
                 new Vector2(closest.x, closest.z));
+
             if (dist < nearestDist)
             {
                 nearestDist = dist;
                 nearestSidewalk = hit;
             }
         }
-        // 歩道が見つからない → 補正不能
+
         if (nearestSidewalk == null) return Vector3.zero;
+
         // 歩道の上にいる → 補正不要
         if (nearestDist < onPathSensorRadius) return Vector3.zero;
+
         // 歩道からずれている → 最寄りの歩道へ補正
         Vector3 direction = nearestSidewalk.ClosestPoint(transform.position) - transform.position;
         direction.y = 0f;
         if (direction.sqrMagnitude < 0.01f) return Vector3.zero;
-        Debug.DrawRay(transform.position, direction.normalized * 2f, Color.magenta);
         return direction.normalized * sidewalkCorrectionSpeed;
     }
 
@@ -180,30 +246,31 @@ public class NPCWalker : MonoBehaviour
         }
     }
 
-    // ── OnCollisionEnter に歩行者同士の衝突無視を追加 ──
     private void OnCollisionEnter(Collision collision)
     {
-        // 歩行者同士はすり抜けるよう動的に設定（後からスポーンした歩行者対策）
+        // 歩行者同士はすり抜ける（後からスポーンした歩行者対策）
         NPCWalker otherWalker = collision.gameObject.GetComponent<NPCWalker>();
         if (otherWalker != null)
         {
             Physics.IgnoreCollision(GetComponent<Collider>(), collision.collider);
             return;
         }
-        // 自転車との衝突（既存のまま）
+
         if (collision.gameObject.GetComponent<BicycleController>() != null)
         {
             if (!isHit)
             {
-                isHit = true;
+                isHit = true; 
                 rb.constraints = RigidbodyConstraints.None;
+
                 Rigidbody bikeRb = collision.gameObject.GetComponent<Rigidbody>();
                 if (bikeRb != null)
                 {
                     Vector3 flyDirection = bikeRb.linearVelocity;
-                    flyDirection.y = Mathf.Max(flyDirection.y, 5f);
+                    flyDirection.y = Mathf.Max(flyDirection.y, 5f); 
                     rb.AddForce(flyDirection * 2.0f, ForceMode.Impulse);
                 }
+
                 Destroy(gameObject, 3f);
             }
         }

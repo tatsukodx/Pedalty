@@ -10,11 +10,12 @@ TagManager:
   - BikeLane_R
   - Road_L
   - Road_R
+  - Pedestrian
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Pedestrian
   - Water
   - UI
   - 

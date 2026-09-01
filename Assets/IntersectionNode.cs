@@ -15,39 +15,32 @@ public class IntersectionNode : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        NPCWalker walker = other.GetComponent<NPCWalker>();
-        if (walker != null)
+        NPCWalker walker = other.GetComponentInParent<NPCWalker>();
+        if (walker != null && !walker.IsAtIntersection)
         {
-            StartCoroutine(TurnWithDelay(walker, other.transform));
+            walker.SetAtIntersection(true);  // 即座にロック
+            StartCoroutine(TurnWithDelay(walker, walker.transform));
         }
     }
 
     private IEnumerator TurnWithDelay(NPCWalker walker, Transform npcTransform)
     {
-        // 遅延後に計算するとズレた向きが基準になるので、曲がる方向は先に決めておく
+        // 方向を先に決める
         Vector3 currentDir = npcTransform.forward;
         Vector3 rightDir = Quaternion.Euler(0, 90, 0) * currentDir;
         Vector3 leftDir = Quaternion.Euler(0, -90, 0) * currentDir;
 
-        Vector3 nextDirection = currentDir; 
+        Vector3 nextDirection = currentDir;
         int choice = Random.Range(0, 3);
-
         switch (choice)
         {
-            case 0:
-                nextDirection = currentDir; // 直進
-                break;
-            case 1:
-                nextDirection = rightDir;   // 右折
-                break;
-            case 2:
-                nextDirection = leftDir;    // 左折
-                break;
+            case 0: nextDirection = currentDir; break;
+            case 1: nextDirection = rightDir;   break;
+            case 2: nextDirection = leftDir;    break;
         }
 
         yield return new WaitForSeconds(delayTime);
 
-        // 待機中に消滅している可能性があるので確認する
         if (walker == null) yield break;
 
         walker.SetCrossing(false);
@@ -60,6 +53,7 @@ public class IntersectionNode : MonoBehaviour
 
             walker.SetTrafficStop(true);
 
+            // 車が青の間は待つ
             while (walker != null && (crossingNSRoad ? manager.IsNS_CarGreen : manager.IsEW_CarGreen))
             {
                 yield return null;
@@ -70,11 +64,20 @@ public class IntersectionNode : MonoBehaviour
             walker.SetTrafficStop(false);
         }
 
+        walker.SnapAcrossPath(transform.position, currentDir, nextDirection);
         walker.SetDirection(nextDirection);
 
         if (willCross)
         {
             walker.SetCrossing(true);
+        }
+
+        // 歩行者がこのトリガーから離れるまで少し待ってからロック解除
+        yield return new WaitForSeconds(1.5f);
+
+        if (walker != null)
+        {
+            walker.SetAtIntersection(false);
         }
     }
 
