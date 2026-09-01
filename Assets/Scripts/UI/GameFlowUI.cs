@@ -40,7 +40,7 @@ public sealed class GameFlowUI : MonoBehaviour
     TextMeshProUGUI rulesLeftActionText;
     TextMeshProUGUI rulesRightActionText;
     GameObject rulesMapPlaceholder;
-    RawImage rulesMapImage;
+    Image rulesMapImage;
     Coroutine countdownCoroutine;
     Coroutine menuInputGuardCoroutine;
     FlowState state;
@@ -176,6 +176,7 @@ public sealed class GameFlowUI : MonoBehaviour
             new Vector2(590f, 245f), 18f, TextAlignmentOptions.TopLeft, Color.white);
         rulesBodyText.textWrappingMode = TextWrappingModes.Normal;
         rulesBodyText.lineSpacing = 5f;
+        rulesBodyText.overflowMode = TextOverflowModes.Truncate;
 
         rulesMapPlaceholder = new GameObject("MapImagePlaceholder", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Outline));
         rulesMapPlaceholder.transform.SetParent(card.transform, false);
@@ -183,8 +184,8 @@ public sealed class GameFlowUI : MonoBehaviour
         mapRect.anchorMin = new Vector2(0.5f, 0.5f);
         mapRect.anchorMax = new Vector2(0.5f, 0.5f);
         mapRect.pivot = new Vector2(0.5f, 0.5f);
-        mapRect.anchoredPosition = new Vector2(0f, -27f);
-        mapRect.sizeDelta = new Vector2(330f, 220f);
+        mapRect.anchoredPosition = new Vector2(0f, -30f);
+        mapRect.sizeDelta = new Vector2(390f, 210f);
         rulesMapPlaceholder.GetComponent<Image>().color = new Color(0.07f, 0.09f, 0.12f, 1f);
         Outline mapOutline = rulesMapPlaceholder.GetComponent<Outline>();
         mapOutline.effectColor = new Color(0.55f, 0.6f, 0.67f, 1f);
@@ -194,28 +195,28 @@ public sealed class GameFlowUI : MonoBehaviour
             new Vector2(300f, 100f), 18f, TextAlignmentOptions.Center, new Color(0.65f, 0.7f, 0.77f, 1f));
         mapLabel.text = "マップを読み込んでいます…";
 
-        GameObject mapImageObject = new GameObject("MapImage", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage), typeof(AspectRatioFitter));
+        GameObject mapImageObject = new GameObject("MapImage", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         mapImageObject.transform.SetParent(rulesMapPlaceholder.transform, false);
         RectTransform mapImageRect = mapImageObject.GetComponent<RectTransform>();
         mapImageRect.anchorMin = Vector2.zero;
         mapImageRect.anchorMax = Vector2.one;
         mapImageRect.offsetMin = new Vector2(4f, 4f);
         mapImageRect.offsetMax = new Vector2(-4f, -4f);
-        rulesMapImage = mapImageObject.GetComponent<RawImage>();
+        rulesMapImage = mapImageObject.GetComponent<Image>();
         rulesMapImage.raycastTarget = false;
-        AspectRatioFitter mapAspect = mapImageObject.GetComponent<AspectRatioFitter>();
-        mapAspect.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+        rulesMapImage.preserveAspect = true;
 
-        Texture2D mapTexture = Resources.Load<Texture2D>("UI/map");
-        if (mapTexture != null)
+        Sprite mapSprite = Resources.Load<Sprite>("UI/map");
+        if (mapSprite != null)
         {
-            rulesMapImage.texture = mapTexture;
-            mapAspect.aspectRatio = (float)mapTexture.width / mapTexture.height;
+            rulesMapImage.sprite = mapSprite;
             mapLabel.gameObject.SetActive(false);
         }
         else
         {
             rulesMapImage.gameObject.SetActive(false);
+            mapLabel.text = "マップ画像を読み込めませんでした";
+            Debug.LogError("[GameFlowUI] Resources/UI/map.pngをSpriteとして読み込めません。");
         }
 
         rulesLeftActionText = CreateChoiceCard(card.transform, "RulesLeft", new Vector2(-150f, -197f), Cyan,
@@ -468,8 +469,8 @@ public sealed class GameFlowUI : MonoBehaviour
         bool isMapPage = rulesPageIndex == 1;
         rulesMapPlaceholder.SetActive(isMapPage);
         RectTransform bodyRect = rulesBodyText.rectTransform;
-        bodyRect.anchoredPosition = isMapPage ? new Vector2(0f, 123f) : new Vector2(0f, 30f);
-        bodyRect.sizeDelta = isMapPage ? new Vector2(590f, 75f) : new Vector2(590f, 245f);
+        bodyRect.anchoredPosition = isMapPage ? new Vector2(0f, 125f) : new Vector2(0f, 30f);
+        bodyRect.sizeDelta = isMapPage ? new Vector2(590f, 70f) : new Vector2(590f, 245f);
 
         rulesLeftActionText.text = rulesPageIndex == 0 ? "スタート画面へ戻る" : "前のページへ";
         rulesRightActionText.text = rulesPageIndex == RuleTitles.Length - 1 ? "説明を終了する" : "次のページへ";
