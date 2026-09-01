@@ -1,7 +1,6 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
@@ -17,12 +16,6 @@ public sealed class GameFlowUI : MonoBehaviour
         Countdown,
         Playing,
         Results
-    }
-
-    enum ReloadDestination
-    {
-        StartMenu,
-        Countdown
     }
 
     static readonly Color Yellow = new Color(1f, 0.78f, 0.18f, 1f);
@@ -55,9 +48,6 @@ public sealed class GameFlowUI : MonoBehaviour
     FlowState state;
     int rulesPageIndex;
     bool menuInputLocked;
-
-    static bool reloadRequested;
-    static ReloadDestination reloadDestination;
 
     static readonly string[] RuleTitles =
     {
@@ -126,26 +116,7 @@ public sealed class GameFlowUI : MonoBehaviour
         inputManager.OnMenuBack?.AddListener(HandleLeftButton);
         gameTimer.Finished += HandleGoal;
 
-        if (reloadRequested)
-        {
-            ReloadDestination destination = reloadDestination;
-            reloadRequested = false;
-            reloadDestination = ReloadDestination.StartMenu;
-
-            if (destination == ReloadDestination.Countdown)
-            {
-                StartCountdown();
-            }
-            else
-            {
-                ShowStartMenu();
-            }
-        }
-        else
-        {
-            ShowStartMenu();
-        }
-
+        ShowStartMenu();
         BeginMenuInputGuard();
     }
 
@@ -407,7 +378,9 @@ public sealed class GameFlowUI : MonoBehaviour
                 }
                 break;
             case FlowState.Results:
-                ReloadGameScene(ReloadDestination.Countdown);
+                ResetWorldActors();
+                BeginMenuInputGuard();
+                StartCountdown();
                 break;
         }
     }
@@ -433,7 +406,9 @@ public sealed class GameFlowUI : MonoBehaviour
                 }
                 break;
             case FlowState.Results:
-                ReloadGameScene(ReloadDestination.StartMenu);
+                ResetWorldActors();
+                BeginMenuInputGuard();
+                ShowStartMenu();
                 break;
         }
     }
@@ -557,19 +532,19 @@ public sealed class GameFlowUI : MonoBehaviour
         SetOnlyPanel(resultsPanel);
     }
 
-    void ReloadGameScene(ReloadDestination destination)
+    void ResetWorldActors()
     {
-        menuInputLocked = true;
-        state = FlowState.Countdown;
-        inputManager.isMenuState = true;
-        bicycle.SetControlEnabled(false);
-        reloadDestination = destination;
-        reloadRequested = true;
-        Time.timeScale = 1f;
+        CarSpawner[] carSpawners = FindObjectsByType<CarSpawner>();
+        foreach (CarSpawner spawner in carSpawners)
+        {
+            spawner.ResetSpawnedCars();
+        }
 
-        Scene activeScene = SceneManager.GetActiveScene();
-        int buildIndex = activeScene.buildIndex >= 0 ? activeScene.buildIndex : 0;
-        SceneManager.LoadScene(buildIndex);
+        NPCSpawner[] npcSpawners = FindObjectsByType<NPCSpawner>();
+        foreach (NPCSpawner spawner in npcSpawners)
+        {
+            spawner.ResetSpawnedNPCs();
+        }
     }
 
     void BuildOverheadMapCamera()
