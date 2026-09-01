@@ -19,6 +19,12 @@ public sealed class GameFlowUI : MonoBehaviour
         Results
     }
 
+    enum ReloadDestination
+    {
+        StartMenu,
+        Countdown
+    }
+
     static readonly Color Yellow = new Color(1f, 0.78f, 0.18f, 1f);
     static readonly Color Cyan = new Color(0.18f, 0.74f, 0.92f, 1f);
     static readonly Color PanelBlack = new Color(0.025f, 0.035f, 0.055f, 0.94f);
@@ -41,11 +47,15 @@ public sealed class GameFlowUI : MonoBehaviour
     TextMeshProUGUI rulesLeftActionText;
     TextMeshProUGUI rulesRightActionText;
     GameObject rulesMapPlaceholder;
+    RawImage rulesMapImage;
+    Camera rulesMapCamera;
+    RenderTexture rulesMapTexture;
     Coroutine countdownCoroutine;
     FlowState state;
     int rulesPageIndex;
 
-    static bool startWithCountdownAfterReload;
+    static bool reloadRequested;
+    static ReloadDestination reloadDestination;
 
     static readonly string[] RuleTitles =
     {
@@ -62,8 +72,8 @@ public sealed class GameFlowUI : MonoBehaviour
         "ただ速く走るだけではなく、自転車の交通ルールを守ることも大切です。違反すると内容が表示され、罰金額が加算されます。\n\n" +
         "交通ルールを守りながら、速いタイムと少ない罰金額でのゴールを目指しましょう。",
 
-        "黄色いピンがゴール地点です。走行画面には、ゴールの方向とゴールまでの距離が表示されます。\n" +
-        "交通ルールを守っていれば、どの道を通ってゴールへ向かっても構いません。",
+        "下のマップは、ゲームフィールドを真上から見たものです。黄色いピンがゴール地点です。\n" +
+        "走行画面にはゴールの方向と距離が表示されます。交通ルールを守っていれば、どの道を通っても構いません。",
 
         "自転車は車道の左側を走ることが基本です。道路標識や信号など、ゲーム内で示される交通ルールを守りましょう。\n\n" +
         "交通違反をすると、違反内容と加算される罰金額が画面に表示されます。現在の罰金総額は画面左上で確認できます。\n\n" +
@@ -114,10 +124,20 @@ public sealed class GameFlowUI : MonoBehaviour
         inputManager.OnMenuBack?.AddListener(HandleLeftButton);
         gameTimer.Finished += HandleGoal;
 
-        if (startWithCountdownAfterReload)
+        if (reloadRequested)
         {
-            startWithCountdownAfterReload = false;
-            StartCountdown();
+            ReloadDestination destination = reloadDestination;
+            reloadRequested = false;
+            reloadDestination = ReloadDestination.StartMenu;
+
+            if (destination == ReloadDestination.Countdown)
+            {
+                StartCountdown();
+            }
+            else
+            {
+                ShowStartMenu();
+            }
         }
         else
         {
@@ -199,7 +219,28 @@ public sealed class GameFlowUI : MonoBehaviour
 
         TextMeshProUGUI mapLabel = CreateText(rulesMapPlaceholder.transform, "MapPlaceholderLabel", Vector2.zero,
             new Vector2(300f, 100f), 18f, TextAlignmentOptions.Center, new Color(0.65f, 0.7f, 0.77f, 1f));
-        mapLabel.text = "MAP IMAGE\nマップ画像をここに配置";
+        mapLabel.text = "マップを読み込んでいます…";
+
+        GameObject mapImageObject = new GameObject("OverheadMap", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
+        mapImageObject.transform.SetParent(rulesMapPlaceholder.transform, false);
+        RectTransform mapImageRect = mapImageObject.GetComponent<RectTransform>();
+        mapImageRect.anchorMin = Vector2.zero;
+        mapImageRect.anchorMax = Vector2.one;
+        mapImageRect.offsetMin = new Vector2(4f, 4f);
+        mapImageRect.offsetMax = new Vector2(-4f, -4f);
+        rulesMapImage = mapImageObject.GetComponent<RawImage>();
+        rulesMapImage.raycastTarget = false;
+
+        BuildOverheadMapCamera();
+        if (rulesMapTexture != null)
+        {
+            rulesMapImage.texture = rulesMapTexture;
+            mapLabel.gameObject.SetActive(false);
+        }
+        else
+        {
+            rulesMapImage.gameObject.SetActive(false);
+        }
 
         rulesLeftActionText = CreateChoiceCard(card.transform, "RulesLeft", new Vector2(-150f, -197f), Cyan,
             "左ボタン", "前のページへ", "左クリック / J / ←");
@@ -360,7 +401,7 @@ public sealed class GameFlowUI : MonoBehaviour
                 }
                 break;
             case FlowState.Results:
-                ReloadGameScene(true);
+                ReloadGameScene(ReloadDestination.Countdown);
                 break;
         }
     }
@@ -384,7 +425,7 @@ public sealed class GameFlowUI : MonoBehaviour
                 }
                 break;
             case FlowState.Results:
-                ReloadGameScene(false);
+                ReloadGameScene(ReloadDestination.StartMenu);
                 break;
         }
     }
@@ -417,6 +458,10 @@ public sealed class GameFlowUI : MonoBehaviour
 
         bool isMapPage = rulesPageIndex == 1;
         rulesMapPlaceholder.SetActive(isMapPage);
+        if (isMapPage)
+        {
+            RenderOverheadMap();
+        }
         RectTransform bodyRect = rulesBodyText.rectTransform;
         bodyRect.anchoredPosition = isMapPage ? new Vector2(0f, 103f) : new Vector2(0f, 30f);
         bodyRect.sizeDelta = isMapPage ? new Vector2(590f, 100f) : new Vector2(590f, 245f);
@@ -479,17 +524,77 @@ public sealed class GameFlowUI : MonoBehaviour
         SetOnlyPanel(resultsPanel);
     }
 
-    void ReloadGameScene(bool beginWithCountdown)
+    void ReloadGameScene(ReloadDestination destination)
     {
         state = FlowState.Countdown;
         inputManager.isMenuState = true;
         bicycle.SetControlEnabled(false);
-        startWithCountdownAfterReload = beginWithCountdown;
+        reloadDestination = destination;
+        reloadRequested = true;
         Time.timeScale = 1f;
 
         Scene activeScene = SceneManager.GetActiveScene();
         int buildIndex = activeScene.buildIndex >= 0 ? activeScene.buildIndex : 0;
         SceneManager.LoadScene(buildIndex);
+    }
+
+    void BuildOverheadMapCamera()
+    {
+        GameObject roads = GameObject.Find("Roads");
+        if (roads == null)
+        {
+            Debug.LogWarning("[GameFlowUI] Roadsが見つからないため、ルール画面の上空マップを作成できません。");
+            return;
+        }
+
+        Renderer[] roadRenderers = roads.GetComponentsInChildren<Renderer>(true);
+        if (roadRenderers.Length == 0)
+        {
+            Debug.LogWarning("[GameFlowUI] Roads内にRendererがないため、ルール画面の上空マップを作成できません。");
+            return;
+        }
+
+        Bounds mapBounds = roadRenderers[0].bounds;
+        for (int i = 1; i < roadRenderers.Length; i++)
+        {
+            mapBounds.Encapsulate(roadRenderers[i].bounds);
+        }
+
+        GameObject cameraObject = new GameObject("RulesOverheadMapCamera", typeof(Camera));
+        rulesMapCamera = cameraObject.GetComponent<Camera>();
+        rulesMapCamera.enabled = false;
+        rulesMapCamera.orthographic = true;
+        rulesMapCamera.clearFlags = CameraClearFlags.SolidColor;
+        rulesMapCamera.backgroundColor = new Color(0.06f, 0.075f, 0.09f, 1f);
+        int uiLayer = LayerMask.NameToLayer("UI");
+        rulesMapCamera.cullingMask = uiLayer >= 0 ? ~(1 << uiLayer) : ~0;
+        rulesMapCamera.allowHDR = false;
+        rulesMapCamera.allowMSAA = true;
+        rulesMapCamera.nearClipPlane = 0.1f;
+        rulesMapCamera.farClipPlane = 2000f;
+
+        const float mapAspect = 1024f / 450f;
+        float requiredHalfHeight = Mathf.Max(mapBounds.extents.z, mapBounds.extents.x / mapAspect);
+        rulesMapCamera.orthographicSize = Mathf.Max(10f, requiredHalfHeight * 1.07f);
+        rulesMapCamera.transform.position = new Vector3(mapBounds.center.x, mapBounds.max.y + 600f, mapBounds.center.z);
+        rulesMapCamera.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+
+        rulesMapTexture = new RenderTexture(1024, 450, 24, RenderTextureFormat.ARGB32)
+        {
+            name = "RulesOverheadMapTexture",
+            antiAliasing = 2,
+            filterMode = FilterMode.Bilinear
+        };
+        rulesMapTexture.Create();
+        rulesMapCamera.targetTexture = rulesMapTexture;
+    }
+
+    void RenderOverheadMap()
+    {
+        if (rulesMapCamera == null || rulesMapTexture == null) return;
+
+        rulesMapCamera.Render();
+        rulesMapImage.texture = rulesMapTexture;
     }
 
     void ResetRunData()
@@ -523,6 +628,18 @@ public sealed class GameFlowUI : MonoBehaviour
     void OnDestroy()
     {
         Time.timeScale = 1f;
+
+        if (rulesMapCamera != null)
+        {
+            rulesMapCamera.targetTexture = null;
+            Destroy(rulesMapCamera.gameObject);
+        }
+
+        if (rulesMapTexture != null)
+        {
+            rulesMapTexture.Release();
+            Destroy(rulesMapTexture);
+        }
 
         if (inputManager != null)
         {
