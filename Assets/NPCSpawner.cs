@@ -123,4 +123,19 @@ public class NPCSpawner : MonoBehaviour
             baseAnimator.Rebind();
         }
     }
+
+    public void ResetSpawnedNPCs()
+    {
+        timer = 0f;
+        StopAllCoroutines();
+
+        NPCWalker[] spawnedNPCs = FindObjectsByType<NPCWalker>();
+        foreach (NPCWalker npc in spawnedNPCs)
+        {
+            if (npc != null)
+            {
+                Destroy(npc.gameObject);
+            }
+        }
+    }
 }

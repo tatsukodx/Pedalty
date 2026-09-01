@@ -56,23 +56,44 @@ public class BicycleController : MonoBehaviour
 
     private Vector3 startPosition;
     private Quaternion startRotation;
+    private bool controlEnabled = true;
+    private bool initialized;
+
+    public bool ControlEnabled => controlEnabled;
 
     public void ApplyBrake(bool brake)
     {
         isBraking = brake;
     }
 
-    void Start()
+    void Awake()
     {
+        InitializeIfNeeded();
+    }
+
+    void InitializeIfNeeded()
+    {
+        if (initialized) return;
+
         rb = GetComponent<Rigidbody>();
         boxCollider = GetComponent<BoxCollider>();
 
         startPosition = transform.position;
         startRotation = transform.rotation;
+        initialized = true;
     }
 
     void Update()
     {
+        InitializeIfNeeded();
+
+        if (!controlEnabled)
+        {
+            StopMovement();
+            UpdateSpeedText();
+            return;
+        }
+
         bool grounded = IsGrounded();
 
         float moveInput = useExternalInput ? externalMoveInput : Input.GetAxis("Vertical"); 
@@ -180,29 +201,67 @@ public class BicycleController : MonoBehaviour
         }
 
         // currentSpeed は m/s なので 3.6 倍が km/h になる
-        if (speedText != null)
-        {
-            int displaySpeed = Mathf.RoundToInt(Mathf.Abs(currentSpeed) * 3.6f);
-            speedText.text = "SPEED: " + displaySpeed + " km/h";
-        }
+        UpdateSpeedText();
 
         wasGroundedLastFrame = grounded;
     }
 
-    private void Respawn()
+    public void ResetToStart()
     {
+        InitializeIfNeeded();
         transform.position = startPosition;
         transform.rotation = startRotation;
 
+        StopMovement();
+        currentSteerAngle = 0f;
+        isBraking = false;
+
+        if (handlebar != null)
+        {
+            handlebar.localRotation = Quaternion.identity;
+        }
+        UpdateSpeedText();
+    }
+
+    public void SetControlEnabled(bool enabled)
+    {
+        InitializeIfNeeded();
+        controlEnabled = enabled;
+        if (!enabled)
+        {
+            StopMovement();
+            UpdateSpeedText();
+        }
+    }
+
+    void StopMovement()
+    {
+        if (rb == null) return;
+
         rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero; 
+        rb.angularVelocity = Vector3.zero;
 
         currentSpeed = 0f;
         airVelocityVector = Vector3.zero;
     }
 
+    void UpdateSpeedText()
+    {
+        if (speedText == null) return;
+
+        int displaySpeed = Mathf.RoundToInt(Mathf.Abs(currentSpeed) * 3.6f);
+        speedText.text = "SPEED: " + displaySpeed + " km/h";
+    }
+
+    private void Respawn()
+    {
+        ResetToStart();
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
+        if (!controlEnabled) return;
+
         ContactPoint contact = collision.contacts[0];
         Vector3 bounceDirection = contact.normal;
 
