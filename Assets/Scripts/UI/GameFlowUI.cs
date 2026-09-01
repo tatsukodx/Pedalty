@@ -41,8 +41,6 @@ public sealed class GameFlowUI : MonoBehaviour
     TextMeshProUGUI rulesRightActionText;
     GameObject rulesMapPlaceholder;
     RawImage rulesMapImage;
-    Camera rulesMapCamera;
-    RenderTexture rulesMapTexture;
     Coroutine countdownCoroutine;
     Coroutine menuInputGuardCoroutine;
     FlowState state;
@@ -185,8 +183,8 @@ public sealed class GameFlowUI : MonoBehaviour
         mapRect.anchorMin = new Vector2(0.5f, 0.5f);
         mapRect.anchorMax = new Vector2(0.5f, 0.5f);
         mapRect.pivot = new Vector2(0.5f, 0.5f);
-        mapRect.anchoredPosition = new Vector2(0f, -22f);
-        mapRect.sizeDelta = new Vector2(330f, 145f);
+        mapRect.anchoredPosition = new Vector2(0f, -27f);
+        mapRect.sizeDelta = new Vector2(330f, 220f);
         rulesMapPlaceholder.GetComponent<Image>().color = new Color(0.07f, 0.09f, 0.12f, 1f);
         Outline mapOutline = rulesMapPlaceholder.GetComponent<Outline>();
         mapOutline.effectColor = new Color(0.55f, 0.6f, 0.67f, 1f);
@@ -196,7 +194,7 @@ public sealed class GameFlowUI : MonoBehaviour
             new Vector2(300f, 100f), 18f, TextAlignmentOptions.Center, new Color(0.65f, 0.7f, 0.77f, 1f));
         mapLabel.text = "マップを読み込んでいます…";
 
-        GameObject mapImageObject = new GameObject("OverheadMap", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
+        GameObject mapImageObject = new GameObject("MapImage", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage), typeof(AspectRatioFitter));
         mapImageObject.transform.SetParent(rulesMapPlaceholder.transform, false);
         RectTransform mapImageRect = mapImageObject.GetComponent<RectTransform>();
         mapImageRect.anchorMin = Vector2.zero;
@@ -205,11 +203,14 @@ public sealed class GameFlowUI : MonoBehaviour
         mapImageRect.offsetMax = new Vector2(-4f, -4f);
         rulesMapImage = mapImageObject.GetComponent<RawImage>();
         rulesMapImage.raycastTarget = false;
+        AspectRatioFitter mapAspect = mapImageObject.GetComponent<AspectRatioFitter>();
+        mapAspect.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
 
-        BuildOverheadMapCamera();
-        if (rulesMapTexture != null)
+        Texture2D mapTexture = Resources.Load<Texture2D>("UI/map");
+        if (mapTexture != null)
         {
-            rulesMapImage.texture = rulesMapTexture;
+            rulesMapImage.texture = mapTexture;
+            mapAspect.aspectRatio = (float)mapTexture.width / mapTexture.height;
             mapLabel.gameObject.SetActive(false);
         }
         else
@@ -466,13 +467,9 @@ public sealed class GameFlowUI : MonoBehaviour
 
         bool isMapPage = rulesPageIndex == 1;
         rulesMapPlaceholder.SetActive(isMapPage);
-        if (isMapPage)
-        {
-            RenderOverheadMap();
-        }
         RectTransform bodyRect = rulesBodyText.rectTransform;
-        bodyRect.anchoredPosition = isMapPage ? new Vector2(0f, 103f) : new Vector2(0f, 30f);
-        bodyRect.sizeDelta = isMapPage ? new Vector2(590f, 100f) : new Vector2(590f, 245f);
+        bodyRect.anchoredPosition = isMapPage ? new Vector2(0f, 123f) : new Vector2(0f, 30f);
+        bodyRect.sizeDelta = isMapPage ? new Vector2(590f, 75f) : new Vector2(590f, 245f);
 
         rulesLeftActionText.text = rulesPageIndex == 0 ? "スタート画面へ戻る" : "前のページへ";
         rulesRightActionText.text = rulesPageIndex == RuleTitles.Length - 1 ? "説明を終了する" : "次のページへ";
@@ -547,65 +544,6 @@ public sealed class GameFlowUI : MonoBehaviour
         }
     }
 
-    void BuildOverheadMapCamera()
-    {
-        GameObject roads = GameObject.Find("Roads");
-        if (roads == null)
-        {
-            Debug.LogWarning("[GameFlowUI] Roadsが見つからないため、ルール画面の上空マップを作成できません。");
-            return;
-        }
-
-        Renderer[] roadRenderers = roads.GetComponentsInChildren<Renderer>(true);
-        if (roadRenderers.Length == 0)
-        {
-            Debug.LogWarning("[GameFlowUI] Roads内にRendererがないため、ルール画面の上空マップを作成できません。");
-            return;
-        }
-
-        Bounds mapBounds = roadRenderers[0].bounds;
-        for (int i = 1; i < roadRenderers.Length; i++)
-        {
-            mapBounds.Encapsulate(roadRenderers[i].bounds);
-        }
-
-        GameObject cameraObject = new GameObject("RulesOverheadMapCamera", typeof(Camera));
-        rulesMapCamera = cameraObject.GetComponent<Camera>();
-        rulesMapCamera.enabled = false;
-        rulesMapCamera.orthographic = true;
-        rulesMapCamera.clearFlags = CameraClearFlags.SolidColor;
-        rulesMapCamera.backgroundColor = new Color(0.06f, 0.075f, 0.09f, 1f);
-        int uiLayer = LayerMask.NameToLayer("UI");
-        rulesMapCamera.cullingMask = uiLayer >= 0 ? ~(1 << uiLayer) : ~0;
-        rulesMapCamera.allowHDR = false;
-        rulesMapCamera.allowMSAA = true;
-        rulesMapCamera.nearClipPlane = 0.1f;
-        rulesMapCamera.farClipPlane = 2000f;
-
-        const float mapAspect = 1024f / 450f;
-        float requiredHalfHeight = Mathf.Max(mapBounds.extents.z, mapBounds.extents.x / mapAspect);
-        rulesMapCamera.orthographicSize = Mathf.Max(10f, requiredHalfHeight * 1.07f);
-        rulesMapCamera.transform.position = new Vector3(mapBounds.center.x, mapBounds.max.y + 600f, mapBounds.center.z);
-        rulesMapCamera.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-
-        rulesMapTexture = new RenderTexture(1024, 450, 24, RenderTextureFormat.ARGB32)
-        {
-            name = "RulesOverheadMapTexture",
-            antiAliasing = 2,
-            filterMode = FilterMode.Bilinear
-        };
-        rulesMapTexture.Create();
-        rulesMapCamera.targetTexture = rulesMapTexture;
-    }
-
-    void RenderOverheadMap()
-    {
-        if (rulesMapCamera == null || rulesMapTexture == null) return;
-
-        rulesMapCamera.Render();
-        rulesMapImage.texture = rulesMapTexture;
-    }
-
     void ResetRunData()
     {
         bicycle.SetControlEnabled(false);
@@ -637,18 +575,6 @@ public sealed class GameFlowUI : MonoBehaviour
     void OnDestroy()
     {
         Time.timeScale = 1f;
-
-        if (rulesMapCamera != null)
-        {
-            rulesMapCamera.targetTexture = null;
-            Destroy(rulesMapCamera.gameObject);
-        }
-
-        if (rulesMapTexture != null)
-        {
-            rulesMapTexture.Release();
-            Destroy(rulesMapTexture);
-        }
 
         if (inputManager != null)
         {
