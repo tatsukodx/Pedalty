@@ -53,9 +53,11 @@ public class IntersectionNode : MonoBehaviour
 
             walker.SetTrafficStop(true);
 
-            // 車が青の間は待つ
-            while (walker != null && (crossingNSRoad ? manager.IsNS_CarGreen : manager.IsEW_CarGreen))
+            // 進行方向と平行な車道の信号が青になった瞬間（または歩車分離の専用フェーズ）に渡れる
+            while (walker != null)
             {
+                bool parallelGreen = crossingNSRoad ? manager.IsEW_CarGreen : manager.IsNS_CarGreen;
+                if (parallelGreen || manager.IsPedestrianGreen) break;
                 yield return null;
             }
 

@@ -10,7 +10,8 @@ public class CarController : MonoBehaviour
     public float obstacleCheckDistance = 6f;
     public float obstacleCheckRadius = 1.2f;
     public float mass = 1000f;
-    bool isTrafficStopped = false;
+    bool isLightStopped = false;
+    bool isYieldStopped = false;
 
     Rigidbody rb;
     Vector3 targetDirection;
@@ -24,8 +25,15 @@ public class CarController : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(targetDirection);
         }
     }
-    public void SetTrafficStop(bool stop){
-        isTrafficStopped = stop;
+
+    public void SetTrafficStop(bool stop)
+    {
+        isLightStopped = stop;
+    }
+
+    public void SetYieldStop(bool stop)
+    {
+        isYieldStopped = stop;
     }
 
     void Start()
@@ -42,7 +50,7 @@ public class CarController : MonoBehaviour
         Quaternion lookRot = Quaternion.LookRotation(targetDirection);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRot, Time.fixedDeltaTime * turnLerpSpeed);
 
-        float target = (HasObstacleAhead() || isTrafficStopped) ? 0f : moveSpeed;
+        float target = (HasObstacleAhead() || isLightStopped || isYieldStopped) ? 0f : moveSpeed;
         currentSpeed = Mathf.MoveTowards(currentSpeed, target, acceleration * Time.fixedDeltaTime);
 
         Vector3 forwardVel = transform.forward * currentSpeed;

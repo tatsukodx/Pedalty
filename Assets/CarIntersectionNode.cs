@@ -7,16 +7,29 @@ public class CarIntersectionNode : MonoBehaviour
     public float leftTurnDistance = 6f;
     public float rightTurnDistance = 10f;
 
+    [Header("対向車線との譲り合い（省略可）")]
+    public CarYieldManager yieldManager;
+    public bool isLaneA = true;
+
     private void OnTriggerEnter(Collider other)
     {
         CarController car = other.GetComponent<CarController>();
         if (car != null)
         {
-            StartCoroutine(TurnAfterDistance(car, other.transform));
+            StartCoroutine(TurnSmoothly(car, other.transform));
         }
     }
 
-    private IEnumerator TurnAfterDistance(CarController car, Transform carTransform)
+    private void OnTriggerExit(Collider other)
+    {
+        CarController car = other.GetComponent<CarController>();
+        if (car != null && yieldManager != null)
+        {
+            yieldManager.ReportIntersectionExit(isLaneA);
+        }
+    }
+
+    private IEnumerator TurnSmoothly(CarController car, Transform carTransform)
     {
         Vector3 currentDir = carTransform.forward;
         Vector3 rightDir = Quaternion.Euler(0, 90, 0) * currentDir;
@@ -42,16 +55,41 @@ public class CarIntersectionNode : MonoBehaviour
                 break;
         }
 
-        Vector3 startPosition = carTransform.position;
-
-        while (car != null && Vector3.Distance(startPosition, carTransform.position) < targetDistance)
+        if (yieldManager != null)
         {
-            yield return null;
+            car.SetYieldStop(true);
+
+            while (car != null && !yieldManager.CanEnter(isLaneA))
+            {
+                yield return null;
+            }
+
+            if (car == null) yield break;
+
+            car.SetYieldStop(false);
         }
 
-        if (car != null)
+        if (choice == 0 || targetDistance <= 0.01f)
         {
-            car.SetDirection(nextDirection);
+            if (car != null) car.SetDirection(nextDirection);
+            yield break;
+        }
+
+        Vector3 startPosition = carTransform.position;
+        Quaternion startRot = Quaternion.LookRotation(currentDir);
+        Quaternion endRot = Quaternion.LookRotation(nextDirection);
+
+        while (car != null)
+        {
+            float traveled = Vector3.Distance(startPosition, carTransform.position);
+            float t = Mathf.Clamp01(traveled / targetDistance);
+
+            Vector3 interpolatedDir = Quaternion.Slerp(startRot, endRot, t) * Vector3.forward;
+            car.SetDirection(interpolatedDir);
+
+            if (t >= 1f) yield break;
+
+            yield return new WaitForFixedUpdate();
         }
     }
 }

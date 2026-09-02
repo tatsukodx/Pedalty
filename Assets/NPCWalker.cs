@@ -261,6 +261,7 @@ public class NPCWalker : MonoBehaviour
             if (!isHit)
             {
                 isHit = true; 
+                rb.isKinematic = false; // 信号待ち中(Kinematic)でもAddForceが効くように解除
                 rb.constraints = RigidbodyConstraints.None;
 
                 Rigidbody bikeRb = collision.gameObject.GetComponent<Rigidbody>();

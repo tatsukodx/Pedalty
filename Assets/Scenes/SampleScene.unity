@@ -3338,9 +3338,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15ccf72e75b097147a029d862c3506dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
-  straightDistance: 6
-  leftTurnDistance: 4.5
-  rightTurnDistance: 8
+  straightDistance: 4
+  leftTurnDistance: 7
+  rightTurnDistance: 11.5
+  yieldManager: {fileID: 0}
+  isLaneA: 1
 --- !u!65 &75610557
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -20162,9 +20164,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15ccf72e75b097147a029d862c3506dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
-  straightDistance: 6
-  leftTurnDistance: 4.5
-  rightTurnDistance: 8
+  straightDistance: 4
+  leftTurnDistance: 7
+  rightTurnDistance: 11.5
+  yieldManager: {fileID: 0}
+  isLaneA: 1
 --- !u!65 &580389901
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -25009,9 +25013,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15ccf72e75b097147a029d862c3506dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
-  straightDistance: 6
-  leftTurnDistance: 4.5
-  rightTurnDistance: 8
+  straightDistance: 4
+  leftTurnDistance: 7
+  rightTurnDistance: 11.5
+  yieldManager: {fileID: 0}
+  isLaneA: 1
 --- !u!65 &727530893
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -31210,9 +31216,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15ccf72e75b097147a029d862c3506dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
-  straightDistance: 6
-  leftTurnDistance: 4.5
-  rightTurnDistance: 8
+  straightDistance: 4
+  leftTurnDistance: 7
+  rightTurnDistance: 11.5
+  yieldManager: {fileID: 0}
+  isLaneA: 1
 --- !u!65 &873389803
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -37979,6 +37987,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrafficStopZone
   manager: {fileID: 1386230806}
   isNSDirection: 0
+  yieldManager: {fileID: 1343208823}
+  isLaneA: 1
 --- !u!65 &1084214067
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -43366,6 +43376,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrafficStopZone
   manager: {fileID: 1386230806}
   isNSDirection: 0
+  yieldManager: {fileID: 1343208823}
+  isLaneA: 0
 --- !u!65 &1237737889
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -46904,6 +46916,50 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 296735160}
   m_SourcePrefab: {fileID: 100100000, guid: 4c3178e7d9864a349a71f8e4bc19a179, type: 3}
+--- !u!1 &1343208822
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1343208824}
+  - component: {fileID: 1343208823}
+  m_Layer: 0
+  m_Name: CarYieldManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1343208823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1343208822}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb4c34a8f4023114d88bf158cfe9afad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarYieldManager
+--- !u!4 &1343208824
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1343208822}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 466.98907, y: 0.5749944, z: 62.507156}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1344446235 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: 736724502c2975348b2f19e5e99e1ec5, type: 3}
@@ -48193,9 +48249,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15ccf72e75b097147a029d862c3506dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
-  straightDistance: 6
-  leftTurnDistance: 4.5
-  rightTurnDistance: 8
+  straightDistance: 4
+  leftTurnDistance: 7
+  rightTurnDistance: 11.5
+  yieldManager: {fileID: 0}
+  isLaneA: 1
 --- !u!65 &1374207896
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -49386,6 +49444,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrafficStopZone
   manager: {fileID: 1386230806}
   isNSDirection: 1
+  yieldManager: {fileID: 1343208823}
+  isLaneA: 0
 --- !u!65 &1421027940
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -56584,9 +56644,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15ccf72e75b097147a029d862c3506dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
-  straightDistance: 6
-  leftTurnDistance: 4.5
-  rightTurnDistance: 8
+  straightDistance: 4
+  leftTurnDistance: 7
+  rightTurnDistance: 11.5
+  yieldManager: {fileID: 0}
+  isLaneA: 1
 --- !u!65 &1621321579
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -67618,6 +67680,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrafficStopZone
   manager: {fileID: 1386230806}
   isNSDirection: 1
+  yieldManager: {fileID: 1343208823}
+  isLaneA: 1
 --- !u!65 &1914337927
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -70135,7 +70199,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameTimer
   player: {fileID: 415440741}
   timeText: {fileID: 6731652}
-  startDistance: 0.5
 --- !u!114 &2000000003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -76648,6 +76711,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cars
       objectReference: {fileID: 0}
+    - target: {fileID: 7780228023210467582, guid: 6385191d3ff0fca468efb505e5e7cd86, type: 3}
+      propertyPath: obstacleCheckDistance
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -76681,6 +76748,7 @@ SceneRoots:
   - {fileID: 1749143480}
   - {fileID: 1841557472}
   - {fileID: 435441436}
-  - {fileID: 427956832}
   - {fileID: 145095191}
   - {fileID: 1636130127}
+  - {fileID: 427956832}
+  - {fileID: 1343208824}

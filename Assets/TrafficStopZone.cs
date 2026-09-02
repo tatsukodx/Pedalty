@@ -7,12 +7,16 @@ using UnityEngine;
 
 public class TrafficStopZone : MonoBehaviour
 {
-    [Header("この停止ゾーンを管理する交差点マネージャー")]
+    [Header("この停止ゾーンを管理する交差点マネージャー（信号、省略可）")]
     public TrafficLightManager manager;
 
-    [Header("この停止ゾーンの方向")]
+    [Header("この停止ゾーンの方向（信号用）")]
     [Tooltip("true = 南北方向の車が通る停止線 / false = 東西方向の車が通る停止線")]
     public bool isNSDirection = true;
+
+    [Header("対向車線との譲り合い（省略可）")]
+    public CarYieldManager yieldManager;
+    public bool isLaneA = true;
 
     // 現在ゾーン内にいる車のリスト
     private readonly List<CarController> carsInZone = new List<CarController>();
@@ -38,9 +42,16 @@ public class TrafficStopZone : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         CarController car = other.GetComponentInParent<CarController>();
-        if (car != null && !carsInZone.Contains(car))
+        if (car == null) return;
+
+        if (!carsInZone.Contains(car))
         {
             carsInZone.Add(car);
+        }
+
+        if (yieldManager != null)
+        {
+            yieldManager.ReportStopZoneEnter(isLaneA);
         }
     }
 
