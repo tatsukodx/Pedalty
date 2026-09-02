@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class CarIntersectionNode : MonoBehaviour
 {
@@ -7,9 +8,19 @@ public class CarIntersectionNode : MonoBehaviour
     public float leftTurnDistance = 6f;
     public float rightTurnDistance = 10f;
 
-    [Header("対向車線との譲り合い（省略可）")]
-    public CarYieldManager yieldManager;
-    public bool isLaneA = true;
+    [Header("南北方向の対向車線マネージャー（省略可）")]
+    public CarYieldManager nsYieldManager;
+
+    [Header("東西方向の対向車線マネージャー（省略可）")]
+    public CarYieldManager ewYieldManager;
+
+    private class ActiveCarInfo
+    {
+        public CarYieldManager manager;
+        public bool isLaneA;
+    }
+
+    private readonly Dictionary<CarController, ActiveCarInfo> activeCars = new Dictionary<CarController, ActiveCarInfo>();
 
     private void OnTriggerEnter(Collider other)
     {
@@ -23,9 +34,15 @@ public class CarIntersectionNode : MonoBehaviour
     private void OnTriggerExit(Collider other)
     {
         CarController car = other.GetComponent<CarController>();
-        if (car != null && yieldManager != null)
+        if (car == null) return;
+
+        if (activeCars.TryGetValue(car, out ActiveCarInfo info))
         {
-            yieldManager.ReportIntersectionExit(isLaneA);
+            if (info.manager != null)
+            {
+                info.manager.ReportIntersectionExit(info.isLaneA);
+            }
+            activeCars.Remove(car);
         }
     }
 
@@ -55,11 +72,18 @@ public class CarIntersectionNode : MonoBehaviour
                 break;
         }
 
-        if (yieldManager != null)
+        // 進入方向から南北軸/東西軸と、軸内のどちら向きか（レーンA/B）を動的に判定する
+        bool isNSAxis = Mathf.Abs(currentDir.x) < Mathf.Abs(currentDir.z);
+        CarYieldManager relevantManager = isNSAxis ? nsYieldManager : ewYieldManager;
+        bool isLaneA = isNSAxis ? currentDir.z >= 0f : currentDir.x >= 0f;
+
+        if (relevantManager != null)
         {
+            activeCars[car] = new ActiveCarInfo { manager = relevantManager, isLaneA = isLaneA };
+
             car.SetYieldStop(true);
 
-            while (car != null && !yieldManager.CanEnter(isLaneA))
+            while (car != null && !relevantManager.CanEnter(isLaneA))
             {
                 yield return null;
             }

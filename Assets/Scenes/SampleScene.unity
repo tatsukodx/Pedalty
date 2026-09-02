@@ -3165,6 +3165,50 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1246001505}
   m_SourcePrefab: {fileID: 100100000, guid: e3c71c50de390ec4190b877211ba0717, type: 3}
+--- !u!1 &73100408
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 73100410}
+  - component: {fileID: 73100409}
+  m_Layer: 0
+  m_Name: EwYieldManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &73100409
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 73100408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb4c34a8f4023114d88bf158cfe9afad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarYieldManager
+--- !u!4 &73100410
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 73100408}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 466.98907, y: 0.5749944, z: 62.507156}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &74581198
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3341,8 +3385,8 @@ MonoBehaviour:
   straightDistance: 4
   leftTurnDistance: 7
   rightTurnDistance: 11.5
-  yieldManager: {fileID: 0}
-  isLaneA: 1
+  nsYieldManager: {fileID: 0}
+  ewYieldManager: {fileID: 0}
 --- !u!65 &75610557
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -20167,8 +20211,8 @@ MonoBehaviour:
   straightDistance: 4
   leftTurnDistance: 7
   rightTurnDistance: 11.5
-  yieldManager: {fileID: 0}
-  isLaneA: 1
+  nsYieldManager: {fileID: 0}
+  ewYieldManager: {fileID: 0}
 --- !u!65 &580389901
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -25016,8 +25060,8 @@ MonoBehaviour:
   straightDistance: 4
   leftTurnDistance: 7
   rightTurnDistance: 11.5
-  yieldManager: {fileID: 0}
-  isLaneA: 1
+  nsYieldManager: {fileID: 1343208823}
+  ewYieldManager: {fileID: 73100409}
 --- !u!65 &727530893
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -31219,8 +31263,8 @@ MonoBehaviour:
   straightDistance: 4
   leftTurnDistance: 7
   rightTurnDistance: 11.5
-  yieldManager: {fileID: 0}
-  isLaneA: 1
+  nsYieldManager: {fileID: 0}
+  ewYieldManager: {fileID: 0}
 --- !u!65 &873389803
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -46927,7 +46971,7 @@ GameObject:
   - component: {fileID: 1343208824}
   - component: {fileID: 1343208823}
   m_Layer: 0
-  m_Name: CarYieldManager
+  m_Name: NsYieldManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48252,8 +48296,8 @@ MonoBehaviour:
   straightDistance: 4
   leftTurnDistance: 7
   rightTurnDistance: 11.5
-  yieldManager: {fileID: 0}
-  isLaneA: 1
+  nsYieldManager: {fileID: 0}
+  ewYieldManager: {fileID: 0}
 --- !u!65 &1374207896
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -49444,7 +49488,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrafficStopZone
   manager: {fileID: 1386230806}
   isNSDirection: 1
-  yieldManager: {fileID: 1343208823}
+  yieldManager: {fileID: 73100409}
   isLaneA: 0
 --- !u!65 &1421027940
 BoxCollider:
@@ -56647,8 +56691,8 @@ MonoBehaviour:
   straightDistance: 4
   leftTurnDistance: 7
   rightTurnDistance: 11.5
-  yieldManager: {fileID: 0}
-  isLaneA: 1
+  nsYieldManager: {fileID: 0}
+  ewYieldManager: {fileID: 0}
 --- !u!65 &1621321579
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -59756,7 +59800,7 @@ MonoBehaviour:
   - {x: 0, y: 0, z: 1}
   - {x: -1, y: 0, z: 0}
   - {x: 1, y: 0, z: 0}
-  spawnInterval: 4
+  spawnInterval: 1
   maxCarCount: 100
   spawnCheckRadius: 4
 --- !u!4 &1709395598
@@ -67680,7 +67724,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrafficStopZone
   manager: {fileID: 1386230806}
   isNSDirection: 1
-  yieldManager: {fileID: 1343208823}
+  yieldManager: {fileID: 73100409}
   isLaneA: 1
 --- !u!65 &1914337927
 BoxCollider:
@@ -76752,3 +76796,4 @@ SceneRoots:
   - {fileID: 1636130127}
   - {fileID: 427956832}
   - {fileID: 1343208824}
+  - {fileID: 73100410}
