@@ -38031,7 +38031,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrafficStopZone
   manager: {fileID: 1386230806}
   isNSDirection: 0
-  yieldManager: {fileID: 1343208823}
+  yieldManager: {fileID: 73100409}
   isLaneA: 1
 --- !u!65 &1084214067
 BoxCollider:
@@ -43420,7 +43420,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrafficStopZone
   manager: {fileID: 1386230806}
   isNSDirection: 0
-  yieldManager: {fileID: 1343208823}
+  yieldManager: {fileID: 73100409}
   isLaneA: 0
 --- !u!65 &1237737889
 BoxCollider:
@@ -49488,7 +49488,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrafficStopZone
   manager: {fileID: 1386230806}
   isNSDirection: 1
-  yieldManager: {fileID: 73100409}
+  yieldManager: {fileID: 1343208823}
   isLaneA: 0
 --- !u!65 &1421027940
 BoxCollider:
@@ -67724,7 +67724,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrafficStopZone
   manager: {fileID: 1386230806}
   isNSDirection: 1
-  yieldManager: {fileID: 73100409}
+  yieldManager: {fileID: 1343208823}
   isLaneA: 1
 --- !u!65 &1914337927
 BoxCollider:

@@ -73,24 +73,15 @@ public class CarIntersectionNode : MonoBehaviour
         }
 
         // 進入方向から南北軸/東西軸と、軸内のどちら向きか（レーンA/B）を動的に判定する
+        // ※ここでの待機は行わない。譲り合い待機は TrafficStopZone 側ですでに解消済みの前提。
         bool isNSAxis = Mathf.Abs(currentDir.x) < Mathf.Abs(currentDir.z);
         CarYieldManager relevantManager = isNSAxis ? nsYieldManager : ewYieldManager;
         bool isLaneA = isNSAxis ? currentDir.z >= 0f : currentDir.x >= 0f;
 
         if (relevantManager != null)
         {
+            // OnTriggerExit で ReportIntersectionExit を呼ぶための登録のみ行う
             activeCars[car] = new ActiveCarInfo { manager = relevantManager, isLaneA = isLaneA };
-
-            car.SetYieldStop(true);
-
-            while (car != null && !relevantManager.CanEnter(isLaneA))
-            {
-                yield return null;
-            }
-
-            if (car == null) yield break;
-
-            car.SetYieldStop(false);
         }
 
         if (choice == 0 || targetDistance <= 0.01f)
