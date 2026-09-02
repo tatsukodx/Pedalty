@@ -18,6 +18,7 @@ public class InputManager : MonoBehaviour
     [SerializeField] BicycleController bicycleController;
 
     public bool IsBraking { get; private set; }
+    public bool AnyButtonPressed { get; private set; }
 
     [Header("メニュー中イベント")]
     public UnityEvent OnMenuNext;
@@ -54,15 +55,10 @@ public class InputManager : MonoBehaviour
 
         if (!isArduinoActive)
         {
-            // キーボードモード：左クリック（Jキーも互換用）でブレーキ
-            curLeft = Input.GetMouseButton(0) || Input.GetKey(KeyCode.J);
-            curRight = Input.GetKey(KeyCode.K);
+            // キーボードモード：左右の代替キーはメニューと走行中の両方で使用する
+            curLeft = Input.GetMouseButton(0) || Input.GetKey(KeyCode.J) || Input.GetKey(KeyCode.LeftArrow);
+            curRight = Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.RightArrow);
         }
-
-#if UNITY_EDITOR
-        if (Input.GetKey(KeyCode.RightArrow)) curRight = true;
-        if (Input.GetKey(KeyCode.LeftArrow)) curLeft = true;
-#endif
 
         if (isArduinoActive)
         {
@@ -73,6 +69,8 @@ public class InputManager : MonoBehaviour
         {
             ResetStuckState();
         }
+
+        AnyButtonPressed = curRight || curLeft;
 
         bool rightEdgeOn = curRight && !prevRight;
         bool leftEdgeOn = curLeft && !prevLeft;
@@ -144,6 +142,7 @@ public class InputManager : MonoBehaviour
 
     void OnDisable()
     {
+        AnyButtonPressed = false;
         if (IsBraking)
         {
             SetBrakeState(false);

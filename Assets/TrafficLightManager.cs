@@ -42,17 +42,23 @@ public class TrafficLightManager : MonoBehaviour
     //  停止ゾーンが参照するプロパティ
     // ─────────────────────────────────────────
 
-    /// <summary>南北方向の車が進んでよいか（赤以外=true）</summary>
+    /// <summary>南北方向の車が進んでよいか（青のときだけtrue）</summary>
     public bool IsNS_CarGreen { get; private set; }
 
-    /// <summary>東西方向の車が進んでよいか</summary>
+    /// <summary>東西方向の車が進んでよいか（青のときだけtrue）</summary>
     public bool IsEW_CarGreen { get; private set; }
+
+    /// <summary>南北方向の車が完全に赤か（青にも黄にも該当しない）</summary>
+    public bool IsNS_CarRed { get; private set; }
+
+    /// <summary>東西方向の車が完全に赤か（青にも黄にも該当しない）</summary>
+    public bool IsEW_CarRed { get; private set; }
 
     /// <summary>
     /// 歩行者が進んでよいか。
     /// ・Scrambleモード: 歩行者専用フェーズのみ true
     /// ・Alternatingモード: NS青時は EW道路横断が可、EW青時は NS道路横断が可
-    ///   （方向別判断は PedestrianStopZone 側で行う）
+    ///   （方向別判断は IntersectionNode 側で IsNS_CarRed / IsEW_CarRed を見て行う）
     /// </summary>
     public bool IsPedestrianGreen { get; private set; }
 
@@ -79,28 +85,34 @@ public class TrafficLightManager : MonoBehaviour
             // ── NS 黄 ──
             yield return StartCoroutine(EnterPhase(TrafficLightPhase.NS_Yellow, yellowDuration));
 
+            // ── 全赤（バッファ）── NS→EW切り替え時も必ず挟む
+            yield return StartCoroutine(EnterPhase(TrafficLightPhase.AllRed, allRedDuration));
+
             // ── EW 青 ──
             yield return StartCoroutine(EnterPhase(TrafficLightPhase.EW_Green,  greenDuration));
 
             // ── EW 黄 ──
             yield return StartCoroutine(EnterPhase(TrafficLightPhase.EW_Yellow, yellowDuration));
 
+            // ── 全赤（バッファ）── EW→NS切り替え時も必ず挟む
+            yield return StartCoroutine(EnterPhase(TrafficLightPhase.AllRed, allRedDuration));
+
             if (cycleMode == CycleMode.Scramble)
             {
-                // ── 全赤（バッファ）──
-                yield return StartCoroutine(EnterPhase(TrafficLightPhase.AllRed, allRedDuration));
-
                 // ── 歩行者 青 ──
                 yield return StartCoroutine(EnterPhase(TrafficLightPhase.Pedestrian_Green, pedGreenDuration));
 
                 // ── 歩行者 点滅 ──
                 yield return StartCoroutine(EnterPhase(TrafficLightPhase.Pedestrian_Blink, pedBlinkDuration));
+
+                // ── 全赤（バッファ）── 歩行者フェーズ後、車道が動き出す前に挟む
+                yield return StartCoroutine(EnterPhase(TrafficLightPhase.AllRed, allRedDuration));
             }
             else if (altPedGreenDuration > 0f)
             {
                 // 交互モードで歩行者フェーズを挿入する場合（0秒ならスキップ）
-                yield return StartCoroutine(EnterPhase(TrafficLightPhase.AllRed,           allRedDuration));
                 yield return StartCoroutine(EnterPhase(TrafficLightPhase.Pedestrian_Green, altPedGreenDuration));
+                yield return StartCoroutine(EnterPhase(TrafficLightPhase.AllRed,           allRedDuration));
             }
         }
     }
@@ -121,12 +133,17 @@ public class TrafficLightManager : MonoBehaviour
         IsEW_CarGreen     = false;
         IsPedestrianGreen = false;
 
+        // 青でも黄でもない限り「完全に赤」として扱う（歩行者はこちらを見て渡る）
+        IsNS_CarRed = true;
+        IsEW_CarRed = true;
+
         Debug.Log($"[TrafficLight:{name}] → {phase}");
 
         switch (phase)
         {
             case TrafficLightPhase.NS_Green:
                 IsNS_CarGreen = true;
+                IsNS_CarRed   = false;
                 // 交互モードでは NS青時に EW道路横断（東西の横断歩道）の歩行者が進める
                 if (cycleMode == CycleMode.Alternating) IsPedestrianGreen = true;
                 SetCarLights(TrafficLightState.Green, TrafficLightState.Red);
@@ -134,12 +151,14 @@ public class TrafficLightManager : MonoBehaviour
                 break;
 
             case TrafficLightPhase.NS_Yellow:
+                IsNS_CarRed = false; // 黄色はまだ赤ではない＝歩行者はまだ渡ってはいけない
                 SetCarLights(TrafficLightState.Yellow, TrafficLightState.Red);
                 SetPedLights(TrafficLightState.Red);
                 break;
 
             case TrafficLightPhase.EW_Green:
                 IsEW_CarGreen = true;
+                IsEW_CarRed   = false;
                 // 交互モードでは EW青時に NS道路横断（南北の横断歩道）の歩行者が進める
                 if (cycleMode == CycleMode.Alternating) IsPedestrianGreen = true;
                 SetCarLights(TrafficLightState.Red, TrafficLightState.Green);
@@ -147,11 +166,13 @@ public class TrafficLightManager : MonoBehaviour
                 break;
 
             case TrafficLightPhase.EW_Yellow:
+                IsEW_CarRed = false; // 黄色はまだ赤ではない＝歩行者はまだ渡ってはいけない
                 SetCarLights(TrafficLightState.Red, TrafficLightState.Yellow);
                 SetPedLights(TrafficLightState.Red);
                 break;
 
             case TrafficLightPhase.AllRed:
+                // IsNS_CarRed / IsEW_CarRed は両方とも既定値のtrueのまま
                 SetCarLights(TrafficLightState.Red, TrafficLightState.Red);
                 SetPedLights(TrafficLightState.Red);
                 break;

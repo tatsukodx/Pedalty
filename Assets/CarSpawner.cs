@@ -118,6 +118,21 @@ public class CarSpawner : MonoBehaviour
         return false;
     }
 
+    public void ResetSpawnedCars()
+    {
+        timer = 0f;
+
+        foreach (CarController car in spawnedCars)
+        {
+            if (car != null)
+            {
+                Destroy(car.gameObject);
+            }
+        }
+
+        spawnedCars.Clear();
+    }
+
 #if UNITY_EDITOR
     void OnDrawGizmos()
     {

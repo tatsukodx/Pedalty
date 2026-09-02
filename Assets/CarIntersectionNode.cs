@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class CarIntersectionNode : MonoBehaviour
 {
@@ -7,16 +8,45 @@ public class CarIntersectionNode : MonoBehaviour
     public float leftTurnDistance = 6f;
     public float rightTurnDistance = 10f;
 
+    [Header("南北方向の対向車線マネージャー（省略可）")]
+    public CarYieldManager nsYieldManager;
+
+    [Header("東西方向の対向車線マネージャー（省略可）")]
+    public CarYieldManager ewYieldManager;
+
+    private class ActiveCarInfo
+    {
+        public CarYieldManager manager;
+        public bool isLaneA;
+    }
+
+    private readonly Dictionary<CarController, ActiveCarInfo> activeCars = new Dictionary<CarController, ActiveCarInfo>();
+
     private void OnTriggerEnter(Collider other)
     {
         CarController car = other.GetComponent<CarController>();
         if (car != null)
         {
-            StartCoroutine(TurnAfterDistance(car, other.transform));
+            StartCoroutine(TurnSmoothly(car, other.transform));
         }
     }
 
-    private IEnumerator TurnAfterDistance(CarController car, Transform carTransform)
+    private void OnTriggerExit(Collider other)
+    {
+        CarController car = other.GetComponent<CarController>();
+        if (car == null) return;
+
+        if (activeCars.TryGetValue(car, out ActiveCarInfo info))
+        {
+            if (info.manager != null)
+            {
+                info.manager.ReportIntersectionExit(info.isLaneA);
+            }
+            activeCars.Remove(car);
+        }
+    }
+
+    private IEnumerator TurnSmoothly(CarController car, Transform carTransform)
     {
         Vector3 currentDir = carTransform.forward;
         Vector3 rightDir = Quaternion.Euler(0, 90, 0) * currentDir;
@@ -42,16 +72,39 @@ public class CarIntersectionNode : MonoBehaviour
                 break;
         }
 
-        Vector3 startPosition = carTransform.position;
+        // 進入方向から南北軸/東西軸と、軸内のどちら向きか（レーンA/B）を動的に判定する
+        // ※ここでの待機は行わない。譲り合い待機は TrafficStopZone 側ですでに解消済みの前提。
+        bool isNSAxis = Mathf.Abs(currentDir.x) < Mathf.Abs(currentDir.z);
+        CarYieldManager relevantManager = isNSAxis ? nsYieldManager : ewYieldManager;
+        bool isLaneA = isNSAxis ? currentDir.z >= 0f : currentDir.x >= 0f;
 
-        while (car != null && Vector3.Distance(startPosition, carTransform.position) < targetDistance)
+        if (relevantManager != null)
         {
-            yield return null;
+            // OnTriggerExit で ReportIntersectionExit を呼ぶための登録のみ行う
+            activeCars[car] = new ActiveCarInfo { manager = relevantManager, isLaneA = isLaneA };
         }
 
-        if (car != null)
+        if (choice == 0 || targetDistance <= 0.01f)
         {
-            car.SetDirection(nextDirection);
+            if (car != null) car.SetDirection(nextDirection);
+            yield break;
+        }
+
+        Vector3 startPosition = carTransform.position;
+        Quaternion startRot = Quaternion.LookRotation(currentDir);
+        Quaternion endRot = Quaternion.LookRotation(nextDirection);
+
+        while (car != null)
+        {
+            float traveled = Vector3.Distance(startPosition, carTransform.position);
+            float t = Mathf.Clamp01(traveled / targetDistance);
+
+            Vector3 interpolatedDir = Quaternion.Slerp(startRot, endRot, t) * Vector3.forward;
+            car.SetDirection(interpolatedDir);
+
+            if (t >= 1f) yield break;
+
+            yield return new WaitForFixedUpdate();
         }
     }
 }
