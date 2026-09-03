@@ -10,8 +10,18 @@ public class CarController : MonoBehaviour
     public float obstacleCheckDistance = 6f;
     public float obstacleCheckRadius = 1.2f;
     public float mass = 1000f;
+
+    [Header("車体・停止余裕の設定")]
+    public float vehicleLength = 6f;
+    public float brakingSafetyBuffer = 2f;
+
+    [Header("計画的な停止（信号・譲り合い・歩行者待ち）専用の減速度")]
+    [Tooltip("あらかじめ止まるとわかっている場合は、障害物回避より強めにブレーキをかけて、手前で止まれるようにする")]
+    public float voluntaryStopDeceleration = 14f;
+
     bool isLightStopped = false;
     bool isYieldStopped = false;
+    bool isPedestrianStopped = false;
 
     Rigidbody rb;
     Vector3 targetDirection;
@@ -20,6 +30,7 @@ public class CarController : MonoBehaviour
     public void SetDirection(Vector3 direction)
     {
         targetDirection = direction.normalized;
+
         if (targetDirection != Vector3.zero)
         {
             transform.rotation = Quaternion.LookRotation(targetDirection);
@@ -36,6 +47,11 @@ public class CarController : MonoBehaviour
         isYieldStopped = stop;
     }
 
+    public void SetPedestrianStop(bool stop)
+    {
+        isPedestrianStopped = stop;
+    }
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -47,11 +63,20 @@ public class CarController : MonoBehaviour
 
     void FixedUpdate()
     {
+
         Quaternion lookRot = Quaternion.LookRotation(targetDirection);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRot, Time.fixedDeltaTime * turnLerpSpeed);
 
-        float target = (HasObstacleAhead() || isLightStopped || isYieldStopped) ? 0f : moveSpeed;
-        currentSpeed = Mathf.MoveTowards(currentSpeed, target, acceleration * Time.fixedDeltaTime);
+        bool obstacleAhead = HasObstacleAhead();
+        bool voluntaryStop = isLightStopped || isYieldStopped || isPedestrianStopped;
+
+        float target = (obstacleAhead || voluntaryStop) ? 0f : moveSpeed;
+
+        // 障害物回避は物理的な制動距離を確保した緩やかな減速、
+        // 信号待ち・譲り合い・歩行者待ちは、あらかじめ分かっている停止なので強めに減速して手前で止める
+        float decelRate = (!obstacleAhead && voluntaryStop) ? voluntaryStopDeceleration : acceleration;
+
+        currentSpeed = Mathf.MoveTowards(currentSpeed, target, decelRate * Time.fixedDeltaTime);
 
         Vector3 forwardVel = transform.forward * currentSpeed;
         Vector3 lateralVel = ComputeLaneCorrection();
@@ -71,6 +96,7 @@ public class CarController : MonoBehaviour
         foreach (Collider hit in hits)
         {
             if (hit.CompareTag("BIkeLane_L") || hit.CompareTag("Sidewalk_L"))
+
             {
                 correction += transform.right;
             }
@@ -104,17 +130,36 @@ public class CarController : MonoBehaviour
         return correction.normalized * laneCorrectionSpeed;
     }
 
+
     bool HasObstacleAhead()
     {
-        Vector3 origin = transform.position + Vector3.up * 0.5f;
-        RaycastHit hit;
+        float frontOffset = vehicleLength * 0.5f;
+        Vector3 origin = transform.position + Vector3.up * 0.5f + transform.forward * frontOffset;
 
-        if (Physics.SphereCast(origin, obstacleCheckRadius, transform.forward, out hit, obstacleCheckDistance, ~0, QueryTriggerInteraction.Ignore))
+        float brakingDistance = (currentSpeed * currentSpeed) / (2f * Mathf.Max(acceleration, 0.01f));
+        float checkDistance = Mathf.Max(obstacleCheckDistance, brakingDistance + brakingSafetyBuffer);
+
+        // 旧実装は SphereCast（最も手前のヒット1件のみ）を使っていたため、
+        // 交差点付近にある無関係なコライダー（縁石・標識・停止線マーカーなど）に
+        // 一番手前で当たると、その奥で歩行者待ち・信号待ちをしている車を
+        // 検知できずに素通りしてしまうバグがあった。
+        // SphereCastAll で経路上の全ヒットを手前から順に調べ、
+        // 無関係な物はすり抜けて、車・自転車・歩行者が見つかった時点で
+        // 「障害物あり」と判定するように修正。
+        RaycastHit[] hits = Physics.SphereCastAll(origin, obstacleCheckRadius, transform.forward, checkDistance, ~0, QueryTriggerInteraction.Ignore);
+
+        if (hits.Length > 0)
         {
-            if (hit.collider.transform.IsChildOf(transform)) return false;
-            if (hit.collider.GetComponentInParent<CarController>() != null) return true;
-            if (hit.collider.GetComponentInParent<BicycleController>() != null) return true;
-            if (hit.collider.GetComponentInParent<NPCWalker>() != null) return true;
+            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+            foreach (RaycastHit hit in hits)
+            {
+                if (hit.collider.transform.IsChildOf(transform)) continue; // 自分自身は無視して奥を確認
+                if (hit.collider.GetComponentInParent<CarController>() != null) return true;
+                if (hit.collider.GetComponentInParent<BicycleController>() != null) return true;
+                if (hit.collider.GetComponentInParent<NPCWalker>() != null) return true;
+                // 関係のない物体（縁石・看板など）はここでは判定せず、次のヒットを確認する
+            }
         }
 
         return false;
