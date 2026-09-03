@@ -14,6 +14,13 @@ public class CarIntersectionNode : MonoBehaviour
     [Header("東西方向の対向車線マネージャー（省略可）")]
     public CarYieldManager ewYieldManager;
 
+    [Header("横断歩道の位置（省略可、Intersection_01のCrosswalk_1〜4をドラッグ）")]
+    public Transform crosswalkNorth;
+    public Transform crosswalkSouth;
+    public Transform crosswalkEast;
+    public Transform crosswalkWest;
+    public float crosswalkCheckRadius = 3f;
+
     private class ActiveCarInfo
     {
         public CarYieldManager manager;
@@ -72,8 +79,27 @@ public class CarIntersectionNode : MonoBehaviour
                 break;
         }
 
+        // 進入時に通る横断歩道（来た方向の逆側）と、旋回後に通る横断歩道（nextDirection側）が
+        // どちらも人がいなくなるまで、曲がり始める前に待つ
+        Transform entryCrosswalk = GetCrosswalkForDirection(-currentDir);
+        Transform exitCrosswalk = GetCrosswalkForDirection(nextDirection);
+
+        if (entryCrosswalk != null || exitCrosswalk != null)
+        {
+            car.SetPedestrianStop(true);
+
+            while (car != null && (!IsCrosswalkClear(entryCrosswalk) || !IsCrosswalkClear(exitCrosswalk)))
+            {
+                yield return null;
+            }
+
+            if (car == null) yield break;
+
+            car.SetPedestrianStop(false);
+        }
+
         // 進入方向から南北軸/東西軸と、軸内のどちら向きか（レーンA/B）を動的に判定する
-        // ※ここでの待機は行わない。譲り合い待機は TrafficStopZone 側ですでに解消済みの前提。
+        // ※ここでの対向車線の待機は行わない。譲り合い待機は TrafficStopZone 側ですでに解消済みの前提。
         bool isNSAxis = Mathf.Abs(currentDir.x) < Mathf.Abs(currentDir.z);
         CarYieldManager relevantManager = isNSAxis ? nsYieldManager : ewYieldManager;
         bool isLaneA = isNSAxis ? currentDir.z >= 0f : currentDir.x >= 0f;
@@ -106,5 +132,31 @@ public class CarIntersectionNode : MonoBehaviour
 
             yield return new WaitForFixedUpdate();
         }
+    }
+
+    Transform GetCrosswalkForDirection(Vector3 dir)
+    {
+        if (Mathf.Abs(dir.x) > Mathf.Abs(dir.z))
+        {
+            return dir.x >= 0f ? crosswalkEast : crosswalkWest;
+        }
+        else
+        {
+            return dir.z >= 0f ? crosswalkNorth : crosswalkSouth;
+        }
+    }
+
+    bool IsCrosswalkClear(Transform crosswalk)
+    {
+        if (crosswalk == null) return true;
+
+        Collider[] hits = Physics.OverlapSphere(crosswalk.position, crosswalkCheckRadius, ~0, QueryTriggerInteraction.Ignore);
+
+        foreach (Collider hit in hits)
+        {
+            if (hit.GetComponentInParent<NPCWalker>() != null) return false;
+        }
+
+        return true;
     }
 }
