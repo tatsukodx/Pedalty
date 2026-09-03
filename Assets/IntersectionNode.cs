@@ -18,14 +18,13 @@ public class IntersectionNode : MonoBehaviour
         NPCWalker walker = other.GetComponentInParent<NPCWalker>();
         if (walker != null && !walker.IsAtIntersection)
         {
-            walker.SetAtIntersection(true);  // 即座にロック
+            walker.SetAtIntersection(true);
             StartCoroutine(TurnWithDelay(walker, walker.transform));
         }
     }
 
     private IEnumerator TurnWithDelay(NPCWalker walker, Transform npcTransform)
     {
-        // 方向を先に決める
         Vector3 currentDir = npcTransform.forward;
         Vector3 rightDir = Quaternion.Euler(0, 90, 0) * currentDir;
         Vector3 leftDir = Quaternion.Euler(0, -90, 0) * currentDir;
@@ -53,11 +52,13 @@ public class IntersectionNode : MonoBehaviour
 
             walker.SetTrafficStop(true);
 
-            // 進行方向と平行な車道の信号が青になった瞬間（または歩車分離の専用フェーズ）に渡れる
+            // 進行方向と平行な車道の信号が青、または南北・東西どちらの車道も青でない
+            // （＝歩車分離式の専用フェーズなど）場合にのみ渡ってよい
             while (walker != null)
             {
                 bool parallelGreen = crossingNSRoad ? manager.IsEW_CarGreen : manager.IsNS_CarGreen;
-                if (parallelGreen || manager.IsPedestrianGreen) break;
+                bool bothCarsStopped = !manager.IsNS_CarGreen && !manager.IsEW_CarGreen;
+                if (parallelGreen || bothCarsStopped) break;
                 yield return null;
             }
 
@@ -74,7 +75,6 @@ public class IntersectionNode : MonoBehaviour
             walker.SetCrossing(true);
         }
 
-        // 歩行者がこのトリガーから離れるまで少し待ってからロック解除
         yield return new WaitForSeconds(1.5f);
 
         if (walker != null)
