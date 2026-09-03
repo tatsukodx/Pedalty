@@ -19,9 +19,14 @@ public class CarController : MonoBehaviour
     [Tooltip("あらかじめ止まるとわかっている場合は、障害物回避より強めにブレーキをかけて、手前で止まれるようにする")]
     public float voluntaryStopDeceleration = 14f;
 
+    [Header("左折時に歩行者を待つ場合の減速度")]
+    [Tooltip("左折は奥の横断歩道（対向側）を確認するため、通常の歩行者待ちよりさらに強めにブレーキをかけて、より手前で停止させる")]
+    public float leftTurnPedestrianStopDeceleration = 22f;
+
     bool isLightStopped = false;
     bool isYieldStopped = false;
     bool isPedestrianStopped = false;
+    bool isLeftTurnPedestrianStop = false;
 
     Rigidbody rb;
     Vector3 targetDirection;
@@ -47,9 +52,10 @@ public class CarController : MonoBehaviour
         isYieldStopped = stop;
     }
 
-    public void SetPedestrianStop(bool stop)
+    public void SetPedestrianStop(bool stop, bool isLeftTurn = false)
     {
         isPedestrianStopped = stop;
+        isLeftTurnPedestrianStop = stop && isLeftTurn;
     }
 
     void Start()
@@ -74,7 +80,9 @@ public class CarController : MonoBehaviour
 
         // 障害物回避は物理的な制動距離を確保した緩やかな減速、
         // 信号待ち・譲り合い・歩行者待ちは、あらかじめ分かっている停止なので強めに減速して手前で止める
-        float decelRate = (!obstacleAhead && voluntaryStop) ? voluntaryStopDeceleration : acceleration;
+        // 左折時の歩行者待ちは、奥の横断歩道を見て判断するため、通常よりさらに強く減速してより手前で止める
+        float voluntaryDecel = isLeftTurnPedestrianStop ? leftTurnPedestrianStopDeceleration : voluntaryStopDeceleration;
+        float decelRate = (!obstacleAhead && voluntaryStop) ? voluntaryDecel : acceleration;
 
         currentSpeed = Mathf.MoveTowards(currentSpeed, target, decelRate * Time.fixedDeltaTime);
 

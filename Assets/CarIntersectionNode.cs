@@ -92,9 +92,11 @@ public class CarIntersectionNode : MonoBehaviour
         Transform entryCrosswalk = GetCrosswalkForDirection(-currentDir);
         Transform exitCrosswalk = GetCrosswalkForDirection(nextDirection);
 
+        bool isLeftTurn = (choice == 2);
+
         if (entryCrosswalk != null || exitCrosswalk != null)
         {
-            car.SetPedestrianStop(true);
+            car.SetPedestrianStop(true, isLeftTurn);
 
 
             while (car != null && (!IsCrosswalkClear(entryCrosswalk) || !IsCrosswalkClear(exitCrosswalk)))
