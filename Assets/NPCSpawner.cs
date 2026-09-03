@@ -26,7 +26,6 @@ public class NPCSpawner : MonoBehaviour
     {
         GameObject[] allObjects = Resources.LoadAll<GameObject>("NPC_Models");
         
-        // アニメーションのみのFBXを除外し、体のメッシュを持つモデルだけを使う
         foreach (GameObject obj in allObjects)
         {
             if (obj.GetComponentInChildren<SkinnedMeshRenderer>() != null)
@@ -69,31 +68,37 @@ public class NPCSpawner : MonoBehaviour
 
         GameObject newNPC = Instantiate(baseNpcPrefab, spawnPoint.position, spawnPoint.rotation);
 
+        // NPCWalker（＝Rigidbody/Collider/Animatorも一緒に乗っている本体）は
+        // ルート直下ではなく子オブジェクトにあるため、GetComponentInChildrenで探す
+        NPCWalker walker = newNPC.GetComponentInChildren<NPCWalker>();
+
         // 見た目のモデルだけをランダムに差し替える
-        if (validNpcModels.Count > 0)
+        if (validNpcModels.Count > 0 && walker != null)
         {
             int randomModelIndex = Random.Range(0, validNpcModels.Count);
             GameObject chosenModel = validNpcModels[randomModelIndex];
-            
-            StartCoroutine(ReplaceVisualCoroutine(newNPC, chosenModel));
+
+            // 差し替え対象は「NPCWalkerが付いている本体オブジェクト」自身ではなく、
+            // その中の見た目（メッシュ・ボーン）だけにする
+            StartCoroutine(ReplaceVisualCoroutine(walker.gameObject, chosenModel));
         }
 
-        NPCWalker walker = newNPC.GetComponent<NPCWalker>();
         if (walker != null && randomPointIndex < moveDirections.Length)
         {
             walker.SetDirection(moveDirections[randomPointIndex]);
         }
     }
 
-    IEnumerator ReplaceVisualCoroutine(GameObject npcObj, GameObject newModelPrefab)
+    IEnumerator ReplaceVisualCoroutine(GameObject bodyObj, GameObject newModelPrefab)
     {
-        // 古い見た目とボーンを破棄する
-        int childCount = npcObj.transform.childCount;
+        // bodyObj自体（NPCWalker/Rigidbody/Collider/Animatorが乗っているオブジェクト）は消さず、
+        // その中の古い見た目とボーンだけを破棄する
+        int childCount = bodyObj.transform.childCount;
         GameObject[] childrenToDelete = new GameObject[childCount];
         
         for (int i = 0; i < childCount; i++)
         {
-            childrenToDelete[i] = npcObj.transform.GetChild(i).gameObject;
+            childrenToDelete[i] = bodyObj.transform.GetChild(i).gameObject;
         }
 
         foreach (GameObject child in childrenToDelete)
@@ -104,16 +109,16 @@ public class NPCSpawner : MonoBehaviour
         // 破棄が完了するまで1フレーム待つ
         yield return null;
 
-        if (npcObj == null) yield break;
+        if (bodyObj == null) yield break;
 
-        GameObject visual = Instantiate(newModelPrefab, npcObj.transform);
+        GameObject visual = Instantiate(newModelPrefab, bodyObj.transform);
         visual.transform.localPosition = Vector3.zero;
         
         // モデル固有の初期回転を捨て、ベースの正面に合わせる
         visual.transform.localRotation = Quaternion.identity;
 
         Animator childAnimator = visual.GetComponent<Animator>();
-        Animator baseAnimator = npcObj.GetComponent<Animator>();
+        Animator baseAnimator = bodyObj.GetComponent<Animator>();
         
         if (childAnimator != null && baseAnimator != null)
         {

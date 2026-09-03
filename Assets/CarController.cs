@@ -7,9 +7,14 @@ public class CarController : MonoBehaviour
     public float turnLerpSpeed = 4f;
     public float laneCorrectionSpeed = 4f;
     public float laneSensorRadius = 1f;
-    public float obstacleCheckDistance = 6f;
+    public float obstacleCheckDistance = 6f; // 最低確保する検知距離（低速時の下限として使用）
     public float obstacleCheckRadius = 1.2f;
     public float mass = 1000f;
+
+    [Header("車体・停止余裕の設定")]
+    public float vehicleLength = 6f;      // Cars.prefab の BoxCollider.size.z と合わせる
+    public float brakingSafetyBuffer = 2f; // 制動距離に追加で確保する余裕（m）
+
     bool isLightStopped = false;
     bool isYieldStopped = false;
     bool isPedestrianStopped = false;
@@ -67,6 +72,7 @@ public class CarController : MonoBehaviour
         rb.angularVelocity = Vector3.zero;
     }
 
+
     Vector3 ComputeLaneCorrection()
     {
         Collider[] hits = Physics.OverlapSphere(transform.position, laneSensorRadius, ~0, QueryTriggerInteraction.Collide);
@@ -112,10 +118,17 @@ public class CarController : MonoBehaviour
 
     bool HasObstacleAhead()
     {
-        Vector3 origin = transform.position + Vector3.up * 0.5f;
+        // 中心ではなく前バンパー付近を起点にする
+        float frontOffset = vehicleLength * 0.5f;
+        Vector3 origin = transform.position + Vector3.up * 0.5f + transform.forward * frontOffset;
+
+        // 現在速度から物理的に必要な制動距離 + 余裕分を動的に確保する
+        float brakingDistance = (currentSpeed * currentSpeed) / (2f * Mathf.Max(acceleration, 0.01f));
+        float checkDistance = Mathf.Max(obstacleCheckDistance, brakingDistance + brakingSafetyBuffer);
+
         RaycastHit hit;
 
-        if (Physics.SphereCast(origin, obstacleCheckRadius, transform.forward, out hit, obstacleCheckDistance, ~0, QueryTriggerInteraction.Ignore))
+        if (Physics.SphereCast(origin, obstacleCheckRadius, transform.forward, out hit, checkDistance, ~0, QueryTriggerInteraction.Ignore))
         {
             if (hit.collider.transform.IsChildOf(transform)) return false;
             if (hit.collider.GetComponentInParent<CarController>() != null) return true;

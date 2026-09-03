@@ -19,10 +19,18 @@ public class CarIntersectionNode : MonoBehaviour
     public Transform crosswalkSouth;
     public Transform crosswalkEast;
     public Transform crosswalkWest;
-    public float crosswalkCheckRadius = 3f;
+
+    [Header("横断歩道の判定範囲（横断歩道のTransformのローカル軸基準）")]
+    [Tooltip("横断歩道と平行な方向（人が横切る向き）の幅")]
+    public float crosswalkWidth = 6f;
+    [Tooltip("車の進行方向にあたる奥行き（横断歩道の厚み）")]
+    public float crosswalkDepth = 3f;
+    [Tooltip("判定する高さ（上下方向）")]
+    public float crosswalkHeight = 3f;
 
     private class ActiveCarInfo
     {
+
         public CarYieldManager manager;
         public bool isLaneA;
     }
@@ -55,6 +63,8 @@ public class CarIntersectionNode : MonoBehaviour
 
     private IEnumerator TurnSmoothly(CarController car, Transform carTransform)
     {
+
+        Vector3 entryPosition = carTransform.position;
         Vector3 currentDir = carTransform.forward;
         Vector3 rightDir = Quaternion.Euler(0, 90, 0) * currentDir;
         Vector3 leftDir = Quaternion.Euler(0, -90, 0) * currentDir;
@@ -79,14 +89,13 @@ public class CarIntersectionNode : MonoBehaviour
                 break;
         }
 
-        // 進入時に通る横断歩道（来た方向の逆側）と、旋回後に通る横断歩道（nextDirection側）が
-        // どちらも人がいなくなるまで、曲がり始める前に待つ
         Transform entryCrosswalk = GetCrosswalkForDirection(-currentDir);
         Transform exitCrosswalk = GetCrosswalkForDirection(nextDirection);
 
         if (entryCrosswalk != null || exitCrosswalk != null)
         {
             car.SetPedestrianStop(true);
+
 
             while (car != null && (!IsCrosswalkClear(entryCrosswalk) || !IsCrosswalkClear(exitCrosswalk)))
             {
@@ -96,17 +105,17 @@ public class CarIntersectionNode : MonoBehaviour
             if (car == null) yield break;
 
             car.SetPedestrianStop(false);
+
+            float traveledWhileWaiting = Vector3.Distance(entryPosition, carTransform.position);
+            targetDistance = Mathf.Max(0.01f, targetDistance - traveledWhileWaiting);
         }
 
-        // 進入方向から南北軸/東西軸と、軸内のどちら向きか（レーンA/B）を動的に判定する
-        // ※ここでの対向車線の待機は行わない。譲り合い待機は TrafficStopZone 側ですでに解消済みの前提。
         bool isNSAxis = Mathf.Abs(currentDir.x) < Mathf.Abs(currentDir.z);
         CarYieldManager relevantManager = isNSAxis ? nsYieldManager : ewYieldManager;
         bool isLaneA = isNSAxis ? currentDir.z >= 0f : currentDir.x >= 0f;
 
         if (relevantManager != null)
         {
-            // OnTriggerExit で ReportIntersectionExit を呼ぶための登録のみ行う
             activeCars[car] = new ActiveCarInfo { manager = relevantManager, isLaneA = isLaneA };
         }
 
@@ -119,6 +128,7 @@ public class CarIntersectionNode : MonoBehaviour
         Vector3 startPosition = carTransform.position;
         Quaternion startRot = Quaternion.LookRotation(currentDir);
         Quaternion endRot = Quaternion.LookRotation(nextDirection);
+
 
         while (car != null)
         {
@@ -150,7 +160,9 @@ public class CarIntersectionNode : MonoBehaviour
     {
         if (crosswalk == null) return true;
 
-        Collider[] hits = Physics.OverlapSphere(crosswalk.position, crosswalkCheckRadius, ~0, QueryTriggerInteraction.Ignore);
+        Vector3 halfExtents = new Vector3(crosswalkWidth * 0.5f, crosswalkHeight * 0.5f, crosswalkDepth * 0.5f);
+        Collider[] hits = Physics.OverlapBox(crosswalk.position, halfExtents, crosswalk.rotation, ~0, QueryTriggerInteraction.Ignore);
+
 
         foreach (Collider hit in hits)
         {
@@ -159,4 +171,26 @@ public class CarIntersectionNode : MonoBehaviour
 
         return true;
     }
+
+#if UNITY_EDITOR
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = new Color(1f, 1f, 0f, 0.35f);
+        Vector3 size = new Vector3(crosswalkWidth, crosswalkHeight, crosswalkDepth);
+
+        DrawCrosswalkGizmo(crosswalkNorth, size);
+        DrawCrosswalkGizmo(crosswalkSouth, size);
+        DrawCrosswalkGizmo(crosswalkEast, size);
+        DrawCrosswalkGizmo(crosswalkWest, size);
+    }
+
+    void DrawCrosswalkGizmo(Transform crosswalk, Vector3 size)
+    {
+        if (crosswalk == null) return;
+        Matrix4x4 oldMatrix = Gizmos.matrix;
+        Gizmos.matrix = Matrix4x4.TRS(crosswalk.position, crosswalk.rotation, Vector3.one);
+        Gizmos.DrawCube(Vector3.zero, size);
+        Gizmos.matrix = oldMatrix;
+    }
+#endif
 }

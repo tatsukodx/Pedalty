@@ -52,13 +52,17 @@ public class IntersectionNode : MonoBehaviour
 
             walker.SetTrafficStop(true);
 
-            // 進行方向と平行な車道の信号が青、または南北・東西どちらの車道も青でない
-            // （＝歩車分離式の専用フェーズなど）場合にのみ渡ってよい
+            // 許可が出るのは次の2パターンのみ：
+            // ① 進行方向と平行な車道の信号が実際に「青」になったとき
+            // ② 歩車分離モードの歩行者専用フェーズ（Pedestrian_Green/Blink）になったとき
+            // 黄信号中・全赤バッファ中はどちらにも該当しないため、絶対に渡らせない
             while (walker != null)
             {
                 bool parallelGreen = crossingNSRoad ? manager.IsEW_CarGreen : manager.IsNS_CarGreen;
-                bool bothCarsStopped = !manager.IsNS_CarGreen && !manager.IsEW_CarGreen;
-                if (parallelGreen || bothCarsStopped) break;
+                bool dedicatedPedPhase = manager.CurrentPhase == TrafficLightPhase.Pedestrian_Green
+                                       || manager.CurrentPhase == TrafficLightPhase.Pedestrian_Blink;
+
+                if (parallelGreen || dedicatedPedPhase) break;
                 yield return null;
             }
 
