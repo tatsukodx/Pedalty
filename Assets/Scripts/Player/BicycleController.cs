@@ -58,12 +58,29 @@ public class BicycleController : MonoBehaviour
     private Quaternion startRotation;
     private bool controlEnabled = true;
     private bool initialized;
+    private bool isAtRoadEnd;
+    private Vector3 roadEndOutwardDirection;
 
     public bool ControlEnabled => controlEnabled;
 
     public void ApplyBrake(bool brake)
     {
         isBraking = brake;
+    }
+
+    /// <summary>
+    /// 道路端の外向き方向を登録する。接触中でも内側へ戻る移動と旋回は許可する。
+    /// </summary>
+    public void SetRoadEndBoundary(bool active, Vector3 outwardDirection)
+    {
+        isAtRoadEnd = active;
+        roadEndOutwardDirection = outwardDirection;
+        roadEndOutwardDirection.y = 0f;
+
+        if (roadEndOutwardDirection.sqrMagnitude > 0.001f)
+        {
+            roadEndOutwardDirection.Normalize();
+        }
     }
 
     void Awake()
@@ -136,13 +153,21 @@ public class BicycleController : MonoBehaviour
                 currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, deceleration * Time.deltaTime);
             }
 
-            // 壁にぶつかって実速度が落ちたぶんを currentSpeed へ反映する
-            if (Mathf.Abs(currentSpeed) > 1.5f && Mathf.Abs(realHorizontalSpeed) < Mathf.Abs(currentSpeed) - 1.5f)
+            bool blockedByRoadEnd = IsBlockedByRoadEnd(transform.forward * currentSpeed);
+
+            // 道路端で漕いでいる間は車輪の回転用速度を残す。
+            // それ以外の壁では、実速度が落ちたぶんを currentSpeed へ反映する。
+            if (!blockedByRoadEnd && Mathf.Abs(currentSpeed) > 1.5f &&
+                Mathf.Abs(realHorizontalSpeed) < Mathf.Abs(currentSpeed) - 1.5f)
             {
                 currentSpeed = Mathf.MoveTowards(currentSpeed, realHorizontalSpeed, acceleration * 3f * Time.deltaTime);
             }
 
             Vector3 moveDirection = transform.forward * currentSpeed;
+            if (IsBlockedByRoadEnd(moveDirection))
+            {
+                moveDirection = Vector3.zero;
+            }
             rb.linearVelocity = new Vector3(moveDirection.x, rb.linearVelocity.y, moveDirection.z);
         }
         else
@@ -161,14 +186,18 @@ public class BicycleController : MonoBehaviour
                 currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, acceleration * Time.deltaTime);
             }
 
+            bool blockedByRoadEnd = IsBlockedByRoadEnd(airVelocityVector);
+
             // 空中での壁衝突判定
-            if (airVelocityVector.magnitude > 1.5f && flatVelocity.magnitude < airVelocityVector.magnitude - 1.5f)
+            if (!blockedByRoadEnd && airVelocityVector.magnitude > 1.5f &&
+                flatVelocity.magnitude < airVelocityVector.magnitude - 1.5f)
             {
                 airVelocityVector = Vector3.MoveTowards(airVelocityVector, flatVelocity, acceleration * 4f * Time.deltaTime);
                 currentSpeed = Mathf.MoveTowards(currentSpeed, realHorizontalSpeed, acceleration * 4f * Time.deltaTime);
             }
 
-            rb.linearVelocity = new Vector3(airVelocityVector.x, rb.linearVelocity.y, airVelocityVector.z);
+            Vector3 airMovement = blockedByRoadEnd ? Vector3.zero : airVelocityVector;
+            rb.linearVelocity = new Vector3(airMovement.x, rb.linearVelocity.y, airMovement.z);
         }
 
         if (Input.GetKeyDown(KeyCode.Space) && grounded)
@@ -215,6 +244,7 @@ public class BicycleController : MonoBehaviour
         StopMovement();
         currentSteerAngle = 0f;
         isBraking = false;
+        SetRoadEndBoundary(false, Vector3.zero);
 
         if (handlebar != null)
         {
@@ -251,6 +281,17 @@ public class BicycleController : MonoBehaviour
 
         int displaySpeed = Mathf.RoundToInt(Mathf.Abs(currentSpeed) * 3.6f);
         speedText.text = "SPEED: " + displaySpeed + " km/h";
+    }
+
+    bool IsBlockedByRoadEnd(Vector3 movement)
+    {
+        if (!isAtRoadEnd || roadEndOutwardDirection.sqrMagnitude < 0.001f)
+        {
+            return false;
+        }
+
+        movement.y = 0f;
+        return Vector3.Dot(movement, roadEndOutwardDirection) > 0.01f;
     }
 
     private void Respawn()
