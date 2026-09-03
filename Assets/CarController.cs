@@ -139,14 +139,27 @@ public class CarController : MonoBehaviour
         float brakingDistance = (currentSpeed * currentSpeed) / (2f * Mathf.Max(acceleration, 0.01f));
         float checkDistance = Mathf.Max(obstacleCheckDistance, brakingDistance + brakingSafetyBuffer);
 
-        RaycastHit hit;
+        // 旧実装は SphereCast（最も手前のヒット1件のみ）を使っていたため、
+        // 交差点付近にある無関係なコライダー（縁石・標識・停止線マーカーなど）に
+        // 一番手前で当たると、その奥で歩行者待ち・信号待ちをしている車を
+        // 検知できずに素通りしてしまうバグがあった。
+        // SphereCastAll で経路上の全ヒットを手前から順に調べ、
+        // 無関係な物はすり抜けて、車・自転車・歩行者が見つかった時点で
+        // 「障害物あり」と判定するように修正。
+        RaycastHit[] hits = Physics.SphereCastAll(origin, obstacleCheckRadius, transform.forward, checkDistance, ~0, QueryTriggerInteraction.Ignore);
 
-        if (Physics.SphereCast(origin, obstacleCheckRadius, transform.forward, out hit, checkDistance, ~0, QueryTriggerInteraction.Ignore))
+        if (hits.Length > 0)
         {
-            if (hit.collider.transform.IsChildOf(transform)) return false;
-            if (hit.collider.GetComponentInParent<CarController>() != null) return true;
-            if (hit.collider.GetComponentInParent<BicycleController>() != null) return true;
-            if (hit.collider.GetComponentInParent<NPCWalker>() != null) return true;
+            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+            foreach (RaycastHit hit in hits)
+            {
+                if (hit.collider.transform.IsChildOf(transform)) continue; // 自分自身は無視して奥を確認
+                if (hit.collider.GetComponentInParent<CarController>() != null) return true;
+                if (hit.collider.GetComponentInParent<BicycleController>() != null) return true;
+                if (hit.collider.GetComponentInParent<NPCWalker>() != null) return true;
+                // 関係のない物体（縁石・看板など）はここでは判定せず、次のヒットを確認する
+            }
         }
 
         return false;
