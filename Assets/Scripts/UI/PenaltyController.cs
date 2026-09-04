@@ -35,6 +35,7 @@ public class PenaltyController : MonoBehaviour
 
     public void AddPenalty(int amount)
     {
+        if (GameDebugMode.IsEnabled) return;
         if (fineDisplay == null) return;
         fineDisplay.SetFineAmount(fineDisplay.CurrentFineAmount + amount);
     }
@@ -46,6 +47,8 @@ public class PenaltyController : MonoBehaviour
 
     public void ShowViolationPopup(ViolationInfo violation)
     {
+        if (GameDebugMode.IsEnabled) return;
+
         if (violationPopup == null)
         {
             Debug.LogError("[PenaltyController] violationPopupが設定されていません。");
@@ -63,6 +66,21 @@ public class PenaltyController : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         Time.timeScale = 0f;
+    }
+
+    /// <summary>
+    /// デバッグ開始時に残っている違反画面だけを閉じる。
+    /// カウントダウン中の停止状態を保つため、Time.timeScaleは変更しない。
+    /// </summary>
+    public void ClearViolationPopupForDebugMode()
+    {
+        if (violationPopup != null)
+        {
+            violationPopup.SetActive(false);
+        }
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     public void HideViolationPopup()

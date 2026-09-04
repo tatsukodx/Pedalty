@@ -39,6 +39,7 @@ public sealed class GameFlowUI : MonoBehaviour
     TextMeshProUGUI rulesPageText;
     TextMeshProUGUI rulesLeftActionText;
     TextMeshProUGUI rulesRightActionText;
+    TextMeshProUGUI debugModeText;
     GameObject rulesMapPlaceholder;
     Image rulesMapImage;
     Coroutine countdownCoroutine;
@@ -109,6 +110,7 @@ public sealed class GameFlowUI : MonoBehaviour
         BuildRulesPanel();
         BuildCountdownPanel();
         BuildResultsPanel();
+        BuildDebugModeIndicator();
 
         inputManager.OnMenuNext?.AddListener(HandleRightButton);
         inputManager.OnMenuBack?.AddListener(HandleLeftButton);
@@ -122,6 +124,16 @@ public sealed class GameFlowUI : MonoBehaviour
     {
         // ほかの実行時生成HUDより後ろへ回らないよう、初期化完了後に最前面へ置く。
         transform.SetAsLastSibling();
+    }
+
+    void Update()
+    {
+        // Spaceはプレイ中はジャンプに使われるため、スタート画面でのみ
+        // デバッグモード開始キーとして受け付ける。
+        if (state == FlowState.StartMenu && !menuInputLocked && Input.GetKeyDown(KeyCode.Space))
+        {
+            StartCountdown(true);
+        }
     }
 
     void BuildRoot()
@@ -263,6 +275,21 @@ public sealed class GameFlowUI : MonoBehaviour
         note.text = "リトライするとタイムと罰金額が0に戻ります";
     }
 
+    void BuildDebugModeIndicator()
+    {
+        debugModeText = CreateText(transform, "DebugModeIndicator", Vector2.zero,
+            new Vector2(420f, 34f), 17f, TextAlignmentOptions.Center, Cyan);
+        RectTransform rect = debugModeText.rectTransform;
+        rect.anchorMin = new Vector2(0.5f, 1f);
+        rect.anchorMax = new Vector2(0.5f, 1f);
+        rect.pivot = new Vector2(0.5f, 1f);
+        rect.anchoredPosition = new Vector2(0f, -12f);
+        debugModeText.text = "DEBUG MODE  /  違反判定なし";
+        debugModeText.outlineWidth = 0.18f;
+        debugModeText.outlineColor = Color.black;
+        debugModeText.gameObject.SetActive(false);
+    }
+
     GameObject CreateFullScreenPanel(string objectName, Color color)
     {
         GameObject panel = new GameObject(objectName, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
@@ -366,7 +393,7 @@ public sealed class GameFlowUI : MonoBehaviour
         switch (state)
         {
             case FlowState.StartMenu:
-                StartCountdown();
+                StartCountdown(false);
                 break;
             case FlowState.Rules:
                 if (rulesPageIndex < RuleTitles.Length - 1)
@@ -380,9 +407,10 @@ public sealed class GameFlowUI : MonoBehaviour
                 }
                 break;
             case FlowState.Results:
+                bool retryInDebugMode = GameDebugMode.IsEnabled;
                 ResetWorldActors();
                 BeginMenuInputGuard();
-                StartCountdown();
+                StartCountdown(retryInDebugMode);
                 break;
         }
     }
@@ -419,6 +447,8 @@ public sealed class GameFlowUI : MonoBehaviour
     {
         StopCountdownIfNeeded();
         ResetRunData();
+        GameDebugMode.SetEnabled(false);
+        debugModeText.gameObject.SetActive(false);
         state = FlowState.StartMenu;
         inputManager.isMenuState = true;
         Time.timeScale = 0f;
@@ -476,10 +506,18 @@ public sealed class GameFlowUI : MonoBehaviour
         rulesRightActionText.text = rulesPageIndex == RuleTitles.Length - 1 ? "説明を終了する" : "次のページへ";
     }
 
-    void StartCountdown()
+    void StartCountdown(bool useDebugMode)
     {
         StopCountdownIfNeeded();
         ResetRunData();
+        GameDebugMode.SetEnabled(useDebugMode);
+        debugModeText.gameObject.SetActive(false);
+
+        if (useDebugMode)
+        {
+            FindAnyObjectByType<PenaltyController>()?.ClearViolationPopupForDebugMode();
+        }
+
         state = FlowState.Countdown;
         inputManager.isMenuState = true;
         Time.timeScale = 0f;
@@ -506,6 +544,7 @@ public sealed class GameFlowUI : MonoBehaviour
         Time.timeScale = 1f;
         bicycle.SetControlEnabled(true);
         gameTimer.BeginTiming();
+        debugModeText.gameObject.SetActive(GameDebugMode.IsEnabled);
 
         yield return new WaitForSecondsRealtime(0.7f);
         countdownPanel.SetActive(false);
@@ -518,6 +557,7 @@ public sealed class GameFlowUI : MonoBehaviour
         if (state != FlowState.Playing) return;
 
         state = FlowState.Results;
+        debugModeText.gameObject.SetActive(false);
         bicycle.SetControlEnabled(false);
         inputManager.isMenuState = true;
         Time.timeScale = 0f;

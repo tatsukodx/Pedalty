@@ -84,6 +84,16 @@ public class TrafficViolationDetector : MonoBehaviour
         RoadSide currentSide = laneDetector.currentSide;
         bool bikeLaneExistsNearby = laneDetector.bikeLaneExistsNearby;
 
+        if (GameDebugMode.IsEnabled)
+        {
+            // デバッグ中も現在位置だけは追跡し、通常モードへ戻した際に
+            // 古い状態との差で誤検出しないようにする。
+            previousArea = currentArea;
+            previousSide = currentSide;
+            previousBikeLaneExistsNearby = bikeLaneExistsNearby;
+            return;
+        }
+
         if (currentArea != previousArea || currentSide != previousSide || bikeLaneExistsNearby != previousBikeLaneExistsNearby)
         {
             CheckViolation(currentArea, currentSide, bikeLaneExistsNearby);
