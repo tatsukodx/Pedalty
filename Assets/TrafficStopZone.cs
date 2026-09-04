@@ -94,8 +94,14 @@ public class TrafficStopZone : MonoBehaviour
             // まだ待機コルーチンが残っていれば停止し、譲り合い停止も解除しておく
             if (waitingCars.TryGetValue(car, out Coroutine c))
             {
-                StopCoroutine(c);
                 waitingCars.Remove(car);
+
+                // コルーチンがすでに完了・破棄されている場合は停止処理を呼ばない
+                if (c != null)
+                {
+                    StopCoroutine(c);
+                }
+
                 car.SetYieldStop(false);
             }
         }
