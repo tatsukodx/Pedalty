@@ -24,12 +24,18 @@ public class GoalDirectionIndicator : MonoBehaviour
     [SerializeField] private float minimumSizeRatio = 0.5f;
 
     private Vector2 maximumIndicatorSize;
+    private GoalTrigger goalTrigger;
 
     private void Awake()
     {
         if (targetCamera == null)
         {
             targetCamera = Camera.main;
+        }
+
+        if (goal != null)
+        {
+            goalTrigger = goal.GetComponent<GoalTrigger>();
         }
 
         if (indicator == null)
@@ -78,7 +84,10 @@ public class GoalDirectionIndicator : MonoBehaviour
         indicator.position = screenPosition;
 
         float distanceMeters = GetHorizontalDistance();
-        UpdateDistanceText(distanceMeters);
+        float displayedDistanceMeters = goalTrigger != null && goalTrigger.IsWithinFinishDistance(player)
+            ? 0f
+            : distanceMeters;
+        UpdateDistanceText(displayedDistanceMeters);
         UpdateIndicatorSize(distanceMeters);
     }
 
