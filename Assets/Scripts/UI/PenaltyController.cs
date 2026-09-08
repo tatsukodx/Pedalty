@@ -45,6 +45,14 @@ public class PenaltyController : MonoBehaviour
         return fineDisplay != null ? fineDisplay.CurrentFineAmount : 0;
     }
 
+    private void Update()
+    {
+        if (violationPopup != null && violationPopup.activeSelf && Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            HideViolationPopup();
+        }
+    }
+
     public void ShowViolationPopup(ViolationInfo violation)
     {
         if (GameDebugMode.IsEnabled) return;
