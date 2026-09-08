@@ -178,6 +178,17 @@ public class CarIntersectionNode : MonoBehaviour
         {
             while (car != null)
             {
+                // ロックしていても、旋回中に何らかの理由で歩行者が入ってきた場合の保険として、
+                // 継続してチェックし続ける
+                if (exitCrosswalk != null && !IsCrosswalkClear(exitCrosswalk))
+                {
+                    car.SetPedestrianStop(true, isLeftTurn);
+                    yield return new WaitForFixedUpdate();
+                    continue;
+                }
+
+                car.SetPedestrianStop(false);
+
                 float traveled = Vector3.Distance(startPosition, carTransform.position);
                 float t = Mathf.Clamp01(traveled / targetDistance);
 
@@ -215,10 +226,12 @@ public class CarIntersectionNode : MonoBehaviour
         Vector3 halfExtents = new Vector3(crosswalkWidth * 0.5f, crosswalkHeight * 0.5f, crosswalkDepth * 0.5f);
         Collider[] hits = Physics.OverlapBox(crosswalk.position, halfExtents, crosswalk.rotation, ~0, QueryTriggerInteraction.Ignore);
 
-
         foreach (Collider hit in hits)
         {
-            if (hit.GetComponentInParent<NPCWalker>() != null) return false;
+            // 横断歩道付近の歩道を歩いているだけの歩行者まで巻き込まないよう、
+            // 実際に道路を横断中（IsCrossing）の歩行者だけを対象にする
+            NPCWalker walker = hit.GetComponentInParent<NPCWalker>();
+            if (walker != null && walker.IsCrossing) return false;
         }
 
         return true;

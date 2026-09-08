@@ -5052,8 +5052,8 @@ MonoBehaviour:
   crosswalkSouth: {fileID: 31859832}
   crosswalkEast: {fileID: 746111286}
   crosswalkWest: {fileID: 737591857}
-  crosswalkWidth: 6
-  crosswalkDepth: 6
+  crosswalkWidth: 5
+  crosswalkDepth: 5
   crosswalkHeight: 3
 --- !u!65 &75610557
 BoxCollider:
@@ -20254,6 +20254,7 @@ MonoBehaviour:
   currentArea: 0
   currentSide: 0
   bikeLaneExistsNearby: 0
+  minSpeedForDirection: 0.5
 --- !u!114 &415440748
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26232,8 +26233,8 @@ MonoBehaviour:
   crosswalkSouth: {fileID: 1781180161}
   crosswalkEast: {fileID: 1931199959}
   crosswalkWest: {fileID: 43208473}
-  crosswalkWidth: 6
-  crosswalkDepth: 6
+  crosswalkWidth: 5
+  crosswalkDepth: 5
   crosswalkHeight: 3
 --- !u!65 &580389901
 BoxCollider:
@@ -31835,8 +31836,8 @@ MonoBehaviour:
   crosswalkSouth: {fileID: 1689307812}
   crosswalkEast: {fileID: 1373367093}
   crosswalkWest: {fileID: 460851825}
-  crosswalkWidth: 6
-  crosswalkDepth: 6
+  crosswalkWidth: 5
+  crosswalkDepth: 5
   crosswalkHeight: 4
 --- !u!65 &727530893
 BoxCollider:
@@ -38995,8 +38996,8 @@ MonoBehaviour:
   crosswalkSouth: {fileID: 512997299}
   crosswalkEast: {fileID: 579023941}
   crosswalkWest: {fileID: 1343677405}
-  crosswalkWidth: 6
-  crosswalkDepth: 6
+  crosswalkWidth: 5
+  crosswalkDepth: 5
   crosswalkHeight: 3
 --- !u!65 &873389803
 BoxCollider:
@@ -61380,8 +61381,8 @@ MonoBehaviour:
   crosswalkSouth: {fileID: 260914181}
   crosswalkEast: {fileID: 2028772474}
   crosswalkWest: {fileID: 2132661096}
-  crosswalkWidth: 6
-  crosswalkDepth: 6
+  crosswalkWidth: 5
+  crosswalkDepth: 5
   crosswalkHeight: 3
 --- !u!65 &1374207896
 BoxCollider:
@@ -73300,8 +73301,8 @@ MonoBehaviour:
   crosswalkSouth: {fileID: 1299839099}
   crosswalkEast: {fileID: 1081990474}
   crosswalkWest: {fileID: 1823175304}
-  crosswalkWidth: 6
-  crosswalkDepth: 6
+  crosswalkWidth: 5
+  crosswalkDepth: 5
   crosswalkHeight: 3
 --- !u!65 &1621321579
 BoxCollider:
