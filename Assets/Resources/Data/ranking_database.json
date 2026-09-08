@@ -1,3 +1,60 @@
 {
-  "records": []
+    "records": [
+        {
+            "recordId": "50799b3a7463405ea6a1b3158837827d",
+            "playerName": "090815500",
+            "playedAt": "2026-09-08T15:50:21+09:00",
+            "violationCount": 0,
+            "fineAmount": 0,
+            "clearTimeSeconds": 62.67427444458008
+        },
+        {
+            "recordId": "1cbd95988fe2420282d4489d72c27b2d",
+            "playerName": "090815330",
+            "playedAt": "2026-09-08T15:33:17+09:00",
+            "violationCount": 0,
+            "fineAmount": 0,
+            "clearTimeSeconds": 65.7969741821289
+        },
+        {
+            "recordId": "11894bbc7f444b238347e4a0197e9241",
+            "playerName": "090815430",
+            "playedAt": "2026-09-08T15:43:34+09:00",
+            "violationCount": 0,
+            "fineAmount": 0,
+            "clearTimeSeconds": 66.38971710205078
+        },
+        {
+            "recordId": "f97abe6e16a0436299ffc3d2902420f0",
+            "playerName": "090815310",
+            "playedAt": "2026-09-08T15:31:53+09:00",
+            "violationCount": 0,
+            "fineAmount": 0,
+            "clearTimeSeconds": 68.93437957763672
+        },
+        {
+            "recordId": "d4c00b95a2d14f148a53925f63c8e67f",
+            "playerName": "090815350",
+            "playedAt": "2026-09-08T15:35:38+09:00",
+            "violationCount": 15,
+            "fineAmount": 88000,
+            "clearTimeSeconds": 75.17894744873047
+        },
+        {
+            "recordId": "835e4c7c56cc47e3b8ca4c51cdbc3468",
+            "playerName": "090816160",
+            "playedAt": "2026-09-08T16:16:06+09:00",
+            "violationCount": 7,
+            "fineAmount": 39000,
+            "clearTimeSeconds": 77.83806610107422
+        },
+        {
+            "recordId": "cb1c3da69f264145a655bd5384817cce",
+            "playerName": "090815460",
+            "playedAt": "2026-09-08T15:46:56+09:00",
+            "violationCount": 18,
+            "fineAmount": 105000,
+            "clearTimeSeconds": 87.4030532836914
+        }
+    ]
 }
