@@ -35638,7 +35638,7 @@ Transform:
   m_GameObject: {fileID: 815959812}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 848.4, y: 7.2, z: -192}
+  m_LocalPosition: {x: 838.4, y: 7.2, z: -192}
   m_LocalScale: {x: 20, y: 20, z: 20}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -35657,6 +35657,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GoalTrigger
   gameTimer: {fileID: 2000000002}
+  finishDistanceMeters: 5
 --- !u!1001 &817636965
 PrefabInstance:
   m_ObjectHideFlags: 0
