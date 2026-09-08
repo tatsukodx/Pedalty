@@ -9,6 +9,7 @@ public class NPCWalker : MonoBehaviour
     private bool isHit = false; 
     private bool isTrafficStopped = false;
     private bool isCrossing = false;
+    public bool IsCrossing => isCrossing;
 
     [Header("避けるための設定")]
     public float sensorDistance = 1.5f; 
@@ -64,11 +65,11 @@ public class NPCWalker : MonoBehaviour
         Vector3 newPos = transform.position;
         if (Mathf.Abs(travelDirection.x) > Mathf.Abs(travelDirection.z))
         {
-            newPos.x = nodePosition.x;  // 東西に進んでいる → Xをそろえる
+            newPos.x = nodePosition.x;
         }
         else
         {
-            newPos.z = nodePosition.z;  // 南北に進んでいる → Zをそろえる
+            newPos.z = nodePosition.z;
         }
         Vector3 perpendicular = Vector3.Cross(Vector3.up, newDirection).normalized;
         float offset = Random.Range(-maxOffset, maxOffset);

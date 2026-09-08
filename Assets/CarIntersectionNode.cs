@@ -74,7 +74,13 @@ public class CarIntersectionNode : MonoBehaviour
 
         Vector3 nextDirection = currentDir;
         float targetDistance = straightDistance;
-        int choice = Random.Range(0, 3);
+
+        bool preDecided = car.PlannedTurnChoice != -1;
+        int choice = preDecided ? car.PlannedTurnChoice : Random.Range(0, 3);
+        if (preDecided)
+        {
+            car.ClearPlannedTurn();
+        }
 
         switch (choice)
         {
@@ -97,12 +103,15 @@ public class CarIntersectionNode : MonoBehaviour
 
         bool isLeftTurn = (choice == 2);
 
-        if (entryCrosswalk != null || exitCrosswalk != null)
+        bool needsEntryCheck = entryCrosswalk != null;
+        bool needsExitCheck = !preDecided && exitCrosswalk != null;
+
+        if (needsEntryCheck || needsExitCheck)
         {
             car.SetPedestrianStop(true, isLeftTurn);
 
 
-            while (car != null && (!IsCrosswalkClear(entryCrosswalk) || !IsCrosswalkClear(exitCrosswalk)))
+            while (car != null && ((needsEntryCheck && !IsCrosswalkClear(entryCrosswalk)) || (needsExitCheck && !IsCrosswalkClear(exitCrosswalk))))
             {
                 yield return null;
             }
@@ -136,8 +145,6 @@ public class CarIntersectionNode : MonoBehaviour
 
         while (car != null)
         {
-            // 旋回中に、あとから出口側の横断歩道へ人が入ってきた場合は
-            // 向きはそのまま・位置も進めずにその場で一時停止し、いなくなったら再開する
             if (exitCrosswalk != null && !IsCrosswalkClear(exitCrosswalk))
             {
                 car.SetPedestrianStop(true, isLeftTurn);
@@ -159,7 +166,7 @@ public class CarIntersectionNode : MonoBehaviour
         }
     }
 
-    Transform GetCrosswalkForDirection(Vector3 dir)
+    public Transform GetCrosswalkForDirection(Vector3 dir)
     {
         if (Mathf.Abs(dir.x) > Mathf.Abs(dir.z))
         {
@@ -171,7 +178,7 @@ public class CarIntersectionNode : MonoBehaviour
         }
     }
 
-    bool IsCrosswalkClear(Transform crosswalk)
+    public bool IsCrosswalkClear(Transform crosswalk)
     {
         if (crosswalk == null) return true;
 

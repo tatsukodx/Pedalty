@@ -28,6 +28,8 @@ public class CarController : MonoBehaviour
     bool isPedestrianStopped = false;
     bool isLeftTurnPedestrianStop = false;
 
+    public int PlannedTurnChoice { get; private set; } = -1;
+
     Rigidbody rb;
     Vector3 targetDirection;
     float currentSpeed;
@@ -56,6 +58,16 @@ public class CarController : MonoBehaviour
     {
         isPedestrianStopped = stop;
         isLeftTurnPedestrianStop = stop && isLeftTurn;
+    }
+
+    public void SetPlannedTurn(int choice)
+    {
+        PlannedTurnChoice = choice;
+    }
+
+    public void ClearPlannedTurn()
+    {
+        PlannedTurnChoice = -1;
     }
 
     void Start()
@@ -100,7 +112,6 @@ public class CarController : MonoBehaviour
         foreach (Collider hit in hits)
         {
             if (hit.CompareTag("BIkeLane_L") || hit.CompareTag("Sidewalk_L"))
-
             {
                 correction += transform.right;
             }
@@ -151,10 +162,12 @@ public class CarController : MonoBehaviour
 
             foreach (RaycastHit hit in hits)
             {
-                if (hit.collider.transform.IsChildOf(transform)) continue; // 自分自身は無視して奥を確認
+                if (hit.collider.transform.IsChildOf(transform)) continue;
                 if (hit.collider.GetComponentInParent<CarController>() != null) return true;
                 if (hit.collider.GetComponentInParent<BicycleController>() != null) return true;
-                if (hit.collider.GetComponentInParent<NPCWalker>() != null) return true;
+
+                NPCWalker walker = hit.collider.GetComponentInParent<NPCWalker>();
+                if (walker != null && walker.IsCrossing) return true;
             }
         }
 

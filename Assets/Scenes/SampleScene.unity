@@ -189,6 +189,7 @@ GameObject:
   - component: {fileID: 3629035}
   - component: {fileID: 3629034}
   - component: {fileID: 3629033}
+  - component: {fileID: 3629037}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -305,6 +306,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3629031}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &3629037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3629031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 873389802}
 --- !u!1001 &5709826
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1459,6 +1473,7 @@ GameObject:
   - component: {fileID: 27954262}
   - component: {fileID: 27954261}
   - component: {fileID: 27954260}
+  - component: {fileID: 27954264}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -1575,6 +1590,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 27954258}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &27954264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 27954258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 75610556}
 --- !u!1001 &28799294
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2763,6 +2791,7 @@ GameObject:
   - component: {fileID: 46079071}
   - component: {fileID: 46079070}
   - component: {fileID: 46079069}
+  - component: {fileID: 46079073}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -2879,6 +2908,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 46079067}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &46079073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 46079067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 75610556}
 --- !u!1 &46133038 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: e3c71c50de390ec4190b877211ba0717, type: 3}
@@ -5002,6 +5044,7 @@ MonoBehaviour:
   straightDistance: 4
   leftTurnDistance: 7
   rightTurnDistance: 11.5
+  minimumTurnDistance: 2
   nsYieldManager: {fileID: 464555533}
   ewYieldManager: {fileID: 144994104}
   crosswalkNorth: {fileID: 532773755}
@@ -5009,7 +5052,7 @@ MonoBehaviour:
   crosswalkEast: {fileID: 746111286}
   crosswalkWest: {fileID: 737591857}
   crosswalkWidth: 6
-  crosswalkDepth: 3
+  crosswalkDepth: 6
   crosswalkHeight: 3
 --- !u!65 &75610557
 BoxCollider:
@@ -6985,6 +7028,7 @@ GameObject:
   - component: {fileID: 142642664}
   - component: {fileID: 142642663}
   - component: {fileID: 142642662}
+  - component: {fileID: 142642666}
   m_Layer: 0
   m_Name: Cube (2)
   m_TagString: Untagged
@@ -7101,6 +7145,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 142642660}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &142642666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 142642660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 873389802}
 --- !u!1 &144994102
 GameObject:
   m_ObjectHideFlags: 0
@@ -7230,6 +7287,7 @@ GameObject:
   - component: {fileID: 149550373}
   - component: {fileID: 149550372}
   - component: {fileID: 149550371}
+  - component: {fileID: 149550375}
   m_Layer: 0
   m_Name: Cube (3)
   m_TagString: Untagged
@@ -7346,6 +7404,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 149550369}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &149550375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 149550369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 1374207895}
 --- !u!1 &149651719 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: e3c71c50de390ec4190b877211ba0717, type: 3}
@@ -10368,6 +10439,7 @@ GameObject:
   - component: {fileID: 226309806}
   - component: {fileID: 226309805}
   - component: {fileID: 226309804}
+  - component: {fileID: 226309808}
   m_Layer: 0
   m_Name: Cube (3)
   m_TagString: Untagged
@@ -10484,6 +10556,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 226309802}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &226309808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 226309802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 873389802}
 --- !u!1001 &227886065
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14640,6 +14725,7 @@ GameObject:
   - component: {fileID: 317914540}
   - component: {fileID: 317914539}
   - component: {fileID: 317914538}
+  - component: {fileID: 317914542}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -14756,6 +14842,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 317914536}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &317914542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 317914536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 1621321578}
 --- !u!4 &318819329 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 121f662ea65e2cf40a50c66470757a9e, type: 3}
@@ -18419,6 +18518,7 @@ GameObject:
   - component: {fileID: 383206756}
   - component: {fileID: 383206755}
   - component: {fileID: 383206754}
+  - component: {fileID: 383206758}
   m_Layer: 0
   m_Name: Cube (3)
   m_TagString: Untagged
@@ -18535,6 +18635,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 383206752}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &383206758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 383206752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 75610556}
 --- !u!1 &384334674 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5021194038646509000, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
@@ -26103,6 +26216,7 @@ MonoBehaviour:
   straightDistance: 4
   leftTurnDistance: 7
   rightTurnDistance: 11.5
+  minimumTurnDistance: 2
   nsYieldManager: {fileID: 680970530}
   ewYieldManager: {fileID: 345513672}
   crosswalkNorth: {fileID: 1142139034}
@@ -26110,7 +26224,7 @@ MonoBehaviour:
   crosswalkEast: {fileID: 1931199959}
   crosswalkWest: {fileID: 43208473}
   crosswalkWidth: 6
-  crosswalkDepth: 3
+  crosswalkDepth: 6
   crosswalkHeight: 3
 --- !u!65 &580389901
 BoxCollider:
@@ -31704,6 +31818,7 @@ MonoBehaviour:
   straightDistance: 4
   leftTurnDistance: 7
   rightTurnDistance: 11.5
+  minimumTurnDistance: 2
   nsYieldManager: {fileID: 1154611557}
   ewYieldManager: {fileID: 1391879364}
   crosswalkNorth: {fileID: 1235781271}
@@ -38859,6 +38974,7 @@ MonoBehaviour:
   straightDistance: 4
   leftTurnDistance: 7
   rightTurnDistance: 11.5
+  minimumTurnDistance: 2
   nsYieldManager: {fileID: 1504587877}
   ewYieldManager: {fileID: 1020251617}
   crosswalkNorth: {fileID: 2042720706}
@@ -38866,7 +38982,7 @@ MonoBehaviour:
   crosswalkEast: {fileID: 579023941}
   crosswalkWest: {fileID: 1343677405}
   crosswalkWidth: 6
-  crosswalkDepth: 3
+  crosswalkDepth: 6
   crosswalkHeight: 3
 --- !u!65 &873389803
 BoxCollider:
@@ -44225,6 +44341,7 @@ GameObject:
   - component: {fileID: 1011084071}
   - component: {fileID: 1011084070}
   - component: {fileID: 1011084069}
+  - component: {fileID: 1011084073}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -44341,6 +44458,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1011084067}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1011084073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1011084067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 1374207895}
 --- !u!4 &1011187285 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400002, guid: 0b6fafa63b69b174584365f2641586a4, type: 3}
@@ -45312,6 +45442,7 @@ GameObject:
   - component: {fileID: 1027758444}
   - component: {fileID: 1027758443}
   - component: {fileID: 1027758442}
+  - component: {fileID: 1027758446}
   m_Layer: 0
   m_Name: Cube (2)
   m_TagString: Untagged
@@ -45428,6 +45559,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1027758440}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1027758446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1027758440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 580389900}
 --- !u!1001 &1028938383
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -46181,6 +46325,7 @@ GameObject:
   - component: {fileID: 1049095741}
   - component: {fileID: 1049095740}
   - component: {fileID: 1049095739}
+  - component: {fileID: 1049095743}
   m_Layer: 0
   m_Name: Cube (2)
   m_TagString: Untagged
@@ -46297,6 +46442,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1049095737}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1049095743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1049095737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 75610556}
 --- !u!4 &1051155939 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 931fa17f0ab17504bbfc8903e54e6a16, type: 3}
@@ -46833,6 +46991,7 @@ GameObject:
   - component: {fileID: 1064177344}
   - component: {fileID: 1064177343}
   - component: {fileID: 1064177342}
+  - component: {fileID: 1064177346}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -46949,6 +47108,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1064177340}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1064177346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1064177340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 873389802}
 --- !u!1 &1067102845
 GameObject:
   m_ObjectHideFlags: 0
@@ -48049,6 +48221,7 @@ GameObject:
   - component: {fileID: 1081118101}
   - component: {fileID: 1081118100}
   - component: {fileID: 1081118099}
+  - component: {fileID: 1081118103}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -48165,6 +48338,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1081118097}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1081118103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1081118097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 580389900}
 --- !u!1001 &1081395560
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -48487,6 +48673,7 @@ GameObject:
   - component: {fileID: 1084214068}
   - component: {fileID: 1084214067}
   - component: {fileID: 1084214066}
+  - component: {fileID: 1084214070}
   m_Layer: 0
   m_Name: Cube (3)
   m_TagString: Untagged
@@ -48603,6 +48790,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1084214064}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1084214070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1084214064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 727530892}
 --- !u!1001 &1085863481
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -55007,6 +55207,7 @@ GameObject:
   - component: {fileID: 1237737890}
   - component: {fileID: 1237737889}
   - component: {fileID: 1237737888}
+  - component: {fileID: 1237737892}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -55123,6 +55324,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1237737886}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1237737892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1237737886}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 727530892}
 --- !u!4 &1240522257 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 9ccda285cd5f1ce4fa00133b50ba5cbc, type: 3}
@@ -60526,6 +60740,7 @@ GameObject:
   - component: {fileID: 1367132954}
   - component: {fileID: 1367132953}
   - component: {fileID: 1367132952}
+  - component: {fileID: 1367132956}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -60642,6 +60857,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1367132950}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1367132956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1367132950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 1374207895}
 --- !u!1 &1367463336
 GameObject:
   m_ObjectHideFlags: 0
@@ -61128,6 +61356,7 @@ MonoBehaviour:
   straightDistance: 4
   leftTurnDistance: 7
   rightTurnDistance: 11.5
+  minimumTurnDistance: 2
   nsYieldManager: {fileID: 208713603}
   ewYieldManager: {fileID: 844546468}
   crosswalkNorth: {fileID: 1695950250}
@@ -61135,7 +61364,7 @@ MonoBehaviour:
   crosswalkEast: {fileID: 2028772474}
   crosswalkWest: {fileID: 2132661096}
   crosswalkWidth: 6
-  crosswalkDepth: 3
+  crosswalkDepth: 6
   crosswalkHeight: 3
 --- !u!65 &1374207896
 BoxCollider:
@@ -62482,6 +62711,7 @@ GameObject:
   - component: {fileID: 1397334006}
   - component: {fileID: 1397334005}
   - component: {fileID: 1397334004}
+  - component: {fileID: 1397334008}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -62598,6 +62828,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1397334002}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1397334008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397334002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 1621321578}
 --- !u!4 &1397639370 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 31bbda51eeab02f44a8e92a7da2f5ff8, type: 3}
@@ -63026,6 +63269,7 @@ GameObject:
   - component: {fileID: 1421027941}
   - component: {fileID: 1421027940}
   - component: {fileID: 1421027939}
+  - component: {fileID: 1421027943}
   m_Layer: 0
   m_Name: Cube (2)
   m_TagString: Untagged
@@ -63142,6 +63386,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1421027937}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1421027943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1421027937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 727530892}
 --- !u!1 &1421581577 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: e3c71c50de390ec4190b877211ba0717, type: 3}
@@ -67226,6 +67483,7 @@ GameObject:
   - component: {fileID: 1521924641}
   - component: {fileID: 1521924640}
   - component: {fileID: 1521924639}
+  - component: {fileID: 1521924643}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -67342,6 +67600,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1521924637}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1521924643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1521924637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 580389900}
 --- !u!1 &1522108060 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: fbe896a67df88784abb1f38733468a13, type: 3}
@@ -68315,6 +68586,7 @@ GameObject:
   - component: {fileID: 1541633841}
   - component: {fileID: 1541633840}
   - component: {fileID: 1541633839}
+  - component: {fileID: 1541633843}
   m_Layer: 0
   m_Name: Cube (3)
   m_TagString: Untagged
@@ -68431,6 +68703,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1541633837}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1541633843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1541633837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 1621321578}
 --- !u!4 &1544799540 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 31bbda51eeab02f44a8e92a7da2f5ff8, type: 3}
@@ -68538,6 +68823,7 @@ GameObject:
   - component: {fileID: 1546842198}
   - component: {fileID: 1546842197}
   - component: {fileID: 1546842196}
+  - component: {fileID: 1546842200}
   m_Layer: 0
   m_Name: Cube (2)
   m_TagString: Untagged
@@ -68654,6 +68940,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1546842194}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1546842200
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1546842194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 1621321578}
 --- !u!1001 &1547976756
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -72975,6 +73274,7 @@ MonoBehaviour:
   straightDistance: 4
   leftTurnDistance: 7
   rightTurnDistance: 11.5
+  minimumTurnDistance: 2
   nsYieldManager: {fileID: 9696328}
   ewYieldManager: {fileID: 1450862886}
   crosswalkNorth: {fileID: 1374337785}
@@ -72982,7 +73282,7 @@ MonoBehaviour:
   crosswalkEast: {fileID: 1081990474}
   crosswalkWest: {fileID: 1823175304}
   crosswalkWidth: 6
-  crosswalkDepth: 3
+  crosswalkDepth: 6
   crosswalkHeight: 3
 --- !u!65 &1621321579
 BoxCollider:
@@ -78884,6 +79184,7 @@ GameObject:
   - component: {fileID: 1765969043}
   - component: {fileID: 1765969042}
   - component: {fileID: 1765969041}
+  - component: {fileID: 1765969045}
   m_Layer: 0
   m_Name: Cube (3)
   m_TagString: Untagged
@@ -79000,6 +79301,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1765969039}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1765969045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1765969039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 580389900}
 --- !u!1 &1766290709
 GameObject:
   m_ObjectHideFlags: 0
@@ -86666,6 +86980,7 @@ GameObject:
   - component: {fileID: 1914337928}
   - component: {fileID: 1914337927}
   - component: {fileID: 1914337926}
+  - component: {fileID: 1914337930}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -86782,6 +87097,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1914337924}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1914337930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1914337924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 727530892}
 --- !u!4 &1915603226 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 752637772482204386, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
@@ -88148,6 +88476,7 @@ GameObject:
   - component: {fileID: 1955101162}
   - component: {fileID: 1955101161}
   - component: {fileID: 1955101160}
+  - component: {fileID: 1955101164}
   m_Layer: 0
   m_Name: Cube (2)
   m_TagString: Untagged
@@ -88264,6 +88593,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1955101158}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1955101164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1955101158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eefc4eeec9fc70429df1987fba53783, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
+  intersection: {fileID: 1374207895}
 --- !u!1 &1957806722 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: f84563c4522be5e4bbef79b6a74da743, type: 3}
