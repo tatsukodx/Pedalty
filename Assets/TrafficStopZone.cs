@@ -1,7 +1,3 @@
-// TrafficStopZone.cs
-// 停止線に配置するトリガーコライダー用スクリプト（車用）
-// Box Collider の IsTrigger = true にして停止線の位置に置いてください
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,10 +15,8 @@ public class TrafficStopZone : MonoBehaviour
     public CarYieldManager yieldManager;
     public bool isLaneA = true;
 
-    // 現在ゾーン内にいる車のリスト
     private readonly List<CarController> carsInZone = new List<CarController>();
 
-    // 譲り合い待機中の車とそのコルーチン
     private readonly Dictionary<CarController, Coroutine> waitingCars = new Dictionary<CarController, Coroutine>();
 
     void Update()
@@ -31,7 +25,6 @@ public class TrafficStopZone : MonoBehaviour
 
         bool shouldStop = isNSDirection ? !manager.IsNS_CarGreen : !manager.IsEW_CarGreen;
 
-        // リストを後ろから走査してnullを除去しながら更新
         for (int i = carsInZone.Count - 1; i >= 0; i--)
         {
             if (carsInZone[i] == null)
@@ -57,7 +50,6 @@ public class TrafficStopZone : MonoBehaviour
         {
             yieldManager.ReportStopZoneEnter(isLaneA);
 
-            // すでに待機中でなければ、通ってよくなるまで待つコルーチンを開始
             if (!waitingCars.ContainsKey(car))
             {
                 Coroutine c = StartCoroutine(WaitUntilCanEnter(car));
@@ -88,15 +80,13 @@ public class TrafficStopZone : MonoBehaviour
         CarController car = other.GetComponentInParent<CarController>();
         if (car != null)
         {
-            car.SetTrafficStop(false);  // ゾーンを出たら必ず解放
+            car.SetTrafficStop(false);
             carsInZone.Remove(car);
 
-            // まだ待機コルーチンが残っていれば停止し、譲り合い停止も解除しておく
             if (waitingCars.TryGetValue(car, out Coroutine c))
             {
                 waitingCars.Remove(car);
 
-                // コルーチンがすでに完了・破棄されている場合は停止処理を呼ばない
                 if (c != null)
                 {
                     StopCoroutine(c);

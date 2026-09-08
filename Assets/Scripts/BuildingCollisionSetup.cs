@@ -1,10 +1,6 @@
 using System;
 using UnityEngine;
 
-/// <summary>
-/// シーン内に配置された建物へ、メッシュ外形に合うBox Colliderを自動設定する。
-/// 建物プレハブを今後追加した場合も、名前が「Building」で始まれば自動的に対象になる。
-/// </summary>
 public static class BuildingCollisionSetup
 {
     const string BuildingNamePrefix = "Building";

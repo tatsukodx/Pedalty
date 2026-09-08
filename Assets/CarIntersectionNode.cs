@@ -8,6 +8,9 @@ public class CarIntersectionNode : MonoBehaviour
     public float leftTurnDistance = 6f;
     public float rightTurnDistance = 10f;
 
+    [Header("歩行者待ちで距離を消費しても、カーブが一瞬で終わらないための最低残り距離")]
+    public float minimumTurnDistance = 2f;
+
     [Header("南北方向の対向車線マネージャー（省略可）")]
     public CarYieldManager nsYieldManager;
 
@@ -109,7 +112,7 @@ public class CarIntersectionNode : MonoBehaviour
             car.SetPedestrianStop(false);
 
             float traveledWhileWaiting = Vector3.Distance(entryPosition, carTransform.position);
-            targetDistance = Mathf.Max(0.01f, targetDistance - traveledWhileWaiting);
+            targetDistance = Mathf.Max(minimumTurnDistance, targetDistance - traveledWhileWaiting);
         }
 
         bool isNSAxis = Mathf.Abs(currentDir.x) < Mathf.Abs(currentDir.z);
@@ -131,9 +134,19 @@ public class CarIntersectionNode : MonoBehaviour
         Quaternion startRot = Quaternion.LookRotation(currentDir);
         Quaternion endRot = Quaternion.LookRotation(nextDirection);
 
-
         while (car != null)
         {
+            // 旋回中に、あとから出口側の横断歩道へ人が入ってきた場合は
+            // 向きはそのまま・位置も進めずにその場で一時停止し、いなくなったら再開する
+            if (exitCrosswalk != null && !IsCrosswalkClear(exitCrosswalk))
+            {
+                car.SetPedestrianStop(true, isLeftTurn);
+                yield return new WaitForFixedUpdate();
+                continue;
+            }
+
+            car.SetPedestrianStop(false);
+
             float traveled = Vector3.Distance(startPosition, carTransform.position);
             float t = Mathf.Clamp01(traveled / targetDistance);
 
@@ -175,7 +188,7 @@ public class CarIntersectionNode : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    void OnDrawGizmosSelected()
+    void OnDrawGizmos()
     {
         Gizmos.color = new Color(1f, 1f, 0f, 0.35f);
         Vector3 size = new Vector3(crosswalkWidth, crosswalkHeight, crosswalkDepth);

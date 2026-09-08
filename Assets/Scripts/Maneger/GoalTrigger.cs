@@ -7,8 +7,6 @@ public class GoalTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // 接触したCollider自身、またはその親に
-        // BicycleControllerが付いているか確認する
         BicycleController bicycle =
             other.GetComponentInParent<BicycleController>();
 

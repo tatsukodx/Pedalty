@@ -6,7 +6,6 @@ public class ViolationInfo
 {
     public string id;
     public string triggerArea;
-    // "Left" / "Right" / 空文字列（左右を問わない）
     public string triggerSide;
     public string category;
     public string violationName;
@@ -30,7 +29,6 @@ public class TrafficViolationDetector : MonoBehaviour
     [Header("違反データ（JSON）")]
     [SerializeField] private TextAsset violationDataJson;
 
-    // (エリア, 左右) の完全一致で登録。左右を問わない違反は (エリア, None) に登録する。
     private readonly Dictionary<(RoadAreaType, RoadSide), ViolationInfo> violationsByCondition = new Dictionary<(RoadAreaType, RoadSide), ViolationInfo>();
 
     private RoadAreaType previousArea = RoadAreaType.None;
@@ -86,8 +84,7 @@ public class TrafficViolationDetector : MonoBehaviour
 
         if (GameDebugMode.IsEnabled)
         {
-            // デバッグ中も現在位置だけは追跡し、通常モードへ戻した際に
-            // 古い状態との差で誤検出しないようにする。
+
             previousArea = currentArea;
             previousSide = currentSide;
             previousBikeLaneExistsNearby = bikeLaneExistsNearby;
@@ -105,13 +102,11 @@ public class TrafficViolationDetector : MonoBehaviour
 
     private void CheckViolation(RoadAreaType area, RoadSide side, bool bikeLaneExistsNearby)
     {
-        // 自転車レーンが無い区間では、車道の左側を通行するのが正しい走行方法なので違反にしない
         if (area == RoadAreaType.Road && side == RoadSide.Left && !bikeLaneExistsNearby)
         {
             return;
         }
 
-        // 左右を区別する違反（例: 逆走）を優先し、無ければ左右不問の違反を探す
         if (violationsByCondition.TryGetValue((area, side), out ViolationInfo violation))
         {
             ReportViolation(violation);

@@ -92,7 +92,6 @@ public class NPCWalker : MonoBehaviour
         rb.isKinematic = false; 
         rb.useGravity = true;
 
-        // 歩行者同士の物理衝突を無効化
         Collider myCol = GetComponent<Collider>();
         if (myCol != null)
         {
@@ -144,10 +143,8 @@ public class NPCWalker : MonoBehaviour
     {
         if (isCrossing) return intendedVelocity;
 
-        // 今すでに歩道の外にいるなら、移動を制限しない（補正で戻れるように）
         if (!IsOnSidewalk(transform.position)) return intendedVelocity;
 
-        // 歩道の上にいる → 歩道から出ないように制限
         Vector3 fullMove = intendedVelocity * Time.fixedDeltaTime;
         Vector3 fullPos = transform.position + fullMove;
 
@@ -206,10 +203,8 @@ public class NPCWalker : MonoBehaviour
 
         if (nearestSidewalk == null) return Vector3.zero;
 
-        // 歩道の上にいる → 補正不要
         if (nearestDist < onPathSensorRadius) return Vector3.zero;
 
-        // 歩道からずれている → 最寄りの歩道へ補正
         Vector3 direction = nearestSidewalk.ClosestPoint(transform.position) - transform.position;
         direction.y = 0f;
         if (direction.sqrMagnitude < 0.01f) return Vector3.zero;
@@ -248,7 +243,6 @@ public class NPCWalker : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        // 歩行者同士はすり抜ける（後からスポーンした歩行者対策）
         NPCWalker otherWalker = collision.gameObject.GetComponent<NPCWalker>();
         if (otherWalker != null)
         {
@@ -261,7 +255,7 @@ public class NPCWalker : MonoBehaviour
             if (!isHit)
             {
                 isHit = true; 
-                rb.isKinematic = false; // 信号待ち中(Kinematic)でもAddForceが効くように解除
+                rb.isKinematic = false;
                 rb.constraints = RigidbodyConstraints.None;
 
                 Rigidbody bikeRb = collision.gameObject.GetComponent<Rigidbody>();

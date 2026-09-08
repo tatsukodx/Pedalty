@@ -3,10 +3,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// スタート、カウントダウン、ゴール結果の画面遷移を管理する。
-/// UIは実行時に生成され、左右ボタンとキーボードの代替操作に対応する。
-/// </summary>
 public sealed class GameFlowUI : MonoBehaviour
 {
     enum FlowState

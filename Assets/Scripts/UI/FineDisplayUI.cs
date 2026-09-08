@@ -2,10 +2,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// 画面左上に現在の罰金額を表示する。
-/// 将来の罰金処理からSetFineAmountを呼ぶことで表示額を更新できる。
-/// </summary>
 public sealed class FineDisplayUI : MonoBehaviour
 {
     const int InitialFineAmount = 0;
