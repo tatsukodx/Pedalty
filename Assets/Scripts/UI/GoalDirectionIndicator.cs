@@ -25,6 +25,7 @@ public class GoalDirectionIndicator : MonoBehaviour
     [SerializeField] private float minimumSizeRatio = 0.5f;
 
     [Header("ゴール接近表示")]
+    [Tooltip("この距離以内では画面端のピンを隠し、ゴール地点のピンへ切り替えます")]
     [SerializeField] private float approachDistance = 60f;
     [SerializeField] private float finalApproachDistance = 12f;
 
@@ -35,6 +36,7 @@ public class GoalDirectionIndicator : MonoBehaviour
     private TextMeshProUGUI proximityMessage;
     private Outline proximityOutline;
     private TMP_FontAsset displayFont;
+    private GoalTrigger goalTrigger;
 
     private void Awake()
     {
@@ -43,6 +45,11 @@ public class GoalDirectionIndicator : MonoBehaviour
         if (targetCamera == null)
         {
             targetCamera = Camera.main;
+        }
+
+        if (goal != null)
+        {
+            goalTrigger = goal.GetComponent<GoalTrigger>();
         }
 
         if (indicator == null)
@@ -69,6 +76,10 @@ public class GoalDirectionIndicator : MonoBehaviour
         Vector3 screenPosition =
             targetCamera.WorldToScreenPoint(goal.position);
 
+        bool isGoalVisibleOnScreen = screenPosition.z > 0f &&
+            screenPosition.x >= 0f && screenPosition.x <= Screen.width &&
+            screenPosition.y >= 0f && screenPosition.y <= Screen.height;
+
         if (screenPosition.z < 0f)
         {
             screenPosition.x =
@@ -93,9 +104,11 @@ public class GoalDirectionIndicator : MonoBehaviour
         indicator.position = screenPosition;
 
         float distanceMeters = GetHorizontalDistance();
-        UpdateDistanceText(distanceMeters);
+        float displayedDistanceMeters = GetDisplayedDistance(distanceMeters);
+        UpdateIndicatorVisibility(distanceMeters, isGoalVisibleOnScreen);
+        UpdateDistanceText(displayedDistanceMeters);
         UpdateIndicatorSize(distanceMeters);
-        UpdateProximityPanel(distanceMeters);
+        UpdateProximityPanel(distanceMeters, displayedDistanceMeters);
     }
 
     private float GetHorizontalDistance()
@@ -106,6 +119,35 @@ public class GoalDirectionIndicator : MonoBehaviour
         Vector3 difference = goal.position - player.position;
         difference.y = 0f;
         return difference.magnitude;
+    }
+
+    private float GetDisplayedDistance(float measuredDistanceMeters)
+    {
+        if (goalTrigger != null && goalTrigger.IsWithinFinishDistance(player))
+        {
+            return 0f;
+        }
+
+        return measuredDistanceMeters;
+    }
+
+    private void UpdateIndicatorVisibility(float distanceMeters, bool isGoalVisibleOnScreen)
+    {
+        bool isNearGoal = distanceMeters <= approachDistance;
+        bool showFarIndicator = player != null && (!isNearGoal || !isGoalVisibleOnScreen);
+        if (indicator.gameObject.activeSelf != showFarIndicator)
+        {
+            indicator.gameObject.SetActive(showFarIndicator);
+        }
+
+        if (distanceText != null)
+        {
+            bool showDistanceBesidePin = showFarIndicator && !isNearGoal;
+            if (distanceText.gameObject.activeSelf != showDistanceBesidePin)
+            {
+                distanceText.gameObject.SetActive(showDistanceBesidePin);
+            }
+        }
     }
 
     private void UpdateDistanceText(float distanceMeters)
@@ -257,14 +299,14 @@ public class GoalDirectionIndicator : MonoBehaviour
         return timeText != null ? timeText.font : TMP_Settings.defaultFontAsset;
     }
 
-    private void UpdateProximityPanel(float distanceMeters)
+    private void UpdateProximityPanel(float measuredDistanceMeters, float displayedDistanceMeters)
     {
         if (proximityPanel == null)
         {
             return;
         }
 
-        bool shouldShow = player != null && distanceMeters <= approachDistance;
+        bool shouldShow = player != null && measuredDistanceMeters <= approachDistance;
         if (proximityPanel.activeSelf != shouldShow)
         {
             proximityPanel.SetActive(shouldShow);
@@ -275,8 +317,8 @@ public class GoalDirectionIndicator : MonoBehaviour
             return;
         }
 
-        int displayedMeters = Mathf.RoundToInt(distanceMeters);
-        bool isFinalApproach = distanceMeters <= finalApproachDistance;
+        int displayedMeters = Mathf.RoundToInt(displayedDistanceMeters);
+        bool isFinalApproach = measuredDistanceMeters <= finalApproachDistance;
         proximityTitle.text = isFinalApproach ? "FINISH POINT" : "GOAL ZONE";
         proximityMessage.text = isFinalApproach
             ? $"黄色いピンの中心へ   {displayedMeters} m"

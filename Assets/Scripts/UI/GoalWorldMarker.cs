@@ -14,9 +14,14 @@ public sealed class GoalWorldMarker : MonoBehaviour
     Transform innerRing;
     Transform outerRing;
     Transform diamond;
+    Transform player;
     Material lineMaterial;
     Camera targetCamera;
     float billboardScale;
+
+    [Header("近距離表示")]
+    [Tooltip("この距離以内で、ゴール地点のピンを表示します")]
+    [SerializeField, Min(0f)] float visibleDistanceMeters = 60f;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void CreateForGameScene()
@@ -31,7 +36,10 @@ public sealed class GoalWorldMarker : MonoBehaviour
     void Awake()
     {
         targetCamera = Camera.main;
+        BicycleController bicycle = FindAnyObjectByType<BicycleController>();
+        player = bicycle != null ? bicycle.transform : null;
         BuildMarker();
+        UpdateVisibility();
     }
 
     void BuildMarker()
@@ -186,6 +194,12 @@ public sealed class GoalWorldMarker : MonoBehaviour
         }
 
         visualRoot.transform.position = transform.position;
+        UpdateVisibility();
+
+        if (!visualRoot.activeSelf)
+        {
+            return;
+        }
 
         if (targetCamera == null)
         {
@@ -210,6 +224,33 @@ public sealed class GoalWorldMarker : MonoBehaviour
         innerRing.localScale = Vector3.one * Mathf.Lerp(0.9f, 1.16f, pulse);
         outerRing.localScale = Vector3.one * Mathf.Lerp(1.1f, 0.94f, pulse);
         diamond.Rotate(Vector3.up, 42f * Time.unscaledDeltaTime, Space.Self);
+    }
+
+    void UpdateVisibility()
+    {
+        if (visualRoot == null)
+        {
+            return;
+        }
+
+        if (player == null)
+        {
+            BicycleController bicycle = FindAnyObjectByType<BicycleController>();
+            player = bicycle != null ? bicycle.transform : null;
+        }
+
+        bool shouldShow = player != null && GetHorizontalDistance(player) <= visibleDistanceMeters;
+        if (visualRoot.activeSelf != shouldShow)
+        {
+            visualRoot.SetActive(shouldShow);
+        }
+    }
+
+    float GetHorizontalDistance(Transform target)
+    {
+        Vector3 difference = transform.position - target.position;
+        difference.y = 0f;
+        return difference.magnitude;
     }
 
     void OnDestroy()

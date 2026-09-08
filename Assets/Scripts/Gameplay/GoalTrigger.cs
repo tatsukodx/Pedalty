@@ -9,6 +9,25 @@ public class GoalTrigger : MonoBehaviour
     [Tooltip("ゴール中心から、この距離以内に入ると到着になります")]
     [SerializeField, Min(0f)] private float finishDistanceMeters = 0.49f;
 
+    public float FinishDistanceMeters => finishDistanceMeters;
+
+    public float GetHorizontalDistance(Transform target)
+    {
+        if (target == null)
+        {
+            return float.PositiveInfinity;
+        }
+
+        Vector3 difference = transform.position - target.position;
+        difference.y = 0f;
+        return difference.magnitude;
+    }
+
+    public bool IsWithinFinishDistance(Transform target)
+    {
+        return GetHorizontalDistance(target) <= finishDistanceMeters;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         TryFinish(other);
@@ -34,10 +53,7 @@ public class GoalTrigger : MonoBehaviour
             return;
         }
 
-        Vector3 difference = transform.position - bicycle.transform.position;
-        difference.y = 0f;
-
-        if (difference.sqrMagnitude > finishDistanceMeters * finishDistanceMeters)
+        if (!IsWithinFinishDistance(bicycle.transform))
         {
             return;
         }
