@@ -33,6 +33,7 @@
 | `Assets/Prefabs/Cars.prefab` | 一般車両のPrefab |
 | `Assets/Prefabs/Traffic ramp/` | 道路用ランプのPrefab |
 | `Assets/Resources/NPC_Models/` | `NPCSpawner`が実行時にランダム読み込みする6種類のNPC Prefab |
+| `Assets/Resources/Data/` | 上位30件のプレイ記録を保持するランキングDBの初期データ |
 | `Assets/Resources/UI/` | ベル、ブレーキ、ルール説明用マップの実行時読み込み画像 |
 | `Assets/Resources/Violations/` | 違反名、説明、罰金額を定義する`violations.json` |
 | `Assets/Scenes/SampleScene.unity` | 現在のゲーム本編シーン。Build Settingsに登録済み |
@@ -57,7 +58,7 @@
 | --- | --- |
 | `Assets/Scripts/Core/` | `AppSettings.cs`: 外部設定の読み込み、`GameDebugMode.cs`: 違反判定なしのデバッグ状態 |
 | `Assets/Scripts/Input/` | `ArduinoConnection.cs`: Arduino通信、`InputManager.cs`: ボタンとキーボード入力の統合、`SteeringCalibrator.cs`: ハンドル角度の校正 |
-| `Assets/Scripts/Gameplay/` | `GameTimer.cs`: タイム計測、`GoalTrigger.cs`: ゴール到着判定 |
+| `Assets/Scripts/Gameplay/` | `GameTimer.cs`: タイム計測、`GoalTrigger.cs`: ゴール到着判定、`Ranking/`: ランキング記録と上位30件の保存 |
 | `Assets/Scripts/Player/` | `BicycleController.cs`: 自転車移動、`CameraController.cs`: カメラ追従、`BellController.cs`: ベル、`HandleAngleConverter.cs`: ハンドル入力変換、`WheelSpeedConverter.cs`: 車輪速度変換、`PlayerLaneDetector.cs`: 走行場所判定、`TrafficViolationDetector.cs`: 違反判定 |
 | `Assets/Scripts/Traffic/Vehicles/` | `CarController.cs`: 一般車両移動、`CarSpawner.cs`: 車両生成、`CarIntersectionNode.cs`: 交差点進路、`CarYieldManager.cs`: 対向車との譲り合い |
 | `Assets/Scripts/Traffic/Pedestrians/` | `NPCWalker.cs`: NPC歩行、`NPCSpawner.cs`: NPC生成、`IntersectionNode.cs`: 歩行者の交差点進路、`PedestrianStopZone.cs`: 歩行者停止ゾーン候補 |
@@ -101,6 +102,13 @@
 | `Traffic/Signals/` | 信号設備 | 信号状態、停止ゾーン |
 | `UI/` | ゲーム画面の表示 | HUD、開始・終了画面、違反表示 |
 | `World/` | マップ上の仕組み | 建物コライダー、道路端境界 |
+
+## ランキングDBの運用
+
+- Unity Editorでは`Assets/Resources/Data/ranking_database.json`へ記録する。このファイルはGit管理対象で、必要な記録をGitHubへ共有できる。
+- ビルド版では書き込み権限のある`Application.persistentDataPath`へ記録する。
+- 保存対象はクリアタイム順の上位30件。順位が同じ場合は罰金額、違反回数、プレイ日時の順で比較する。
+- DBファイルを手動編集するときはUnityを停止し、JSON形式と`records`配列を崩さない。
 
 ## 命名ルール
 
