@@ -25,7 +25,7 @@
 | `Assets/Art/Textures/RoadSurfaces/` | 車道、自転車レーン、歩道の路面テクスチャ |
 | `Assets/Audio/` | 自転車ベルの効果音 |
 | `Assets/Fonts/DotGothic16/` | ゲーム画面用フォント、TextMesh Pro用フォントアセット、ライセンス |
-| `Assets/Images/` | 自転車マーク、矢羽根、ゴールピンの元画像 |
+| `Assets/Images/` | 自転車マークと矢羽根の元画像 |
 | `Assets/Materials/` | 自転車マーク、矢羽根、ゴールピン、信号ランプの自作マテリアル |
 | `Assets/Prefabs/BicycleLane/` | 自転車レーン模様を連続配置するPrefab |
 | `Assets/Prefabs/NPC/` | NPCの基本Prefab |
@@ -33,7 +33,7 @@
 | `Assets/Prefabs/Cars.prefab` | 一般車両のPrefab |
 | `Assets/Prefabs/Traffic ramp/` | 道路用ランプのPrefab |
 | `Assets/Resources/NPC_Models/` | `NPCSpawner`が実行時にランダム読み込みする6種類のNPC Prefab |
-| `Assets/Resources/UI/` | ベル、ブレーキ、ルール説明用マップの実行時読み込み画像 |
+| `Assets/Resources/UI/` | ベル、ブレーキ、ゴールピン、ルール説明用マップの実行時読み込み画像 |
 | `Assets/Resources/Violations/` | 違反名、説明、罰金額を定義する`violations.json` |
 | `Assets/Scenes/SampleScene.unity` | 現在のゲーム本編シーン。Build Settingsに登録済み |
 | `Assets/Scripts/` | Pedaltyで作成したC#コード。詳細は次節に記載 |
@@ -62,7 +62,7 @@
 | `Assets/Scripts/Traffic/Vehicles/` | `CarController.cs`: 一般車両移動、`CarSpawner.cs`: 車両生成、`CarIntersectionNode.cs`: 交差点進路、`CarYieldManager.cs`: 対向車との譲り合い |
 | `Assets/Scripts/Traffic/Pedestrians/` | `NPCWalker.cs`: NPC歩行、`NPCSpawner.cs`: NPC生成、`IntersectionNode.cs`: 歩行者の交差点進路、`PedestrianStopZone.cs`: 歩行者停止ゾーン候補 |
 | `Assets/Scripts/Traffic/Signals/` | `TrafficLight.cs`: ランプ表示、`TrafficLightManager.cs`: 信号サイクル、`TrafficLightPhase.cs`: 信号状態定義、`TrafficStopZone.cs`: 車両停止ゾーン |
-| `Assets/Scripts/UI/` | `GameFlowUI.cs`: 開始・ルール・終了画面、`FineDisplayUI.cs`: 罰金総額、`PenaltyController.cs`: 違反画面と加算、`BellIndicatorUI.cs`: ベル表示、`BrakeIndicatorUI.cs`: ブレーキ表示、`GoalDirectionIndicator.cs`: ゴール方向と距離、`GoalMarkerAnimation.cs`: ゴールピン表示、`DigitalDisplayFont.cs`: HUDフォント |
+| `Assets/Scripts/UI/` | `GameFlowUI.cs`: 開始・ルール・終了画面、`FineDisplayUI.cs`: 罰金総額、`PenaltyController.cs`: 違反画面と加算、`BellIndicatorUI.cs`: ベル表示、`BrakeIndicatorUI.cs`: ブレーキ表示、`GoalDirectionIndicator.cs`: ゴール方向・距離・接近表示、`GoalWorldMarker.cs`: ゴール地点の立体演出、`DigitalDisplayFont.cs`: HUDフォント |
 | `Assets/Scripts/World/` | `BuildingCollisionSetup.cs`: 建物コライダー生成、`RoadEndBoundarySystem.cs`: 道路端の壁と警告、`RoadEndBoundaryTrigger.cs`: 境界接触判定 |
 
 ## Arduinoプログラムの内容

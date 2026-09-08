@@ -30844,6 +30844,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GoalTrigger
   gameTimer: {fileID: 2000000002}
+  finishDistanceMeters: 0.49
 --- !u!1001 &817636965
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -78119,6 +78120,8 @@ MonoBehaviour:
   nearDistance: 30
   farDistance: 500
   minimumSizeRatio: 0.5
+  approachDistance: 60
+  finalApproachDistance: 12
 --- !u!1 &2000000103
 GameObject:
   m_ObjectHideFlags: 0
