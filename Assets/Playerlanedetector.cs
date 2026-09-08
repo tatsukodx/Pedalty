@@ -8,8 +8,6 @@ public enum RoadAreaType
     BikeLane
 }
 
-// 進行方向に対する左右。道路プレハブは進行方向(ローカルZ軸)基準で
-// _L/_Rタグが左右対称に配置されているため、タグからそのまま判定できる。
 public enum RoadSide
 {
     None,
@@ -26,8 +24,6 @@ public class PlayerLaneDetector : MonoBehaviour
 
     public RoadAreaType currentArea = RoadAreaType.None;
     public RoadSide currentSide = RoadSide.None;
-
-    // 現在地の近くに自転車レーンが存在するか（存在しない道路区間では車道の左側走行を違反にしないため）
     public bool bikeLaneExistsNearby = false;
 
     void FixedUpdate()

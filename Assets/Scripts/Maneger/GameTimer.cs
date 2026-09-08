@@ -70,7 +70,6 @@ public class GameTimer : MonoBehaviour
 
     public void Finish()
     {
-        // スタート前、またはすでにゴール済みなら何もしない
         if (!hasStarted || hasFinished)
         {
             return;

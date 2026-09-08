@@ -54,7 +54,6 @@ public class GoalDirectionIndicator : MonoBehaviour
         Vector3 screenPosition =
             targetCamera.WorldToScreenPoint(goal.position);
 
-        // カメラの後方にある場合は、反対側の画面端へ表示する。
         if (screenPosition.z < 0f)
         {
             screenPosition.x =
@@ -108,7 +107,6 @@ public class GoalDirectionIndicator : MonoBehaviour
         if (indicator == null)
             return;
 
-        // farDistanceで最小、nearDistanceで最大（現在の35 x 45）になる。
         float proximity = Mathf.InverseLerp(farDistance, nearDistance, distanceMeters);
         float sizeRatio = Mathf.Lerp(minimumSizeRatio, 1f, proximity);
         indicator.sizeDelta = maximumIndicatorSize * sizeRatio;

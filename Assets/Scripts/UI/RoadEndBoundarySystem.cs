@@ -3,10 +3,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// シーンにあるDeadZoneの道路端マーカーを、プレイヤー用の見えない停止壁として利用する。
-/// マーカー自体は非表示にし、外向きの移動だけを止める。
-/// </summary>
 public sealed class RoadEndBoundarySystem : MonoBehaviour
 {
     static RoadEndBoundarySystem instance;

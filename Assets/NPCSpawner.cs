@@ -68,18 +68,14 @@ public class NPCSpawner : MonoBehaviour
 
         GameObject newNPC = Instantiate(baseNpcPrefab, spawnPoint.position, spawnPoint.rotation);
 
-        // NPCWalker（＝Rigidbody/Collider/Animatorも一緒に乗っている本体）は
-        // ルート直下ではなく子オブジェクトにあるため、GetComponentInChildrenで探す
         NPCWalker walker = newNPC.GetComponentInChildren<NPCWalker>();
 
-        // 見た目のモデルだけをランダムに差し替える
         if (validNpcModels.Count > 0 && walker != null)
         {
             int randomModelIndex = Random.Range(0, validNpcModels.Count);
             GameObject chosenModel = validNpcModels[randomModelIndex];
 
-            // 差し替え対象は「NPCWalkerが付いている本体オブジェクト」自身ではなく、
-            // その中の見た目（メッシュ・ボーン）だけにする
+
             StartCoroutine(ReplaceVisualCoroutine(walker.gameObject, chosenModel));
         }
 
@@ -91,8 +87,7 @@ public class NPCSpawner : MonoBehaviour
 
     IEnumerator ReplaceVisualCoroutine(GameObject bodyObj, GameObject newModelPrefab)
     {
-        // bodyObj自体（NPCWalker/Rigidbody/Collider/Animatorが乗っているオブジェクト）は消さず、
-        // その中の古い見た目とボーンだけを破棄する
+
         int childCount = bodyObj.transform.childCount;
         GameObject[] childrenToDelete = new GameObject[childCount];
         
@@ -106,7 +101,6 @@ public class NPCSpawner : MonoBehaviour
             DestroyImmediate(child);
         }
 
-        // 破棄が完了するまで1フレーム待つ
         yield return null;
 
         if (bodyObj == null) yield break;
@@ -114,7 +108,6 @@ public class NPCSpawner : MonoBehaviour
         GameObject visual = Instantiate(newModelPrefab, bodyObj.transform);
         visual.transform.localPosition = Vector3.zero;
         
-        // モデル固有の初期回転を捨て、ベースの正面に合わせる
         visual.transform.localRotation = Quaternion.identity;
 
         Animator childAnimator = visual.GetComponent<Animator>();
@@ -122,7 +115,6 @@ public class NPCSpawner : MonoBehaviour
         
         if (childAnimator != null && baseAnimator != null)
         {
-            // 差し替えたモデルの骨構造をベース側のAnimatorへ引き継ぐ
             baseAnimator.avatar = childAnimator.avatar;
             childAnimator.enabled = false;
             baseAnimator.Rebind();

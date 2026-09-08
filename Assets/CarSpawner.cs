@@ -18,7 +18,6 @@ public class CarSpawner : MonoBehaviour
 
     void Start()
     {
-        // 起動時に carModels の null チェック
         for (int i = 0; i < carModels.Length; i++)
         {
             if (carModels[i] == null)
@@ -47,7 +46,6 @@ public class CarSpawner : MonoBehaviour
 
     void SpawnCar()
     {
-        // 空いているスポーンポイントを探す
         List<int> availableIndices = new List<int>();
         for (int i = 0; i < spawnPoints.Length; i++)
         {
@@ -64,15 +62,13 @@ public class CarSpawner : MonoBehaviour
         int index = availableIndices[Random.Range(0, availableIndices.Count)];
         Transform spawnPoint = spawnPoints[index];
 
-        // ── baseCarPrefab を生成 ──
         GameObject newCar = Instantiate(baseCarPrefab, spawnPoint.position, spawnPoint.rotation);
 
-        // ── 車モデルを選択（null を除外） ──
         GameObject model = GetRandomValidModel();
         if (model == null)
         {
             Debug.LogError("[CarSpawner] 有効な carModel がありません！インスペクターを確認してください。");
-            Destroy(newCar); // ← 幽霊車にならないよう即削除
+            Destroy(newCar);
             return;
         }
 
@@ -80,7 +76,6 @@ public class CarSpawner : MonoBehaviour
         visual.transform.localPosition = Vector3.zero;
         visual.transform.localRotation = Quaternion.identity;
 
-        // ── CarController に方向をセット ──
         CarController controller = newCar.GetComponent<CarController>();
         if (controller != null)
         {
@@ -95,7 +90,6 @@ public class CarSpawner : MonoBehaviour
         Debug.Log($"[CarSpawner] スポーン成功 → 現在 {spawnedCars.Count} 台");
     }
 
-    /// <summary>carModels からnullを除いてランダムに返す</summary>
     GameObject GetRandomValidModel()
     {
         List<GameObject> validModels = new List<GameObject>();

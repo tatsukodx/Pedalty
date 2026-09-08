@@ -1,15 +1,13 @@
 using UnityEngine;
 
-// マグネットセンサのパルス間隔から実速度を求め、BicycleController に渡す。
 //   実速度[km/h] = (周長[m] ÷ 磁石の数) ÷ パルス間隔[s] × 3.6
-// 画面上で遅く見えるため、ゲーム内では speedMultiplier 倍した速度で走らせる。
+
 public class WheelSpeedConverter : MonoBehaviour
 {
     [Header("連携先の設定")]
     public ArduinoConnection arduinoConnection;
     public BicycleController bicycleController;
 
-    // 以下は settings.json から読み込む
     float wheelCircumference = 2.096f;
     int magnetsPerWheel = 1;
     float speedMultiplier = 2f;
@@ -37,7 +35,6 @@ public class WheelSpeedConverter : MonoBehaviour
         smoothFactor = settings.smoothFactor;
         pulseTimeoutSec = settings.pulseTimeoutSec;
 
-        // 上限速度(km/h)と物理速度(m/s)の対応を合わせ、currentSpeed × 3.6 = km/h が成り立つようにする
         if (bicycleController != null)
             bicycleController.maxSpeed = maxSpeedKmh / 3.6f;
 
@@ -69,14 +66,12 @@ public class WheelSpeedConverter : MonoBehaviour
 
         int intervalMs = arduinoConnection.MagnetInterval;
 
-        // MAGNET,0 が届かなかった場合の保険
         bool timedOut = Time.time - lastPulseTime > pulseTimeoutSec;
 
         RealSpeedKmh = (intervalMs > 0 && !timedOut) ? CalcRealKmh(intervalMs) : 0f;
 
         float targetGameKmh = Mathf.Min(RealSpeedKmh * speedMultiplier, maxSpeedKmh);
 
-        // 停止中(0)もスムーズに近づける
         smoothedGameKmh = Mathf.Lerp(smoothedGameKmh, targetGameKmh, smoothFactor * Time.deltaTime);
         GameSpeedKmh = smoothedGameKmh;
 

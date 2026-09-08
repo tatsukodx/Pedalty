@@ -77,6 +77,7 @@ public class CarController : MonoBehaviour
         bool voluntaryStop = isLightStopped || isYieldStopped || isPedestrianStopped;
 
         float target = (obstacleAhead || voluntaryStop) ? 0f : moveSpeed;
+<<<<<<< HEAD
 
         // 障害物回避は物理的な制動距離を確保した緩やかな減速、
         // 信号待ち・譲り合い・歩行者待ちは、あらかじめ分かっている停止なので強めに減速して手前で止める
@@ -88,6 +89,10 @@ public class CarController : MonoBehaviour
             float voluntaryDecel = isLeftTurnPedestrianStop ? leftTurnPedestrianStopDeceleration : voluntaryStopDeceleration;
             decelRate = Mathf.Max(decelRate, voluntaryDecel);
         }
+=======
+        float voluntaryDecel = isLeftTurnPedestrianStop ? leftTurnPedestrianStopDeceleration : voluntaryStopDeceleration;
+        float decelRate = (!obstacleAhead && voluntaryStop) ? voluntaryDecel : acceleration;
+>>>>>>> 326d58711bab99199d3af504ce08b41bc04a6161
 
         currentSpeed = Mathf.MoveTowards(currentSpeed, target, decelRate * Time.fixedDeltaTime);
 
@@ -152,13 +157,6 @@ public class CarController : MonoBehaviour
         float brakingDistance = (currentSpeed * currentSpeed) / (2f * Mathf.Max(acceleration, 0.01f));
         float checkDistance = Mathf.Max(obstacleCheckDistance, brakingDistance + brakingSafetyBuffer);
 
-        // 旧実装は SphereCast（最も手前のヒット1件のみ）を使っていたため、
-        // 交差点付近にある無関係なコライダー（縁石・標識・停止線マーカーなど）に
-        // 一番手前で当たると、その奥で歩行者待ち・信号待ちをしている車を
-        // 検知できずに素通りしてしまうバグがあった。
-        // SphereCastAll で経路上の全ヒットを手前から順に調べ、
-        // 無関係な物はすり抜けて、車・自転車・歩行者が見つかった時点で
-        // 「障害物あり」と判定するように修正。
         RaycastHit[] hits = Physics.SphereCastAll(origin, obstacleCheckRadius, transform.forward, checkDistance, ~0, QueryTriggerInteraction.Ignore);
 
         if (hits.Length > 0)
@@ -171,7 +169,6 @@ public class CarController : MonoBehaviour
                 if (hit.collider.GetComponentInParent<CarController>() != null) return true;
                 if (hit.collider.GetComponentInParent<BicycleController>() != null) return true;
                 if (hit.collider.GetComponentInParent<NPCWalker>() != null) return true;
-                // 関係のない物体（縁石・看板など）はここでは判定せず、次のヒットを確認する
             }
         }
 

@@ -6,13 +6,11 @@ using UnityEngine;
 
 public class ArduinoConnection : MonoBehaviour
 {
-  // シリアル設定は settings.json から読む
   string portName = "AUTO";
   int baudRate = 115200;
 
   [Header("モード設定")]
   [SerializeField] public bool isArduinoMode = true;
-  // ポートが開けなければ自動的にキーボードモードに切り替わる
 
   [Header("デバッグ")]
   [Tooltip("ボタンの状態が変わるたびにConsoleへ出力する")]
@@ -25,17 +23,14 @@ public class ArduinoConnection : MonoBehaviour
   volatile bool isRunning = false;
   string readBuffer = "";
 
-  // 最新のボタン状態を保持（InputManagerから参照される）
   public volatile bool RightPressed = false;
   public volatile bool LeftPressed = false;
-  public volatile int MagnetInterval = 0; // 0=停止、それ以外=ms間隔
+  public volatile int MagnetInterval = 0; 
   [NonSerialized] public volatile int MagnetPulseCount = 0;
 
-  // ハンドル角の生値（HandleAngleConverterから参照される）
-  public volatile int PotRaw = -1; // -1 = 未受信
+  public volatile int PotRaw = -1;
   public volatile bool PotAvailable = false;
 
-  // 受信スレッドが書き、メインスレッドが読むので volatile が必要
   volatile int lastPotTick = 0;
   const int POT_TIMEOUT_MS = 1000;
 
@@ -45,7 +40,6 @@ public class ArduinoConnection : MonoBehaviour
   string lastReadErrorMessage = "";
   float nextErrorLogTime = 0f;
 
-  // 読み取りスレッドから書き込み、メインスレッドで出力する
   readonly object logLock = new object();
   readonly List<string> pendingLogs = new List<string>();
 
@@ -110,7 +104,6 @@ public class ArduinoConnection : MonoBehaviour
       port.RtsEnable = true;
       port.Open();
 
-      // Arduinoはポートを開くとリセットされるので、起動を待ってから確認する
       Thread.Sleep(2000);
       if (!HasValidData(port))
       {
@@ -135,7 +128,6 @@ public class ArduinoConnection : MonoBehaviour
     }
   }
 
-  // こちらのプロトコルらしい行が来るか短時間だけ確認する
   bool HasValidData(SerialPort port)
   {
     string buffer = "";
@@ -170,14 +162,12 @@ public class ArduinoConnection : MonoBehaviour
 
   void Update()
   {
-    // Arduinoモードではスレッド側が更新するのでここでは何もしない
     if (!isArduinoMode)
     {
       RightPressed = Input.GetKey(KeyCode.K);
       LeftPressed = Input.GetKey(KeyCode.J);
     }
 
-    // POT 行は無条件に定期送信されるので、途絶＝断線とみなせる
     if (PotAvailable && unchecked(Environment.TickCount - lastPotTick) > POT_TIMEOUT_MS)
     {
       PotAvailable = false;
@@ -195,7 +185,6 @@ public class ArduinoConnection : MonoBehaviour
       pendingLogs.Clear();
     }
 
-    // 読み取りエラーは1秒に1回だけ、件数付きでまとめて出す
     if (readErrorCount > 0 && Time.unscaledTime >= nextErrorLogTime)
     {
       Debug.LogWarning($"読み取りエラー（直近1秒で{readErrorCount}件）: {lastReadErrorMessage}");
@@ -267,7 +256,6 @@ public class ArduinoConnection : MonoBehaviour
       newLineIndex = readBuffer.IndexOf('\n');
     }
 
-    // 化けたデータでバッファが際限なく膨らまないようにする
     if (readBuffer.Length > 512) readBuffer = "";
   }
 
@@ -289,7 +277,6 @@ public class ArduinoConnection : MonoBehaviour
 
     if (line.StartsWith("POT,"))
     {
-      // 通信化けした異常値をそのまま流すと操舵が暴れるので範囲を検査する
       if (int.TryParse(line.Substring(4), out int v) && v >= 0 && v <= 1023)
       {
         PotRaw = v;

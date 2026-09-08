@@ -2,29 +2,28 @@ using System;
 using System.IO;
 using UnityEngine;
 
-// 実行ファイル（エディタではプロジェクトフォルダ）の隣の settings.json から設定を読み書きする
 [Serializable]
 public class AppSettings
 {
     [Header("シリアル通信")]
-    public string portName = "AUTO";           // "AUTO" で自動検出。"COM7" 等で固定
+    public string portName = "AUTO";          
     public int baudRate = 115200;
     public bool forceKeyboardMode = false;
     public bool logSerialLines = false;
 
     [Header("速度計算")]
-    public float wheelCircumference = 2.096f;  // タイヤ周長(m)
+    public float wheelCircumference = 2.096f;  
     public int magnetsPerWheel = 1;
-    public float speedMultiplier = 2.0f;       // 実速度 → ゲーム速度の倍率
+    public float speedMultiplier = 2.0f;
     public float maxSpeedKmh = 40f;
     public float smoothFactor = 3f;
-    public float pulseTimeoutSec = 2.5f;       // この秒数パルスが来なければ停止扱い
+    public float pulseTimeoutSec = 2.5f;
 
     [Header("ハンドル角（ポテンショメータ）")]
-    public int potMin = 200;        // 切れ角一方の生値
-    public int potCenter = 512;     // 直進時の生値
-    public int potMax = 820;        // 切れ角他方の生値
-    public bool potInvert = false;  // 左右反転（較正時に自動判定）
+    public int potMin = 200;
+    public int potCenter = 512;
+    public int potMax = 820;
+    public bool potInvert = false;
 
     [Header("ベル")]
     public float bellVolume = 1.0f;
@@ -68,7 +67,6 @@ public class AppSettings
 
     public static void Reload() { _i = null; }
 
-    // エディタでは静的フィールドがPlay終了後も残るので、Play開始のたびに読み直す
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void ResetOnPlay() { _i = null; }
 }

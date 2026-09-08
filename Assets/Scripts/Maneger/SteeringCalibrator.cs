@@ -2,9 +2,7 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 
-// ゲーム内でハンドル角の較正を行う。3ステップの指示を出して生値を記録する。
-// TMP_Text を割り当てていない場合は OnGUI のオーバーレイに表示するので、
-// Canvas を組まなくても机上テストと較正がそのまま行える。
+
 public class SteeringCalibrator : MonoBehaviour
 {
     public enum Step { Idle, Left, Right, Center, Done, Error }
@@ -36,8 +34,6 @@ public class SteeringCalibrator : MonoBehaviour
 
     void Start()
     {
-        // 保険の自動検出。Inspector で割り当ててあればここは動かない。
-        // 発動したら警告を出すので、割り当て忘れに気付ける
         if (arduino == null)
         {
             arduino = FindAnyObjectByType<ArduinoConnection>();
