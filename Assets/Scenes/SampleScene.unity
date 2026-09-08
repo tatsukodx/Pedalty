@@ -1931,6 +1931,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1906885208}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &33149340
@@ -5124,6 +5125,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1965791256}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &76096625
@@ -6622,6 +6624,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1470366337}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &131912994
@@ -8092,6 +8095,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 49035977}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &170684802
@@ -12018,6 +12022,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1470366337}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &254631504
@@ -14272,6 +14277,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 568963529}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &299315116
@@ -16908,6 +16914,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1906885208}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &347483195
@@ -18060,6 +18067,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 568963529}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &368608213
@@ -20668,6 +20676,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1386230806}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &427861324
@@ -29392,6 +29401,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1906885208}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &669844973
@@ -31816,7 +31826,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 4
-  leftTurnDistance: 7
+  leftTurnDistance: 6.5
   rightTurnDistance: 11.5
   minimumTurnDistance: 2
   nsYieldManager: {fileID: 1154611557}
@@ -32500,6 +32510,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1965791256}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &738982948
@@ -34857,6 +34868,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 49035977}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &795456626
@@ -35119,6 +35131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1965791256}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &802065429
@@ -40346,6 +40359,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1965791256}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &910063004
@@ -44526,6 +44540,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1470366337}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &1011547933
@@ -51832,6 +51847,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 49035977}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &1159077053
@@ -61427,6 +61443,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1386230806}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &1374704749
@@ -63513,6 +63530,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1386230806}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &1424447558
@@ -73355,6 +73373,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 49035977}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &1625567183
@@ -77392,6 +77411,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 568963529}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &1728683196
@@ -80715,6 +80735,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1386230806}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &1788454610
@@ -88095,6 +88116,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1906885208}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &1946893559
@@ -88288,6 +88310,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 568963529}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &1953355874
@@ -95264,6 +95287,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IntersectionNode
   delayTime: 0.5
   manager: {fileID: 1470366337}
+  carIntersectionNode: {fileID: 0}
   crossingProbeDistance: 2.5
   crossingProbeRadius: 0.5
 --- !u!65 &2116096294

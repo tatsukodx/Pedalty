@@ -9,6 +9,9 @@ public class IntersectionNode : MonoBehaviour
     [Header("この交差点の信号機マネージャー（省略可）")]
     public TrafficLightManager manager;
 
+    [Header("この交差点の車側ノード（省略可、横断歩道のロック状態を確認するために使用）")]
+    public CarIntersectionNode carIntersectionNode;
+
     [Header("横断判定用の前方確認距離")]
     public float crossingProbeDistance = 2.5f;
     public float crossingProbeRadius = 0.5f;
@@ -46,25 +49,33 @@ public class IntersectionNode : MonoBehaviour
 
         bool willCross = !IsSidewalkAhead(npcTransform.position, nextDirection);
 
-        if (willCross && manager != null)
+        if (willCross)
         {
             bool crossingNSRoad = Mathf.Abs(nextDirection.x) > Mathf.Abs(nextDirection.z);
+            Transform crosswalk = carIntersectionNode != null ? carIntersectionNode.GetCrosswalkForDirection(nextDirection) : null;
 
-            walker.SetTrafficStop(true);
-
-            while (walker != null)
+            // 信号待ちが必要な場合(manager あり)、または横断歩道のロック判定が必要な場合(carIntersectionNode あり)は
+            // 両方の条件がそろうまで待機する
+            if (manager != null || carIntersectionNode != null)
             {
-                bool parallelGreen = crossingNSRoad ? manager.IsEW_CarGreen : manager.IsNS_CarGreen;
-                bool dedicatedPedPhase = manager.CurrentPhase == TrafficLightPhase.Pedestrian_Green
-                                       || manager.CurrentPhase == TrafficLightPhase.Pedestrian_Blink;
+                walker.SetTrafficStop(true);
 
-                if (parallelGreen || dedicatedPedPhase) break;
-                yield return null;
+                while (walker != null)
+                {
+                    bool signalOk = manager == null || IsCarLightAllowingCross(crossingNSRoad);
+
+                    // 対応する横断歩道が車の旋回中でロックされている間は、
+                    // 信号が青（歩行者側が進んでよいタイミング）でも進ませない
+                    bool crosswalkLocked = carIntersectionNode != null && carIntersectionNode.IsCrosswalkLocked(crosswalk);
+
+                    if (signalOk && !crosswalkLocked) break;
+                    yield return null;
+                }
+
+                if (walker == null) yield break;
+
+                walker.SetTrafficStop(false);
             }
-
-            if (walker == null) yield break;
-
-            walker.SetTrafficStop(false);
         }
 
         walker.SnapAcrossPath(transform.position, currentDir, nextDirection);
@@ -81,6 +92,14 @@ public class IntersectionNode : MonoBehaviour
         {
             walker.SetAtIntersection(false);
         }
+    }
+
+    bool IsCarLightAllowingCross(bool crossingNSRoad)
+    {
+        bool parallelGreen = crossingNSRoad ? manager.IsEW_CarGreen : manager.IsNS_CarGreen;
+        bool dedicatedPedPhase = manager.CurrentPhase == TrafficLightPhase.Pedestrian_Green
+                               || manager.CurrentPhase == TrafficLightPhase.Pedestrian_Blink;
+        return parallelGreen || dedicatedPedPhase;
     }
 
     bool IsSidewalkAhead(Vector3 origin, Vector3 direction)

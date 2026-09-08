@@ -40,6 +40,33 @@ public class CarIntersectionNode : MonoBehaviour
 
     private readonly Dictionary<CarController, ActiveCarInfo> activeCars = new Dictionary<CarController, ActiveCarInfo>();
 
+    // 旋回中の車がいる横断歩道を「使用中」としてロックするためのカウンター。
+    // 同じ横断歩道に向かって複数台が同時に旋回することもあるため、
+    // bool ではなく参照カウントで管理する。
+    private readonly Dictionary<Transform, int> lockedCrosswalkCounts = new Dictionary<Transform, int>();
+
+    public bool IsCrosswalkLocked(Transform crosswalk)
+    {
+        if (crosswalk == null) return false;
+        return lockedCrosswalkCounts.TryGetValue(crosswalk, out int count) && count > 0;
+    }
+
+    private void LockCrosswalk(Transform crosswalk)
+    {
+        if (crosswalk == null) return;
+        lockedCrosswalkCounts.TryGetValue(crosswalk, out int count);
+        lockedCrosswalkCounts[crosswalk] = count + 1;
+    }
+
+    private void UnlockCrosswalk(Transform crosswalk)
+    {
+        if (crosswalk == null) return;
+        if (lockedCrosswalkCounts.TryGetValue(crosswalk, out int count))
+        {
+            lockedCrosswalkCounts[crosswalk] = Mathf.Max(0, count - 1);
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         CarController car = other.GetComponent<CarController>();
@@ -143,26 +170,29 @@ public class CarIntersectionNode : MonoBehaviour
         Quaternion startRot = Quaternion.LookRotation(currentDir);
         Quaternion endRot = Quaternion.LookRotation(nextDirection);
 
-        while (car != null)
+        // 旋回開始：ここから曲がり終わるまでは車を優先する。
+        // 出口側の横断歩道をロックし、歩行者側には「進んでよい」判定を出させない。
+        LockCrosswalk(exitCrosswalk);
+
+        try
         {
-            if (exitCrosswalk != null && !IsCrosswalkClear(exitCrosswalk))
+            while (car != null)
             {
-                car.SetPedestrianStop(true, isLeftTurn);
+                float traveled = Vector3.Distance(startPosition, carTransform.position);
+                float t = Mathf.Clamp01(traveled / targetDistance);
+
+                Vector3 interpolatedDir = Quaternion.Slerp(startRot, endRot, t) * Vector3.forward;
+                car.SetDirection(interpolatedDir);
+
+                if (t >= 1f) yield break;
+
                 yield return new WaitForFixedUpdate();
-                continue;
             }
-
-            car.SetPedestrianStop(false);
-
-            float traveled = Vector3.Distance(startPosition, carTransform.position);
-            float t = Mathf.Clamp01(traveled / targetDistance);
-
-            Vector3 interpolatedDir = Quaternion.Slerp(startRot, endRot, t) * Vector3.forward;
-            car.SetDirection(interpolatedDir);
-
-            if (t >= 1f) yield break;
-
-            yield return new WaitForFixedUpdate();
+        }
+        finally
+        {
+            // 旋回完了（または車が消滅した場合も含む）：ロックを解除して歩行者を通す
+            UnlockCrosswalk(exitCrosswalk);
         }
     }
 
