@@ -290,35 +290,35 @@ public sealed class GameFlowUI : MonoBehaviour
     void BuildRankingPanel()
     {
         rankingPanel = CreateFullScreenPanel("RankingScreen", new Color(0.01f, 0.02f, 0.04f, 0.94f));
-        GameObject card = CreateWindow(rankingPanel.transform, "RankingWindow", new Vector2(700f, 500f));
+        GameObject card = CreateWindow(rankingPanel.transform, "RankingWindow", new Vector2(740f, 540f));
 
-        TextMeshProUGUI title = CreateText(card.transform, "RankingTitle", new Vector2(0f, 210f),
-            new Vector2(650f, 42f), 34f, TextAlignmentOptions.Center, Yellow);
+        TextMeshProUGUI title = CreateText(card.transform, "RankingTitle", new Vector2(0f, 230f),
+            new Vector2(690f, 46f), 36f, TextAlignmentOptions.Center, Yellow);
         title.text = "RANKING";
 
-        currentRankText = CreateText(card.transform, "CurrentRank", new Vector2(0f, 178f),
-            new Vector2(650f, 28f), 21f, TextAlignmentOptions.Center, Cyan);
+        currentRankText = CreateText(card.transform, "CurrentRank", new Vector2(0f, 194f),
+            new Vector2(690f, 30f), 23f, TextAlignmentOptions.Center, Cyan);
 
-        TextMeshProUGUI currentHeader = CreateText(card.transform, "CurrentRecordHeader", new Vector2(0f, 148f),
-            new Vector2(650f, 24f), 16f, TextAlignmentOptions.Center, Color.white);
+        TextMeshProUGUI currentHeader = CreateText(card.transform, "CurrentRecordHeader", new Vector2(0f, 160f),
+            new Vector2(690f, 26f), 17f, TextAlignmentOptions.Center, Color.white);
         currentHeader.text = "今回の記録";
 
-        CreateRankingColumnHeaders(card.transform, 119f, false);
-        CreateCurrentRecordRow(card.transform, 92f);
+        CreateRankingColumnHeaders(card.transform, 130f, false);
+        CreateCurrentRecordRow(card.transform, 101f);
 
-        TextMeshProUGUI topHeader = CreateText(card.transform, "TopRecordsHeader", new Vector2(0f, 57f),
-            new Vector2(650f, 26f), 18f, TextAlignmentOptions.Center, Yellow);
+        TextMeshProUGUI topHeader = CreateText(card.transform, "TopRecordsHeader", new Vector2(0f, 65f),
+            new Vector2(690f, 28f), 20f, TextAlignmentOptions.Center, Yellow);
         topHeader.text = "過去のTOP 3";
 
-        CreateRankingColumnHeaders(card.transform, 30f, true);
+        CreateRankingColumnHeaders(card.transform, 35f, true);
         for (int index = 0; index < topRecordRows.Length; index++)
         {
-            CreateTopRecordRow(card.transform, index, 2f - index * 28f);
+            CreateTopRecordRow(card.transform, index, 5f - index * 30f);
         }
 
-        CreateChoiceCard(card.transform, "RankingHomeChoice", new Vector2(-135f, -178f), Cyan,
+        CreateChoiceCard(card.transform, "RankingHomeChoice", new Vector2(-140f, -198f), Cyan,
             "左ボタン", "スタート画面へ戻る", "左クリック / J / ←");
-        CreateChoiceCard(card.transform, "RankingRetryChoice", new Vector2(135f, -178f), Yellow,
+        CreateChoiceCard(card.transform, "RankingRetryChoice", new Vector2(140f, -198f), Yellow,
             "右ボタン", "リトライ", "K / →");
     }
 
@@ -327,21 +327,21 @@ public sealed class GameFlowUI : MonoBehaviour
         string prefix = showRank ? "Top" : "Current";
         if (showRank)
         {
-            CreateTableText(parent, "TopRankHeader", "順位", -305f, y, 50f, 12f, Cyan);
+            CreateTableText(parent, "TopRankHeader", "順位", -325f, y, 50f, 13f, Cyan);
         }
 
-        CreateTableText(parent, prefix + "NameHeader", "ユーザー名", -205f, y, 150f, 12f, Cyan);
-        CreateTableText(parent, prefix + "ViolationHeader", "違反回数", -65f, y, 100f, 12f, Cyan);
-        CreateTableText(parent, prefix + "FineHeader", "罰金額", 70f, y, 140f, 12f, Cyan);
-        CreateTableText(parent, prefix + "TimeHeader", "クリアタイム", 245f, y, 180f, 12f, Cyan);
+        CreateTableText(parent, prefix + "NameHeader", "ユーザー名", -220f, y, 165f, 13f, Cyan);
+        CreateTableText(parent, prefix + "ViolationHeader", "違反回数", -70f, y, 105f, 13f, Cyan);
+        CreateTableText(parent, prefix + "FineHeader", "罰金額", 80f, y, 145f, 13f, Cyan);
+        CreateTableText(parent, prefix + "TimeHeader", "クリアタイム", 265f, y, 180f, 13f, Cyan);
     }
 
     void CreateCurrentRecordRow(Transform parent, float y)
     {
-        currentRecordNameText = CreateTableText(parent, "CurrentName", string.Empty, -205f, y, 150f, 15f, Color.white);
-        currentRecordViolationText = CreateTableText(parent, "CurrentViolations", string.Empty, -65f, y, 100f, 15f, Color.white);
-        currentRecordFineText = CreateTableText(parent, "CurrentFine", string.Empty, 70f, y, 140f, 15f, Yellow);
-        currentRecordTimeText = CreateTableText(parent, "CurrentTime", string.Empty, 245f, y, 180f, 15f, Color.white);
+        currentRecordNameText = CreateTableText(parent, "CurrentName", string.Empty, -220f, y, 165f, 16f, Color.white);
+        currentRecordViolationText = CreateTableText(parent, "CurrentViolations", string.Empty, -70f, y, 105f, 16f, Color.white);
+        currentRecordFineText = CreateTableText(parent, "CurrentFine", string.Empty, 80f, y, 145f, 16f, Yellow);
+        currentRecordTimeText = CreateTableText(parent, "CurrentTime", string.Empty, 265f, y, 180f, 16f, Color.white);
     }
 
     void CreateTopRecordRow(Transform parent, int index, float y)
@@ -357,11 +357,11 @@ public sealed class GameFlowUI : MonoBehaviour
 
         topRecordRows[index] = row;
         Color rankColor = index == 0 ? Yellow : Color.white;
-        CreateTableText(row.transform, "Rank", $"{index + 1}", -305f, y, 50f, 15f, rankColor);
-        topRecordNameTexts[index] = CreateTableText(row.transform, "Name", string.Empty, -205f, y, 150f, 14f, Color.white);
-        topRecordViolationTexts[index] = CreateTableText(row.transform, "Violations", string.Empty, -65f, y, 100f, 14f, Color.white);
-        topRecordFineTexts[index] = CreateTableText(row.transform, "Fine", string.Empty, 70f, y, 140f, 14f, Yellow);
-        topRecordTimeTexts[index] = CreateTableText(row.transform, "Time", string.Empty, 245f, y, 180f, 14f, Color.white);
+        CreateTableText(row.transform, "Rank", $"{index + 1}", -325f, y, 50f, 16f, rankColor);
+        topRecordNameTexts[index] = CreateTableText(row.transform, "Name", string.Empty, -220f, y, 165f, 15f, Color.white);
+        topRecordViolationTexts[index] = CreateTableText(row.transform, "Violations", string.Empty, -70f, y, 105f, 15f, Color.white);
+        topRecordFineTexts[index] = CreateTableText(row.transform, "Fine", string.Empty, 80f, y, 145f, 15f, Yellow);
+        topRecordTimeTexts[index] = CreateTableText(row.transform, "Time", string.Empty, 265f, y, 180f, 15f, Color.white);
     }
 
     TextMeshProUGUI CreateTableText(Transform parent, string objectName, string value, float x, float y,
@@ -675,7 +675,9 @@ public sealed class GameFlowUI : MonoBehaviour
         PenaltyController penaltyController = FindAnyObjectByType<PenaltyController>();
         int finalViolationCount = penaltyController != null ? penaltyController.CurrentViolationCount : 0;
 
-        latestRankingResult = rankingDatabase.AddRecord(finalTime, finalViolationCount, finalFine);
+        latestRankingResult = GameDebugMode.IsEnabled
+            ? rankingDatabase.CreatePreviewRecord(finalTime, finalViolationCount, finalFine)
+            : rankingDatabase.AddRecord(finalTime, finalViolationCount, finalFine);
 
         resultTimeText.text = "TIME  " + GameTimer.FormatTime(finalTime);
         resultFineText.text = $"現在の罰金総額  ￥{finalFine:N0}";
@@ -700,7 +702,9 @@ public sealed class GameFlowUI : MonoBehaviour
     void UpdateRankingPanel(RankingResult result)
     {
         RankingRecord current = result.CurrentRecord;
-        currentRankText.text = $"あなたの順位  {result.CurrentRank}位";
+        currentRankText.text = result.IsSaved
+            ? $"あなたの順位  {result.CurrentRank}位"
+            : "DEBUG MODE  /  ランキング記録対象外";
         currentRecordNameText.text = current.playerName;
         currentRecordViolationText.text = $"{current.violationCount}回";
         currentRecordFineText.text = $"￥{current.fineAmount:N0}";

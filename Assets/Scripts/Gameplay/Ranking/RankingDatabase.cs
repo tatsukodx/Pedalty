@@ -24,17 +24,26 @@ public sealed class RankingDatabase
     {
         databasePath = GetDatabasePath();
         data = LoadDatabase();
+        if (EnsureUniquePlayerNames(data.records))
+        {
+            SaveDatabase();
+        }
     }
 
     public RankingResult AddRecord(float clearTimeSeconds, int violationCount, int fineAmount)
     {
+        return CreateResult(clearTimeSeconds, violationCount, fineAmount, true);
+    }
+
+    public RankingResult CreatePreviewRecord(float clearTimeSeconds, int violationCount, int fineAmount)
+    {
+        return CreateResult(clearTimeSeconds, violationCount, fineAmount, false);
+    }
+
+    RankingResult CreateResult(float clearTimeSeconds, int violationCount, int fineAmount, bool saveRecord)
+    {
         DateTime playedAt = DateTime.Now;
-        RankingRecord[] previousTopRecords = data.records
-            .Where(IsValidRecord)
-            .OrderBy(record => record.clearTimeSeconds)
-            .ThenBy(record => record.fineAmount)
-            .ThenBy(record => record.violationCount)
-            .ThenBy(record => record.playedAt, StringComparer.Ordinal)
+        RankingRecord[] previousTopRecords = GetRankedRecords(data.records)
             .Take(TopDisplayCount)
             .ToArray();
         RankingRecord currentRecord = new RankingRecord
@@ -47,23 +56,20 @@ public sealed class RankingDatabase
             clearTimeSeconds = Mathf.Max(0f, clearTimeSeconds)
         };
 
-        List<RankingRecord> rankedRecords = data.records
-            .Where(IsValidRecord)
-            .Append(currentRecord)
-            .OrderBy(record => record.clearTimeSeconds)
-            .ThenBy(record => record.fineAmount)
-            .ThenBy(record => record.violationCount)
-            .ThenBy(record => record.playedAt, StringComparer.Ordinal)
-            .ToList();
-
+        List<RankingRecord> rankedRecords = GetRankedRecords(data.records.Append(currentRecord));
         int currentRank = rankedRecords.IndexOf(currentRecord) + 1;
-        data.records = rankedRecords.Take(MaximumRecordCount).ToList();
-        SaveDatabase();
+
+        if (saveRecord)
+        {
+            data.records = rankedRecords.Take(MaximumRecordCount).ToList();
+            SaveDatabase();
+        }
 
         return new RankingResult(
             currentRecord,
             currentRank,
-            previousTopRecords);
+            previousTopRecords,
+            saveRecord);
     }
 
     string CreatePlayerName(DateTime playedAt)
@@ -72,7 +78,7 @@ public sealed class RankingDatabase
         HashSet<string> existingNames = new HashSet<string>(
             data.records.Where(IsValidRecord).Select(record => record.playerName));
 
-        for (int suffix = 0; suffix <= 9; suffix++)
+        for (int suffix = 0; ; suffix++)
         {
             string candidate = prefix + suffix;
             if (!existingNames.Contains(candidate))
@@ -80,8 +86,6 @@ public sealed class RankingDatabase
                 return candidate;
             }
         }
-
-        return prefix + (playedAt.Second % 10);
     }
 
     RankingDatabaseData LoadDatabase()
@@ -97,9 +101,6 @@ public sealed class RankingDatabase
                 loaded.records = loaded.records
                     .Where(IsValidRecord)
                     .OrderBy(record => record.clearTimeSeconds)
-                    .ThenBy(record => record.fineAmount)
-                    .ThenBy(record => record.violationCount)
-                    .ThenBy(record => record.playedAt, StringComparer.Ordinal)
                     .Take(MaximumRecordCount)
                     .ToList();
                 return loaded;
@@ -111,6 +112,56 @@ public sealed class RankingDatabase
         }
 
         return new RankingDatabaseData();
+    }
+
+    static List<RankingRecord> GetRankedRecords(IEnumerable<RankingRecord> records)
+    {
+        return records
+            .Where(IsValidRecord)
+            .OrderBy(record => record.clearTimeSeconds)
+            .ToList();
+    }
+
+    static bool EnsureUniquePlayerNames(IEnumerable<RankingRecord> records)
+    {
+        bool changed = false;
+        HashSet<string> usedNames = new HashSet<string>();
+
+        foreach (RankingRecord record in records)
+        {
+            if (usedNames.Add(record.playerName))
+            {
+                continue;
+            }
+
+            string prefix = GetPlayerNamePrefix(record);
+            for (int suffix = 0; ; suffix++)
+            {
+                string candidate = prefix + suffix;
+                if (!usedNames.Add(candidate))
+                {
+                    continue;
+                }
+
+                record.playerName = candidate;
+                changed = true;
+                break;
+            }
+        }
+
+        return changed;
+    }
+
+    static string GetPlayerNamePrefix(RankingRecord record)
+    {
+        if (DateTimeOffset.TryParse(record.playedAt, out DateTimeOffset playedAt))
+        {
+            return playedAt.ToLocalTime().ToString("MMddHHmm");
+        }
+
+        return record.playerName.Length >= 8
+            ? record.playerName.Substring(0, 8)
+            : "00000000";
     }
 
     string LoadInitialJson()
