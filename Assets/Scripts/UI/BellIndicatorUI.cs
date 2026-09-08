@@ -3,10 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// 画面右下のブレーキ表示の上に、ベルの鳴動状態を表示する。
-/// InputManagerがあるシーンで自動生成されるため、Inspectorでの配線は不要。
-/// </summary>
+
 public sealed class BellIndicatorUI : MonoBehaviour
 {
     const float RingDisplaySeconds = 0.65f;

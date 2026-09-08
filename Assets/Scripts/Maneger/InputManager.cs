@@ -12,7 +12,7 @@ public class InputManager : MonoBehaviour
 
     [Header("走行中イベント")]
     public UnityEvent OnBellRing;
-    public UnityEvent<bool> OnBrake; // true: ブレーキ開始, false: ブレーキ終了
+    public UnityEvent<bool> OnBrake;
 
     [Header("ブレーキ制御")]
     [SerializeField] BicycleController bicycleController;
@@ -55,7 +55,6 @@ public class InputManager : MonoBehaviour
 
         if (!isArduinoActive)
         {
-            // キーボードモード：左右の代替キーはメニューと走行中の両方で使用する
             curLeft = Input.GetMouseButton(0) || Input.GetKey(KeyCode.J) || Input.GetKey(KeyCode.LeftArrow);
             curRight = Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.RightArrow);
         }
@@ -75,10 +74,8 @@ public class InputManager : MonoBehaviour
         bool rightEdgeOn = curRight && !prevRight;
         bool leftEdgeOn = curLeft && !prevLeft;
 
-        // 何もロックされていない場合のみ新規入力を受け付ける
         if (activeButton == ActiveButton.None)
         {
-            // 同時押しの場合は左を優先
             if (leftEdgeOn)
             {
                 activeButton = ActiveButton.Left;
@@ -105,8 +102,6 @@ public class InputManager : MonoBehaviour
             }
         }
 
-        // 解除条件を「両方離されたら」にすると、片方の信号が1に張り付いた時に
-        // もう片方が永久に効かなくなるので、押している側だけを見る
         bool activeReleased = (activeButton == ActiveButton.Right && !curRight)
                            || (activeButton == ActiveButton.Left && !curLeft);
 
@@ -149,7 +144,6 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    // 長時間 true のままのボタンを張り付きとみなして false を返す。一度 false に戻れば復帰する
     bool FilterStuck(bool pressed, ref float holdTime, ref bool isStuck, string label)
     {
         if (!pressed)

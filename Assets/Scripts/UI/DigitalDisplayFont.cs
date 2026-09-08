@@ -1,7 +1,6 @@
 using TMPro;
 using UnityEngine;
 
-// SPEED / TIME の表示へレトロゲーム風フォントを適用する。
 public class DigitalDisplayFont : MonoBehaviour
 {
     [SerializeField] private Font sourceFont;

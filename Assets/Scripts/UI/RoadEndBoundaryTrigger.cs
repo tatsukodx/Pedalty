@@ -1,9 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// 道路端の既存Triggerに追加され、自転車の接触状態だけを管理する。
-/// </summary>
 public sealed class RoadEndBoundaryTrigger : MonoBehaviour
 {
     readonly HashSet<Collider> bicycleContacts = new();

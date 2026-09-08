@@ -1,7 +1,4 @@
 using UnityEngine;
-
-// ポテンショメータの生値(0-1023)を BicycleController の操舵入力(-1..1)へ変換する。
-// WheelSpeedConverter（速度系）と対になるクラス。
 public class HandleAngleConverter : MonoBehaviour
 {
     [Header("参照")]
@@ -31,7 +28,6 @@ public class HandleAngleConverter : MonoBehaviour
 
     float steer;
 
-    // SteeringCalibrator の画面表示から参照する
     public int DebugRaw => dbgRaw;
     public float DebugNormalized => dbgNormalized;
     public float DebugOutput => dbgOutput;
@@ -39,9 +35,6 @@ public class HandleAngleConverter : MonoBehaviour
     void Start()
     {
         if (bicycle == null) bicycle = GetComponent<BicycleController>();
-
-        // 保険の自動検出。Inspector で割り当ててあればここは動かない。
-        // 発動したら警告を出すので、割り当て忘れに気付ける
         if (arduino == null)
         {
             arduino = FindAnyObjectByType<ArduinoConnection>();
@@ -66,7 +59,6 @@ public class HandleAngleConverter : MonoBehaviour
         LoadCalibration();
     }
 
-    // 較正完了時にも呼ぶ
     public void LoadCalibration()
     {
         var c = AppSettings.I;
@@ -94,8 +86,6 @@ public class HandleAngleConverter : MonoBehaviour
 
         t = ApplyCurve(t);
 
-        // Lerp(a, b, speed * dt) は dt に対して非線形でフレームレートに依存する。
-        // 1 - exp(-dt/tau) なら時定数が保証される
         float k = 1f - Mathf.Exp(-Time.deltaTime / Mathf.Max(smoothTau, 1e-4f));
         steer = Mathf.Lerp(steer, t, k);
 
@@ -105,7 +95,6 @@ public class HandleAngleConverter : MonoBehaviour
         bicycle.useExternalSteer = true;
     }
 
-    // 中心から左右で別々のスケールを使うため、取り付けが左右非対称でも「直進 = 0」が保たれる
     public float Normalize(int raw)
     {
         float t = (raw >= potCenter)
@@ -121,7 +110,6 @@ public class HandleAngleConverter : MonoBehaviour
         float a = Mathf.Abs(t);
         if (a < deadZone) return 0f;
 
-        // 再スケールしないと不感帯の境界で出力が 0 から deadZone へ不連続に跳ぶ
         a = (a - deadZone) / (1f - deadZone);
         a = Mathf.Pow(a, expo);
         return a * Mathf.Sign(t);

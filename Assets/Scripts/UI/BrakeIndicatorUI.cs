@@ -2,10 +2,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// 企画書のレイアウトに合わせ、画面右下にブレーキ状態を表示する。
-/// InputManagerがあるシーンで自動的に生成されるため、Inspectorでの配線は不要。
-/// </summary>
 public sealed class BrakeIndicatorUI : MonoBehaviour
 {
     static readonly Color InactiveIconColor = new Color(0.58f, 0.62f, 0.66f, 1f);

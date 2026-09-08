@@ -1,8 +1,6 @@
 using UnityEngine;
 
-/// <summary>
-/// 現在の走行が違反判定なしのデバッグモードかを共有する。
-/// </summary>
+
 public static class GameDebugMode
 {
     public static bool IsEnabled { get; private set; }
