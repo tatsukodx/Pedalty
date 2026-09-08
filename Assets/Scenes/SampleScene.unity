@@ -3483,7 +3483,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: a119eb0fa059db34bbaef286c1af1696, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -65
+      value: -1.1
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: a119eb0fa059db34bbaef286c1af1696, type: 3}
       propertyPath: m_LocalRotation.w
@@ -20305,7 +20305,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLaneDetector
   sensorRadius: 1
   bikeLaneCheckRadius: 6
-  parkedCarCheckRadius: 3
+  parkedCarCheckRadius: 2.5
   currentArea: 0
   currentSide: 0
   bikeLaneExistsNearby: 0
@@ -36497,8 +36497,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 830518726}
-  - component: {fileID: 830518728}
   - component: {fileID: 830518727}
+  - component: {fileID: 830518728}
   m_Layer: 0
   m_Name: ParkedCarZone_Street_C
   m_TagString: Untagged
@@ -36533,8 +36533,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e22dff0f9d311614ca39b5300f7c7de8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ParkedCarZone
---- !u!135 &830518728
-SphereCollider:
+--- !u!65 &830518728
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -36552,7 +36552,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 1
+  m_Size: {x: 5, y: 3, z: 12}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &830526508
 PrefabInstance:
@@ -44506,8 +44506,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1009440111}
-  - component: {fileID: 1009440113}
   - component: {fileID: 1009440112}
+  - component: {fileID: 1009440113}
   m_Layer: 0
   m_Name: ParkedCarZone_Street_A
   m_TagString: Untagged
@@ -44542,8 +44542,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e22dff0f9d311614ca39b5300f7c7de8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ParkedCarZone
---- !u!135 &1009440113
-SphereCollider:
+--- !u!65 &1009440113
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -44561,7 +44561,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 1
+  m_Size: {x: 5, y: 3, z: 12}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1011084067
 GameObject:
@@ -76063,8 +76063,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1691351333}
-  - component: {fileID: 1691351335}
   - component: {fileID: 1691351334}
+  - component: {fileID: 1691351335}
   m_Layer: 0
   m_Name: ParkedCarZone_Street_B
   m_TagString: Untagged
@@ -76099,8 +76099,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e22dff0f9d311614ca39b5300f7c7de8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ParkedCarZone
---- !u!135 &1691351335
-SphereCollider:
+--- !u!65 &1691351335
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -76118,7 +76118,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 1
+  m_Size: {x: 5, y: 3, z: 12}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!4 &1692856018 stripped
 Transform:
@@ -77663,7 +77663,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: a119eb0fa059db34bbaef286c1af1696, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -65
+      value: -124.9
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: a119eb0fa059db34bbaef286c1af1696, type: 3}
       propertyPath: m_LocalRotation.w
