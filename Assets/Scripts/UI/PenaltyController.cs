@@ -13,6 +13,9 @@ public class PenaltyController : MonoBehaviour
     [SerializeField] private Button closeButton;
 
     private FineDisplayUI fineDisplay;
+    private int violationCount;
+
+    public int CurrentViolationCount => violationCount;
 
     private void Start()
     {
@@ -68,6 +71,7 @@ public class PenaltyController : MonoBehaviour
         if (descriptionText != null) descriptionText.text = violation.description;
         if (popupPenaltyAmountText != null) popupPenaltyAmountText.text = $"¥ {violation.penaltyAmount:N0}";
 
+        violationCount++;
         AddPenalty(violation.penaltyAmount);
         violationPopup.SetActive(true);
 
@@ -99,5 +103,10 @@ public class PenaltyController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         Time.timeScale = 1f;
+    }
+
+    public void ResetRunStatistics()
+    {
+        violationCount = 0;
     }
 }
