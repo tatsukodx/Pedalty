@@ -78121,7 +78121,6 @@ MonoBehaviour:
   farDistance: 500
   minimumSizeRatio: 0.5
   approachDistance: 60
-  finalApproachDistance: 12
 --- !u!1 &2000000103
 GameObject:
   m_ObjectHideFlags: 0

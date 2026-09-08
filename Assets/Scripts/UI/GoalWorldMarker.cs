@@ -17,6 +17,7 @@ public sealed class GoalWorldMarker : MonoBehaviour
     Transform player;
     Material lineMaterial;
     Camera targetCamera;
+    GoalTrigger goalTrigger;
     float billboardScale;
 
     [Header("近距離表示")]
@@ -36,6 +37,7 @@ public sealed class GoalWorldMarker : MonoBehaviour
     void Awake()
     {
         targetCamera = Camera.main;
+        goalTrigger = GetComponent<GoalTrigger>();
         BicycleController bicycle = FindAnyObjectByType<BicycleController>();
         player = bicycle != null ? bicycle.transform : null;
         BuildMarker();
@@ -239,7 +241,12 @@ public sealed class GoalWorldMarker : MonoBehaviour
             player = bicycle != null ? bicycle.transform : null;
         }
 
-        bool shouldShow = player != null && GetHorizontalDistance(player) <= visibleDistanceMeters;
+        bool hasFinished = goalTrigger != null &&
+            goalTrigger.GameTimer != null &&
+            goalTrigger.GameTimer.HasFinished;
+        bool shouldShow = !hasFinished &&
+            player != null &&
+            GetHorizontalDistance(player) <= visibleDistanceMeters;
         if (visualRoot.activeSelf != shouldShow)
         {
             visualRoot.SetActive(shouldShow);

@@ -27,16 +27,15 @@ public class GoalDirectionIndicator : MonoBehaviour
     [Header("ゴール接近表示")]
     [Tooltip("この距離以内では画面端のピンを隠し、ゴール地点のピンへ切り替えます")]
     [SerializeField] private float approachDistance = 60f;
-    [SerializeField] private float finalApproachDistance = 12f;
 
     private Vector2 maximumIndicatorSize;
     private GameObject proximityPanel;
     private RectTransform proximityPanelRect;
-    private TextMeshProUGUI proximityTitle;
-    private TextMeshProUGUI proximityMessage;
+    private TextMeshProUGUI nearDistanceText;
     private Outline proximityOutline;
     private TMP_FontAsset displayFont;
     private GoalTrigger goalTrigger;
+    private GameTimer gameTimer;
 
     private void Awake()
     {
@@ -50,6 +49,7 @@ public class GoalDirectionIndicator : MonoBehaviour
         if (goal != null)
         {
             goalTrigger = goal.GetComponent<GoalTrigger>();
+            gameTimer = goalTrigger != null ? goalTrigger.GameTimer : null;
         }
 
         if (indicator == null)
@@ -70,6 +70,13 @@ public class GoalDirectionIndicator : MonoBehaviour
             targetCamera == null ||
             indicator == null)
         {
+            return;
+        }
+
+        if (gameTimer != null && gameTimer.HasFinished)
+        {
+            indicator.gameObject.SetActive(false);
+            proximityPanel.SetActive(false);
             return;
         }
 
@@ -219,7 +226,7 @@ public class GoalDirectionIndicator : MonoBehaviour
         proximityPanelRect.anchorMax = new Vector2(0.5f, 0f);
         proximityPanelRect.pivot = new Vector2(0.5f, 0f);
         proximityPanelRect.anchoredPosition = new Vector2(0f, 32f);
-        proximityPanelRect.sizeDelta = new Vector2(430f, 88f);
+        proximityPanelRect.sizeDelta = new Vector2(160f, 52f);
 
         Image panelImage = panelObject.GetComponent<Image>();
         panelImage.color = new Color(0.015f, 0.025f, 0.06f, 0.95f);
@@ -227,38 +234,16 @@ public class GoalDirectionIndicator : MonoBehaviour
 
         proximityOutline = panelObject.GetComponent<Outline>();
         proximityOutline.effectColor = new Color(1f, 0.76f, 0.08f, 0.95f);
-        proximityOutline.effectDistance = new Vector2(3f, -3f);
+        proximityOutline.effectDistance = new Vector2(2f, -2f);
 
         Shadow shadow = panelObject.GetComponent<Shadow>();
         shadow.effectColor = new Color(0f, 0f, 0f, 0.75f);
-        shadow.effectDistance = new Vector2(0f, -7f);
+        shadow.effectDistance = new Vector2(0f, -5f);
 
-        CreateAccentBar(panelObject.transform, "LeftAccent", new Vector2(-211f, 0f));
-        CreateAccentBar(panelObject.transform, "RightAccent", new Vector2(211f, 0f));
-
-        proximityTitle = CreatePanelText(panelObject.transform, "GoalProximityTitle",
-            new Vector2(0f, 20f), new Vector2(390f, 32f), 24f, new Color(1f, 0.79f, 0.14f, 1f));
-        proximityMessage = CreatePanelText(panelObject.transform, "GoalProximityMessage",
-            new Vector2(0f, -18f), new Vector2(390f, 26f), 15f, Color.white);
+        nearDistanceText = CreatePanelText(panelObject.transform, "NearGoalDistanceText",
+            Vector2.zero, new Vector2(140f, 40f), 22f, new Color(1f, 0.79f, 0.14f, 1f));
 
         proximityPanel.SetActive(false);
-    }
-
-    private void CreateAccentBar(Transform parent, string objectName, Vector2 position)
-    {
-        GameObject barObject = new GameObject(objectName, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-        barObject.transform.SetParent(parent, false);
-
-        RectTransform rect = barObject.GetComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0.5f, 0.5f);
-        rect.anchorMax = new Vector2(0.5f, 0.5f);
-        rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.anchoredPosition = position;
-        rect.sizeDelta = new Vector2(7f, 72f);
-
-        Image image = barObject.GetComponent<Image>();
-        image.color = new Color(1f, 0.76f, 0.08f, 1f);
-        image.raycastTarget = false;
     }
 
     private TextMeshProUGUI CreatePanelText(Transform parent, string objectName, Vector2 position,
@@ -318,18 +303,8 @@ public class GoalDirectionIndicator : MonoBehaviour
         }
 
         int displayedMeters = Mathf.RoundToInt(displayedDistanceMeters);
-        bool isFinalApproach = measuredDistanceMeters <= finalApproachDistance;
-        proximityTitle.text = isFinalApproach ? "FINISH POINT" : "GOAL ZONE";
-        proximityMessage.text = isFinalApproach
-            ? $"黄色いピンの中心へ   {displayedMeters} m"
-            : $"ゴール地点へ接近中   {displayedMeters} m";
-
-        float pulse = (Mathf.Sin(Time.unscaledTime * 5f) + 1f) * 0.5f;
-        proximityPanelRect.localScale = Vector3.one * Mathf.Lerp(0.99f, 1.025f, pulse);
-        proximityOutline.effectColor = Color.Lerp(
-            new Color(1f, 0.55f, 0.04f, 0.8f),
-            new Color(1f, 0.94f, 0.45f, 1f),
-            pulse
-        );
+        nearDistanceText.text = $"{displayedMeters} m";
+        proximityPanelRect.localScale = Vector3.one;
+        proximityOutline.effectColor = new Color(1f, 0.76f, 0.08f, 0.95f);
     }
 }

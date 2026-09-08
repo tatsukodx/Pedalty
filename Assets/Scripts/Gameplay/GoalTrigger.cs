@@ -9,6 +9,7 @@ public class GoalTrigger : MonoBehaviour
     [Tooltip("ゴール中心から、この距離以内に入ると到着になります")]
     [SerializeField, Min(0f)] private float finishDistanceMeters = 0.49f;
 
+    public GameTimer GameTimer => gameTimer;
     public float FinishDistanceMeters => finishDistanceMeters;
 
     public float GetHorizontalDistance(Transform target)
