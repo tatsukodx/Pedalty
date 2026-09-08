@@ -34,6 +34,7 @@ public class TrafficViolationDetector : MonoBehaviour
     private RoadAreaType previousArea = RoadAreaType.None;
     private RoadSide previousSide = RoadSide.None;
     private bool previousBikeLaneExistsNearby = false;
+    private bool previousParkedCarNearby = false;
 
     private void Awake()
     {
@@ -81,6 +82,7 @@ public class TrafficViolationDetector : MonoBehaviour
         RoadAreaType currentArea = laneDetector.currentArea;
         RoadSide currentSide = laneDetector.currentSide;
         bool bikeLaneExistsNearby = laneDetector.bikeLaneExistsNearby;
+        bool parkedCarNearby = laneDetector.parkedCarNearby;
 
         if (GameDebugMode.IsEnabled)
         {
@@ -88,21 +90,29 @@ public class TrafficViolationDetector : MonoBehaviour
             previousArea = currentArea;
             previousSide = currentSide;
             previousBikeLaneExistsNearby = bikeLaneExistsNearby;
+            previousParkedCarNearby = parkedCarNearby;
             return;
         }
 
-        if (currentArea != previousArea || currentSide != previousSide || bikeLaneExistsNearby != previousBikeLaneExistsNearby)
+        if (currentArea != previousArea || currentSide != previousSide || bikeLaneExistsNearby != previousBikeLaneExistsNearby || parkedCarNearby != previousParkedCarNearby)
         {
-            CheckViolation(currentArea, currentSide, bikeLaneExistsNearby);
+            CheckViolation(currentArea, currentSide, bikeLaneExistsNearby, parkedCarNearby);
             previousArea = currentArea;
             previousSide = currentSide;
             previousBikeLaneExistsNearby = bikeLaneExistsNearby;
+            previousParkedCarNearby = parkedCarNearby;
         }
     }
 
-    private void CheckViolation(RoadAreaType area, RoadSide side, bool bikeLaneExistsNearby)
+    private void CheckViolation(RoadAreaType area, RoadSide side, bool bikeLaneExistsNearby, bool parkedCarNearby)
     {
         if (area == RoadAreaType.Road && side == RoadSide.Left && !bikeLaneExistsNearby)
+        {
+            return;
+        }
+
+        // 路上駐車を避けるための一時的な歩道通行は道路交通法上の除外対象
+        if (area == RoadAreaType.Sidewalk && parkedCarNearby)
         {
             return;
         }
