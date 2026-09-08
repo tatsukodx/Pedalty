@@ -77,22 +77,8 @@ public class CarController : MonoBehaviour
         bool voluntaryStop = isLightStopped || isYieldStopped || isPedestrianStopped;
 
         float target = (obstacleAhead || voluntaryStop) ? 0f : moveSpeed;
-<<<<<<< HEAD
-
-        // 障害物回避は物理的な制動距離を確保した緩やかな減速、
-        // 信号待ち・譲り合い・歩行者待ちは、あらかじめ分かっている停止なので強めに減速して手前で止める
-        // 左折時の歩行者待ちは、奥の横断歩道を見て判断するため、通常よりさらに強く減速してより手前で止める
-        // 両方同時にtrueの場合は、より安全な（強い）方の減速度を使う
-        float decelRate = acceleration;
-        if (voluntaryStop)
-        {
-            float voluntaryDecel = isLeftTurnPedestrianStop ? leftTurnPedestrianStopDeceleration : voluntaryStopDeceleration;
-            decelRate = Mathf.Max(decelRate, voluntaryDecel);
-        }
-=======
         float voluntaryDecel = isLeftTurnPedestrianStop ? leftTurnPedestrianStopDeceleration : voluntaryStopDeceleration;
         float decelRate = (!obstacleAhead && voluntaryStop) ? voluntaryDecel : acceleration;
->>>>>>> 326d58711bab99199d3af504ce08b41bc04a6161
 
         currentSpeed = Mathf.MoveTowards(currentSpeed, target, decelRate * Time.fixedDeltaTime);
 
