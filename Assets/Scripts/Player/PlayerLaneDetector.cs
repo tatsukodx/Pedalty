@@ -23,9 +23,13 @@ public class PlayerLaneDetector : MonoBehaviour
     [Tooltip("自転車レーンの有無を判定する範囲。車道の反対端からでも隣接する自転車レーンを検知できるよう、sensorRadiusより広めに設定する")]
     public float bikeLaneCheckRadius = 6f;
 
+    [Tooltip("路上駐車車両を避けるための歩道通行許可を判定する範囲")]
+    public float parkedCarCheckRadius = 3f;
+
     public RoadAreaType currentArea = RoadAreaType.None;
     public RoadSide currentSide = RoadSide.None;
     public bool bikeLaneExistsNearby = false;
+    public bool parkedCarNearby = false;
 
     [Tooltip("この速さ(m/s)未満のときは進行方向が不安定なため、直前に判定した進行方向をそのまま使う")]
     public float minSpeedForDirection = 0.5f;
@@ -65,6 +69,7 @@ public class PlayerLaneDetector : MonoBehaviour
         currentSide = detectedSide;
 
         bikeLaneExistsNearby = DetectBikeLaneNearby();
+        parkedCarNearby = DetectParkedCarNearby();
     }
 
     void UpdateMovingDirection()
@@ -86,6 +91,19 @@ public class PlayerLaneDetector : MonoBehaviour
         foreach (Collider hit in wideHits)
         {
             if (hit.CompareTag("BIkeLane_L") || hit.CompareTag("BikeLane_R"))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool DetectParkedCarNearby()
+    {
+        Collider[] wideHits = Physics.OverlapSphere(transform.position, parkedCarCheckRadius, ~0, QueryTriggerInteraction.Collide);
+        foreach (Collider hit in wideHits)
+        {
+            if (hit.GetComponent<ParkedCarZone>() != null)
             {
                 return true;
             }
