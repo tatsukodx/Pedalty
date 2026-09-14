@@ -32,6 +32,10 @@ public class TrafficStopZone : MonoBehaviour
                 carsInZone.RemoveAt(i);
                 continue;
             }
+
+            // 既に交差点への進入を開始した車は、信号が変わってもここで止めない
+            if (carsInZone[i].HasEnteredIntersection) continue;
+
             carsInZone[i].SetTrafficStop(shouldStop);
         }
     }

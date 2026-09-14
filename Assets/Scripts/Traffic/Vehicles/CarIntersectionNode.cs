@@ -72,6 +72,9 @@ public class CarIntersectionNode : MonoBehaviour
         CarController car = other.GetComponent<CarController>();
         if (car != null)
         {
+            // 交差点のトリガーに触れた時点で「進入を開始した」ものとして扱い、
+            // 以降 TrafficStopZone が信号の変化で止めてしまわないようにする
+            car.SetIntersectionEntered(true);
             StartCoroutine(TurnSmoothly(car, other.transform));
         }
     }
@@ -80,6 +83,8 @@ public class CarIntersectionNode : MonoBehaviour
     {
         CarController car = other.GetComponent<CarController>();
         if (car == null) return;
+
+        car.SetIntersectionEntered(false);
 
         if (activeCars.TryGetValue(car, out ActiveCarInfo info))
         {

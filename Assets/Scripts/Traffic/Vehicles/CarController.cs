@@ -27,8 +27,10 @@ public class CarController : MonoBehaviour
     bool isYieldStopped = false;
     bool isPedestrianStopped = false;
     bool isLeftTurnPedestrianStop = false;
+    bool hasEnteredIntersection = false;
 
     public int PlannedTurnChoice { get; private set; } = -1;
+    public bool HasEnteredIntersection => hasEnteredIntersection;
 
     Rigidbody rb;
     Vector3 targetDirection;
@@ -58,6 +60,18 @@ public class CarController : MonoBehaviour
     {
         isPedestrianStopped = stop;
         isLeftTurnPedestrianStop = stop && isLeftTurn;
+    }
+
+    public void SetIntersectionEntered(bool entered)
+    {
+        hasEnteredIntersection = entered;
+
+        // 交差点への進入が確定した以上、信号待ちで止まる理由は無くなる
+        // （渡り切るまで、信号が変わっても止めない）
+        if (entered)
+        {
+            isLightStopped = false;
+        }
     }
 
     public void SetPlannedTurn(int choice)
