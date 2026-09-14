@@ -181,6 +181,19 @@ public class CarIntersectionNode : MonoBehaviour
 
         try
         {
+            // カーブ開始前の念のための再確認（保険）。
+            // ロック済みなので基本的には常にクリアなはずだが、万一のズレに備える。
+            // ここで待つのは「カーブが始まる前（t=0）」に限定し、
+            // カーブの途中（半端に旋回した姿勢）で急停止して不自然に固まらないようにする。
+            while (car != null && exitCrosswalk != null && !IsCrosswalkClear(exitCrosswalk))
+            {
+                car.SetPedestrianStop(true, isLeftTurn);
+                yield return null;
+            }
+
+            if (car == null) yield break;
+            car.SetPedestrianStop(false);
+
             while (car != null)
             {
                 float traveled = Vector3.Distance(startPosition, carTransform.position);
@@ -211,6 +224,34 @@ public class CarIntersectionNode : MonoBehaviour
         {
             return dir.z >= 0f ? crosswalkNorth : crosswalkSouth;
         }
+    }
+
+    // 歩行者側で使用：進行方向ではなく「現在位置に一番近い横断歩道」を返す。
+    // 歩行者は道路を横切る向き（車の進行方向とはほぼ直角）に進むため、
+    // GetCrosswalkForDirection にその向きを渡すと車側とズレた横断歩道を参照してしまう。
+    // 位置ベースで判定することで、車側がロックしている横断歩道と必ず一致させる。
+    public Transform GetNearestCrosswalk(Vector3 position)
+    {
+        Transform nearest = null;
+        float nearestSqrDist = float.MaxValue;
+
+        void Check(Transform cw)
+        {
+            if (cw == null) return;
+            float sqrDist = (cw.position - position).sqrMagnitude;
+            if (sqrDist < nearestSqrDist)
+            {
+                nearestSqrDist = sqrDist;
+                nearest = cw;
+            }
+        }
+
+        Check(crosswalkNorth);
+        Check(crosswalkSouth);
+        Check(crosswalkEast);
+        Check(crosswalkWest);
+
+        return nearest;
     }
 
     public bool IsCrosswalkClear(Transform crosswalk)
