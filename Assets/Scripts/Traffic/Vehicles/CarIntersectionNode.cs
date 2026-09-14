@@ -183,17 +183,6 @@ public class CarIntersectionNode : MonoBehaviour
         {
             while (car != null)
             {
-                // ロックしていても、旋回中に何らかの理由で歩行者が入ってきた場合の保険として、
-                // 継続してチェックし続ける
-                if (exitCrosswalk != null && !IsCrosswalkClear(exitCrosswalk))
-                {
-                    car.SetPedestrianStop(true, isLeftTurn);
-                    yield return new WaitForFixedUpdate();
-                    continue;
-                }
-
-                car.SetPedestrianStop(false);
-
                 float traveled = Vector3.Distance(startPosition, carTransform.position);
                 float t = Mathf.Clamp01(traveled / targetDistance);
 
