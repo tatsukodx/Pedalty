@@ -13,11 +13,16 @@ public class TrafficStopZone : MonoBehaviour
 
     [Header("対向車線との譲り合い（省略可）")]
     public CarYieldManager yieldManager;
-    public bool isLaneA = true;
 
     private readonly List<CarController> carsInZone = new List<CarController>();
 
     private readonly Dictionary<CarController, Coroutine> waitingCars = new Dictionary<CarController, Coroutine>();
+
+    private bool ComputeIsLaneA(Vector3 dir)
+    {
+        bool isNSAxis = Mathf.Abs(dir.x) < Mathf.Abs(dir.z);
+        return isNSAxis ? dir.z >= 0f : dir.x >= 0f;
+    }
 
     void Update()
     {
@@ -52,17 +57,18 @@ public class TrafficStopZone : MonoBehaviour
 
         if (yieldManager != null)
         {
+            bool isLaneA = ComputeIsLaneA(car.transform.forward);
             yieldManager.ReportStopZoneEnter(isLaneA);
 
             if (!waitingCars.ContainsKey(car))
             {
-                Coroutine c = StartCoroutine(WaitUntilCanEnter(car));
+                Coroutine c = StartCoroutine(WaitUntilCanEnter(car, isLaneA));
                 waitingCars[car] = c;
             }
         }
     }
 
-    private IEnumerator WaitUntilCanEnter(CarController car)
+    private IEnumerator WaitUntilCanEnter(CarController car, bool isLaneA)
     {
         car.SetYieldStop(true);
 

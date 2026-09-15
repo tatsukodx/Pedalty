@@ -227,7 +227,6 @@ MonoBehaviour:
   manager: {fileID: 1470366337}
   isNSDirection: 1
   yieldManager: {fileID: 1504587877}
-  isLaneA: 1
 --- !u!65 &3629034
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1511,7 +1510,6 @@ MonoBehaviour:
   manager: {fileID: 568963529}
   isNSDirection: 0
   yieldManager: {fileID: 144994104}
-  isLaneA: 0
 --- !u!65 &27954261
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2830,7 +2828,6 @@ MonoBehaviour:
   manager: {fileID: 568963529}
   isNSDirection: 1
   yieldManager: {fileID: 464555533}
-  isLaneA: 1
 --- !u!65 &46079070
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5105,7 +5102,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 4
-  leftTurnDistance: 7
+  leftTurnDistance: 6.5
   rightTurnDistance: 11.5
   minimumTurnDistance: 2
   nsYieldManager: {fileID: 464555533}
@@ -7131,7 +7128,6 @@ MonoBehaviour:
   manager: {fileID: 1470366337}
   isNSDirection: 1
   yieldManager: {fileID: 1504587877}
-  isLaneA: 0
 --- !u!65 &142642663
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7390,7 +7386,6 @@ MonoBehaviour:
   manager: {fileID: 1906885208}
   isNSDirection: 0
   yieldManager: {fileID: 844546468}
-  isLaneA: 1
 --- !u!65 &149550372
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9133,7 +9128,7 @@ Transform:
   m_GameObject: {fileID: 194851083}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 225, y: 0, z: 49}
+  m_LocalPosition: {x: 224, y: 0, z: 49}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10543,7 +10538,6 @@ MonoBehaviour:
   manager: {fileID: 1470366337}
   isNSDirection: 0
   yieldManager: {fileID: 1020251617}
-  isLaneA: 1
 --- !u!65 &226309805
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -14831,7 +14825,6 @@ MonoBehaviour:
   manager: {fileID: 49035977}
   isNSDirection: 1
   yieldManager: {fileID: 9696328}
-  isLaneA: 1
 --- !u!65 &317914539
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -18626,7 +18619,6 @@ MonoBehaviour:
   manager: {fileID: 568963529}
   isNSDirection: 0
   yieldManager: {fileID: 144994104}
-  isLaneA: 1
 --- !u!65 &383206755
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -26288,7 +26280,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 4
-  leftTurnDistance: 7
+  leftTurnDistance: 6.5
   rightTurnDistance: 11.5
   minimumTurnDistance: 2
   nsYieldManager: {fileID: 680970530}
@@ -28930,7 +28922,7 @@ Transform:
   m_GameObject: {fileID: 648294150}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 435, y: 0, z: -246}
+  m_LocalPosition: {x: 435, y: 0, z: -245}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -35773,6 +35765,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GoalTrigger
   gameTimer: {fileID: 2000000002}
   finishDistanceMeters: 5
+  finishHalfWidthMeters: 10
 --- !u!1001 &817636965
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -39135,7 +39128,7 @@ Transform:
   m_GameObject: {fileID: 873389800}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 348.5, y: 0, z: -257}
+  m_LocalPosition: {x: 348.5, y: 0, z: -256}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -39154,7 +39147,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 4
-  leftTurnDistance: 7
+  leftTurnDistance: 6.5
   rightTurnDistance: 11.5
   minimumTurnDistance: 2
   nsYieldManager: {fileID: 1504587877}
@@ -41171,6 +41164,10 @@ PrefabInstance:
     - target: {fileID: 3294062322166412593, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
+      propertyPath: yellowDuration
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5402036508823616856, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: m_Name
@@ -44628,7 +44625,6 @@ MonoBehaviour:
   manager: {fileID: 1906885208}
   isNSDirection: 1
   yieldManager: {fileID: 208713603}
-  isLaneA: 1
 --- !u!65 &1011084070
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -45730,7 +45726,6 @@ MonoBehaviour:
   manager: {fileID: 1965791256}
   isNSDirection: 1
   yieldManager: {fileID: 680970530}
-  isLaneA: 0
 --- !u!65 &1027758443
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -46613,7 +46608,6 @@ MonoBehaviour:
   manager: {fileID: 568963529}
   isNSDirection: 1
   yieldManager: {fileID: 464555533}
-  isLaneA: 0
 --- !u!65 &1049095740
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -47279,7 +47273,6 @@ MonoBehaviour:
   manager: {fileID: 1470366337}
   isNSDirection: 0
   yieldManager: {fileID: 1020251617}
-  isLaneA: 0
 --- !u!65 &1064177343
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -48509,7 +48502,6 @@ MonoBehaviour:
   manager: {fileID: 1965791256}
   isNSDirection: 0
   yieldManager: {fileID: 345513672}
-  isLaneA: 0
 --- !u!65 &1081118100
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -48961,7 +48953,6 @@ MonoBehaviour:
   manager: {fileID: 1386230806}
   isNSDirection: 0
   yieldManager: {fileID: 1391879364}
-  isLaneA: 1
 --- !u!65 &1084214067
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -55496,7 +55487,6 @@ MonoBehaviour:
   manager: {fileID: 1386230806}
   isNSDirection: 0
   yieldManager: {fileID: 1391879364}
-  isLaneA: 0
 --- !u!65 &1237737889
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -61029,7 +61019,6 @@ MonoBehaviour:
   manager: {fileID: 1906885208}
   isNSDirection: 0
   yieldManager: {fileID: 844546468}
-  isLaneA: 0
 --- !u!65 &1367132953
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -61605,7 +61594,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 4
-  leftTurnDistance: 7
+  leftTurnDistance: 6.5
   rightTurnDistance: 11.5
   minimumTurnDistance: 2
   nsYieldManager: {fileID: 208713603}
@@ -63001,7 +62990,6 @@ MonoBehaviour:
   manager: {fileID: 49035977}
   isNSDirection: 0
   yieldManager: {fileID: 1450862886}
-  isLaneA: 0
 --- !u!65 &1397334005
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -63559,7 +63547,6 @@ MonoBehaviour:
   manager: {fileID: 1386230806}
   isNSDirection: 1
   yieldManager: {fileID: 1154611557}
-  isLaneA: 0
 --- !u!65 &1421027940
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -67774,7 +67761,6 @@ MonoBehaviour:
   manager: {fileID: 1965791256}
   isNSDirection: 1
   yieldManager: {fileID: 680970530}
-  isLaneA: 1
 --- !u!65 &1521924640
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -68877,7 +68863,6 @@ MonoBehaviour:
   manager: {fileID: 49035977}
   isNSDirection: 0
   yieldManager: {fileID: 1450862886}
-  isLaneA: 1
 --- !u!65 &1541633840
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -69114,7 +69099,6 @@ MonoBehaviour:
   manager: {fileID: 49035977}
   isNSDirection: 1
   yieldManager: {fileID: 9696328}
-  isLaneA: 0
 --- !u!65 &1546842197
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -70970,6 +70954,10 @@ PrefabInstance:
     - target: {fileID: 3294062322166412593, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
+      propertyPath: yellowDuration
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5402036508823616856, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: m_Name
@@ -73525,7 +73513,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarIntersectionNode
   straightDistance: 4
-  leftTurnDistance: 7
+  leftTurnDistance: 6.5
   rightTurnDistance: 11.5
   minimumTurnDistance: 2
   nsYieldManager: {fileID: 9696328}
@@ -74151,6 +74139,10 @@ PrefabInstance:
     - target: {fileID: 3294062322166412593, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
+      propertyPath: yellowDuration
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5402036508823616856, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: m_Name
@@ -77217,7 +77209,7 @@ MonoBehaviour:
   - {x: 0, y: 0, z: 1}
   - {x: -1, y: 0, z: 0}
   - {x: 1, y: 0, z: 0}
-  spawnInterval: 1
+  spawnInterval: 2
   maxCarCount: 100
   spawnCheckRadius: 4
 --- !u!4 &1709395598
@@ -79667,7 +79659,6 @@ MonoBehaviour:
   manager: {fileID: 1965791256}
   isNSDirection: 0
   yieldManager: {fileID: 345513672}
-  isLaneA: 1
 --- !u!65 &1765969042
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -86675,6 +86666,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
+      propertyPath: yellowDuration
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 5402036508823616856, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: m_Name
       value: traffic_ramp (5)
@@ -87464,7 +87459,6 @@ MonoBehaviour:
   manager: {fileID: 1386230806}
   isNSDirection: 1
   yieldManager: {fileID: 1154611557}
-  isLaneA: 1
 --- !u!65 &1914337927
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -88962,7 +88956,6 @@ MonoBehaviour:
   manager: {fileID: 1906885208}
   isNSDirection: 1
   yieldManager: {fileID: 208713603}
-  isLaneA: 0
 --- !u!65 &1955101161
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -90152,6 +90145,10 @@ PrefabInstance:
     - target: {fileID: 3294062322166412593, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
+      propertyPath: yellowDuration
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5402036508823616856, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: m_Name
@@ -94441,6 +94438,10 @@ PrefabInstance:
     - target: {fileID: 3294062322166412593, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
+      propertyPath: yellowDuration
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5402036508823616856, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: m_Name

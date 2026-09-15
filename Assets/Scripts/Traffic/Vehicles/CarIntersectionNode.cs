@@ -51,14 +51,14 @@ public class CarIntersectionNode : MonoBehaviour
         return lockedCrosswalkCounts.TryGetValue(crosswalk, out int count) && count > 0;
     }
 
-    private void LockCrosswalk(Transform crosswalk)
+    public void LockCrosswalk(Transform crosswalk)
     {
         if (crosswalk == null) return;
         lockedCrosswalkCounts.TryGetValue(crosswalk, out int count);
         lockedCrosswalkCounts[crosswalk] = count + 1;
     }
 
-    private void UnlockCrosswalk(Transform crosswalk)
+    public void UnlockCrosswalk(Transform crosswalk)
     {
         if (crosswalk == null) return;
         if (lockedCrosswalkCounts.TryGetValue(crosswalk, out int count))
@@ -134,57 +134,56 @@ public class CarIntersectionNode : MonoBehaviour
         Transform exitCrosswalk = GetCrosswalkForDirection(nextDirection);
 
         bool isLeftTurn = (choice == 2);
+        bool crosswalkNeedsLock = choice != 0 && exitCrosswalk != null;
 
-        bool needsEntryCheck = entryCrosswalk != null;
-        bool needsExitCheck = !preDecided && exitCrosswalk != null;
-
-        if (needsEntryCheck || needsExitCheck)
+        // CarTurnDecisionZoneで既にロック済みの場合は二重ロックしない。
+        // ロックの解除責任はここから先、必ずこの関数のfinallyが持つ。
+        if (crosswalkNeedsLock && !preDecided)
         {
-            car.SetPedestrianStop(true, isLeftTurn);
-
-
-            while (car != null && ((needsEntryCheck && !IsCrosswalkClear(entryCrosswalk)) || (needsExitCheck && !IsCrosswalkClear(exitCrosswalk))))
-            {
-                yield return null;
-            }
-
-            if (car == null) yield break;
-
-            car.SetPedestrianStop(false);
-
-            float traveledWhileWaiting = Vector3.Distance(entryPosition, carTransform.position);
-            targetDistance = Mathf.Max(minimumTurnDistance, targetDistance - traveledWhileWaiting);
+            LockCrosswalk(exitCrosswalk);
         }
-
-        bool isNSAxis = Mathf.Abs(currentDir.x) < Mathf.Abs(currentDir.z);
-        CarYieldManager relevantManager = isNSAxis ? nsYieldManager : ewYieldManager;
-        bool isLaneA = isNSAxis ? currentDir.z >= 0f : currentDir.x >= 0f;
-
-        if (relevantManager != null)
-        {
-            activeCars[car] = new ActiveCarInfo { manager = relevantManager, isLaneA = isLaneA };
-        }
-
-        if (choice == 0 || targetDistance <= 0.01f)
-        {
-            if (car != null) car.SetDirection(nextDirection);
-            yield break;
-        }
-
-        Vector3 startPosition = carTransform.position;
-        Quaternion startRot = Quaternion.LookRotation(currentDir);
-        Quaternion endRot = Quaternion.LookRotation(nextDirection);
-
-        // 旋回開始：ここから曲がり終わるまでは車を優先する。
-        // 出口側の横断歩道をロックし、歩行者側には「進んでよい」判定を出させない。
-        LockCrosswalk(exitCrosswalk);
 
         try
         {
-            // カーブ開始前の念のための再確認（保険）。
-            // ロック済みなので基本的には常にクリアなはずだが、万一のズレに備える。
-            // ここで待つのは「カーブが始まる前（t=0）」に限定し、
-            // カーブの途中（半端に旋回した姿勢）で急停止して不自然に固まらないようにする。
+            bool needsEntryCheck = entryCrosswalk != null;
+            bool needsExitCheck = !preDecided && exitCrosswalk != null;
+
+            if (needsEntryCheck || needsExitCheck)
+            {
+                car.SetPedestrianStop(true, isLeftTurn);
+
+                while (car != null && ((needsEntryCheck && !IsCrosswalkClear(entryCrosswalk)) || (needsExitCheck && !IsCrosswalkClear(exitCrosswalk))))
+                {
+                    yield return null;
+                }
+
+                if (car == null) yield break;
+
+                car.SetPedestrianStop(false);
+
+                float traveledWhileWaiting = Vector3.Distance(entryPosition, carTransform.position);
+                targetDistance = Mathf.Max(minimumTurnDistance, targetDistance - traveledWhileWaiting);
+            }
+
+            bool isNSAxis = Mathf.Abs(currentDir.x) < Mathf.Abs(currentDir.z);
+            CarYieldManager relevantManager = isNSAxis ? nsYieldManager : ewYieldManager;
+            bool isLaneA = isNSAxis ? currentDir.z >= 0f : currentDir.x >= 0f;
+
+            if (relevantManager != null)
+            {
+                activeCars[car] = new ActiveCarInfo { manager = relevantManager, isLaneA = isLaneA };
+            }
+
+            if (choice == 0 || targetDistance <= 0.01f)
+            {
+                if (car != null) car.SetDirection(nextDirection);
+                yield break;
+            }
+
+            Vector3 startPosition = carTransform.position;
+            Quaternion startRot = Quaternion.LookRotation(currentDir);
+            Quaternion endRot = Quaternion.LookRotation(nextDirection);
+
             while (car != null && exitCrosswalk != null && !IsCrosswalkClear(exitCrosswalk))
             {
                 car.SetPedestrianStop(true, isLeftTurn);
@@ -209,8 +208,10 @@ public class CarIntersectionNode : MonoBehaviour
         }
         finally
         {
-            // 旋回完了（または車が消滅した場合も含む）：ロックを解除して歩行者を通す
-            UnlockCrosswalk(exitCrosswalk);
+            if (crosswalkNeedsLock)
+            {
+                UnlockCrosswalk(exitCrosswalk);
+            }
         }
     }
 

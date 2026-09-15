@@ -52,9 +52,10 @@ public class IntersectionNode : MonoBehaviour
         if (willCross)
         {
             bool crossingNSRoad = Mathf.Abs(nextDirection.x) > Mathf.Abs(nextDirection.z);
-            // 進行方向（歩行者は道路を横切る向き）ではなく現在位置ベースで判定することで、
-            // 車側がロックしている横断歩道と必ず一致させる
-            Transform crosswalk = carIntersectionNode != null ? carIntersectionNode.GetNearestCrosswalk(npcTransform.position) : null;
+            // 角の現在位置ではなく、これから進む方向に少し進んだ地点を基準にすることで、
+            // 直進・左折・右折のどれを選んでも実際に渡る横断歩道と一致させる
+            Vector3 crossingProbePoint = npcTransform.position + nextDirection.normalized * crossingProbeDistance;
+            Transform crosswalk = carIntersectionNode != null ? carIntersectionNode.GetNearestCrosswalk(crossingProbePoint) : null;
 
             // 信号待ちが必要な場合(manager あり)、または横断歩道のロック判定が必要な場合(carIntersectionNode あり)は
             // 両方の条件がそろうまで待機する

@@ -43,5 +43,16 @@ public class CarTurnDecisionZone : MonoBehaviour
         if (car == null) yield break;
 
         car.SetPedestrianStop(false);
+        intersection.LockCrosswalk(exitCrosswalk);
+
+        while (car != null && !car.HasEnteredIntersection)
+        {
+            yield return null;
+        }
+
+        if (car == null)
+        {
+            intersection.UnlockCrosswalk(exitCrosswalk);
+        }
     }
 }

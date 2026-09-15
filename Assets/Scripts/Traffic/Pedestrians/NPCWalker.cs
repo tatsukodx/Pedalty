@@ -15,6 +15,9 @@ public class NPCWalker : MonoBehaviour
     public float sensorDistance = 1.5f; 
     public float avoidForce = 0.5f;    
 
+    [Header("車と衝突した際の吹っ飛び倍率")]
+    public float carHitForceMultiplier = 2.0f;
+
     [Header("安全設定")]
     public float birthSafetyTime = 0.5f;
     private float ageTimer = 0f;
@@ -265,6 +268,27 @@ public class NPCWalker : MonoBehaviour
                     Vector3 flyDirection = bikeRb.linearVelocity;
                     flyDirection.y = Mathf.Max(flyDirection.y, 5f); 
                     rb.AddForce(flyDirection * 2.0f, ForceMode.Impulse);
+                }
+
+                Destroy(gameObject, 3f);
+            }
+            return;
+        }
+
+        if (collision.gameObject.GetComponent<CarController>() != null)
+        {
+            if (!isHit)
+            {
+                isHit = true;
+                rb.isKinematic = false;
+                rb.constraints = RigidbodyConstraints.None;
+
+                Rigidbody carRb = collision.gameObject.GetComponent<Rigidbody>();
+                if (carRb != null)
+                {
+                    Vector3 flyDirection = carRb.linearVelocity;
+                    flyDirection.y = Mathf.Max(flyDirection.y, 5f);
+                    rb.AddForce(flyDirection * carHitForceMultiplier, ForceMode.Impulse);
                 }
 
                 Destroy(gameObject, 3f);

@@ -23,6 +23,9 @@ public class CarController : MonoBehaviour
     [Tooltip("左折は奥の横断歩道（対向側）を確認するため、通常の歩行者待ちよりさらに強めにブレーキをかけて、より手前で停止させる")]
     public float leftTurnPedestrianStopDeceleration = 22f;
 
+    [Header("デバッグ表示")]
+    [SerializeField] private string stopReasonDebug = "走行中";
+
     bool isLightStopped = false;
     bool isYieldStopped = false;
     bool isPedestrianStopped = false;
@@ -66,8 +69,6 @@ public class CarController : MonoBehaviour
     {
         hasEnteredIntersection = entered;
 
-        // 交差点への進入が確定した以上、信号待ちで止まる理由は無くなる
-        // （渡り切るまで、信号が変わっても止めない）
         if (entered)
         {
             isLightStopped = false;
@@ -114,6 +115,20 @@ public class CarController : MonoBehaviour
 
         rb.linearVelocity = new Vector3(totalVel.x, rb.linearVelocity.y, totalVel.z);
         rb.angularVelocity = Vector3.zero;
+
+        UpdateStopReasonDebug(obstacleAhead);
+    }
+
+    void UpdateStopReasonDebug(bool obstacleAhead)
+    {
+        string reason = "";
+
+        if (isLightStopped) reason += "信号待ち / ";
+        if (isYieldStopped) reason += "対向車線を待機 / ";
+        if (isPedestrianStopped) reason += "歩行者の横断を待機 / ";
+        if (obstacleAhead) reason += "障害物 / ";
+
+        stopReasonDebug = reason == "" ? "走行中" : reason.Substring(0, reason.Length - 3);
     }
 
     Vector3 ComputeLaneCorrection()

@@ -125,6 +125,11 @@ public class CarSpawner : MonoBehaviour
         }
 
         spawnedCars.Clear();
+
+        foreach (CarYieldManager yieldManager in FindObjectsByType<CarYieldManager>(FindObjectsSortMode.None))
+        {
+            yieldManager.ResetCounts();
+        }
     }
 
 #if UNITY_EDITOR

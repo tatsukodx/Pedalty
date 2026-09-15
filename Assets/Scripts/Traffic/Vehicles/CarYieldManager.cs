@@ -45,4 +45,12 @@ public class CarYieldManager : MonoBehaviour
 
         return ownArrival <= otherArrival;
     }
+
+    public void ResetCounts()
+    {
+        laneACount = 0;
+        laneBCount = 0;
+        laneAFirstArrival = float.MaxValue;
+        laneBFirstArrival = float.MaxValue;
+    }
 }
