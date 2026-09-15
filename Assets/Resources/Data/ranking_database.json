@@ -55,6 +55,14 @@
             "violationCount": 18,
             "fineAmount": 105000,
             "clearTimeSeconds": 87.4030532836914
+        },
+        {
+            "recordId": "fc2c188c325543d3b7617a1534449849",
+            "playerName": "091408520",
+            "playedAt": "2026-09-14T08:52:27+09:00",
+            "violationCount": 13,
+            "fineAmount": 73000,
+            "clearTimeSeconds": 101.5150375366211
         }
     ]
 }
