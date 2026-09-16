@@ -35,7 +35,7 @@ public class TrafficLight : MonoBehaviour
     [Tooltip("SetState/StartBlinkが呼ばれた際、ここに登録したTrafficLightにも同じ状態を転送する")]
     public TrafficLight[] linkedLights;
 
-    void Start()
+    void Awake()
     {
         SetState(TrafficLightState.Red);
     }
