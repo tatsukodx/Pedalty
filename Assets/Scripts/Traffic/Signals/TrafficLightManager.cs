@@ -15,6 +15,10 @@ public class TrafficLightManager : MonoBehaviour
     public float pedGreenDuration  = 15f;
     public float pedBlinkDuration  = 5f;
 
+    [Header("交互モードの歩行者信号設定（秒）")]
+    [Tooltip("自動車信号が黄になる何秒前に歩行者信号の点滅を始めるか")]
+    public float pedBlinkLeadTime = 10f;
+
     [Header("車道信号機（4方向）")]
     public TrafficLight northLight;
     public TrafficLight southLight;
@@ -31,6 +35,7 @@ public class TrafficLightManager : MonoBehaviour
     public bool IsNS_CarRed { get; private set; }
     public bool IsEW_CarRed { get; private set; }
     public bool IsPedestrianGreen { get; private set; }
+    public bool IsPedestrianBlinking { get; private set; }
     public TrafficLightPhase CurrentPhase { get; private set; }
 
     void Start()
@@ -43,10 +48,10 @@ public class TrafficLightManager : MonoBehaviour
     {
         while (true)
         {
-            yield return StartCoroutine(EnterPhase(TrafficLightPhase.NS_Green,  greenDuration));
+            yield return StartCoroutine(EnterCarGreenPhase(TrafficLightPhase.NS_Green, greenDuration, pedEastLight, pedWestLight));
             yield return StartCoroutine(EnterPhase(TrafficLightPhase.NS_Yellow, yellowDuration));
             yield return StartCoroutine(EnterPhase(TrafficLightPhase.AllRed, allRedDuration));
-            yield return StartCoroutine(EnterPhase(TrafficLightPhase.EW_Green,  greenDuration));
+            yield return StartCoroutine(EnterCarGreenPhase(TrafficLightPhase.EW_Green, greenDuration, pedNorthLight, pedSouthLight));
             yield return StartCoroutine(EnterPhase(TrafficLightPhase.EW_Yellow, yellowDuration));
             yield return StartCoroutine(EnterPhase(TrafficLightPhase.AllRed, allRedDuration));
 
@@ -63,6 +68,28 @@ public class TrafficLightManager : MonoBehaviour
     {
         ApplyPhase(phase);
         yield return new WaitForSeconds(duration);
+    }
+
+    IEnumerator EnterCarGreenPhase(TrafficLightPhase phase, float duration, TrafficLight pedA, TrafficLight pedB)
+    {
+        ApplyPhase(phase);
+
+        float blinkStart = Mathf.Max(0f, duration - pedBlinkLeadTime);
+        float blinkLength = Mathf.Min(pedBlinkDuration, duration - blinkStart);
+
+        yield return new WaitForSeconds(blinkStart);
+
+        IsPedestrianGreen = false;
+        IsPedestrianBlinking = true;
+        pedA?.StartBlink();
+        pedB?.StartBlink();
+
+        yield return new WaitForSeconds(blinkLength);
+
+        IsPedestrianBlinking = false;
+        SetPedPair(pedA, pedB, TrafficLightState.Red);
+
+        yield return new WaitForSeconds(duration - blinkStart - blinkLength);
     }
 
     void ApplyPhase(TrafficLightPhase phase)
