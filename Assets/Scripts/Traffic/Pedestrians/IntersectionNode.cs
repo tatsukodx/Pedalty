@@ -99,9 +99,8 @@ public class IntersectionNode : MonoBehaviour
 
     bool IsCarLightAllowingCross(bool crossingNSRoad)
     {
-        bool parallelGreen = crossingNSRoad ? manager.IsEW_CarGreen : manager.IsNS_CarGreen;
-        bool dedicatedPedPhase = manager.CurrentPhase == TrafficLightPhase.Pedestrian_Green
-                               || manager.CurrentPhase == TrafficLightPhase.Pedestrian_Blink;
+        bool parallelGreen = (crossingNSRoad ? manager.IsEW_CarGreen : manager.IsNS_CarGreen) && manager.IsPedestrianGreen;
+        bool dedicatedPedPhase = manager.CurrentPhase == TrafficLightPhase.Pedestrian_Green;
         return parallelGreen || dedicatedPedPhase;
     }
 

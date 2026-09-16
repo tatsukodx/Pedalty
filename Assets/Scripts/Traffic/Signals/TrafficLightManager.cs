@@ -74,6 +74,12 @@ public class TrafficLightManager : MonoBehaviour
     {
         ApplyPhase(phase);
 
+        if (cycleMode != CycleMode.Alternating)
+        {
+            yield return new WaitForSeconds(duration);
+            yield break;
+        }
+
         float blinkStart = Mathf.Max(0f, duration - pedBlinkLeadTime);
         float blinkLength = Mathf.Min(pedBlinkDuration, duration - blinkStart);
 
@@ -108,10 +114,17 @@ public class TrafficLightManager : MonoBehaviour
             case TrafficLightPhase.NS_Green:
                 IsNS_CarGreen = true;
                 IsNS_CarRed   = false;
-                IsPedestrianGreen = true;
                 SetCarLights(TrafficLightState.Green, TrafficLightState.Red);
-                SetPedPair(pedEastLight, pedWestLight, TrafficLightState.Green);
-                SetPedPair(pedNorthLight, pedSouthLight, TrafficLightState.Red);
+                if (cycleMode == CycleMode.Alternating)
+                {
+                    IsPedestrianGreen = true;
+                    SetPedPair(pedEastLight, pedWestLight, TrafficLightState.Green);
+                    SetPedPair(pedNorthLight, pedSouthLight, TrafficLightState.Red);
+                }
+                else
+                {
+                    SetPedLights(TrafficLightState.Red);
+                }
                 break;
 
             case TrafficLightPhase.NS_Yellow:
@@ -123,10 +136,17 @@ public class TrafficLightManager : MonoBehaviour
             case TrafficLightPhase.EW_Green:
                 IsEW_CarGreen = true;
                 IsEW_CarRed   = false;
-                IsPedestrianGreen = true;
                 SetCarLights(TrafficLightState.Red, TrafficLightState.Green);
-                SetPedPair(pedNorthLight, pedSouthLight, TrafficLightState.Green);
-                SetPedPair(pedEastLight, pedWestLight, TrafficLightState.Red);
+                if (cycleMode == CycleMode.Alternating)
+                {
+                    IsPedestrianGreen = true;
+                    SetPedPair(pedNorthLight, pedSouthLight, TrafficLightState.Green);
+                    SetPedPair(pedEastLight, pedWestLight, TrafficLightState.Red);
+                }
+                else
+                {
+                    SetPedLights(TrafficLightState.Red);
+                }
                 break;
 
             case TrafficLightPhase.EW_Yellow:

@@ -264,10 +264,7 @@ public class CarIntersectionNode : MonoBehaviour
 
         foreach (Collider hit in hits)
         {
-            // 横断歩道付近の歩道を歩いているだけの歩行者まで巻き込まないよう、
-            // 実際に道路を横断中（IsCrossing）の歩行者だけを対象にする
-            NPCWalker walker = hit.GetComponentInParent<NPCWalker>();
-            if (walker != null && walker.IsCrossing) return false;
+            if (hit.GetComponentInParent<NPCWalker>() != null) return false;
         }
 
         return true;
