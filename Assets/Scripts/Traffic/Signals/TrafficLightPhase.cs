@@ -13,6 +13,8 @@ public enum TrafficLightPhase
 
 public enum CycleMode
 {
-    Alternating,   
-    Scramble        
+    Alternating,
+    Scramble
 }
+
+public enum CrosswalkDirection { North, South, East, West }

@@ -52,23 +52,27 @@ public class IntersectionNode : MonoBehaviour
         if (willCross)
         {
             bool crossingNSRoad = Mathf.Abs(nextDirection.x) > Mathf.Abs(nextDirection.z);
-            // 角の現在位置ではなく、これから進む方向に少し進んだ地点を基準にすることで、
-            // 直進・左折・右折のどれを選んでも実際に渡る横断歩道と一致させる
+
             Vector3 crossingProbePoint = npcTransform.position + nextDirection.normalized * crossingProbeDistance;
             Transform crosswalk = carIntersectionNode != null ? carIntersectionNode.GetNearestCrosswalk(crossingProbePoint) : null;
 
-            // 信号待ちが必要な場合(manager あり)、または横断歩道のロック判定が必要な場合(carIntersectionNode あり)は
-            // 両方の条件がそろうまで待機する
+            TrafficLight pedLight = null;
+            if (manager != null && carIntersectionNode != null)
+            {
+                CrosswalkDirection? dir = carIntersectionNode.GetNearestCrosswalkDirection(crossingProbePoint);
+                if (dir.HasValue) pedLight = manager.GetPedLight(dir.Value);
+            }
+
             if (manager != null || carIntersectionNode != null)
             {
                 walker.SetTrafficStop(true);
 
                 while (walker != null)
                 {
-                    bool signalOk = manager == null || IsCarLightAllowingCross(crossingNSRoad);
+                    bool signalOk = pedLight != null
+                        ? pedLight.IsCrossableForPedestrian
+                        : (manager == null || IsCarLightAllowingCross(crossingNSRoad));
 
-                    // 対応する横断歩道が車の旋回中でロックされている間は、
-                    // 信号が青（歩行者側が進んでよいタイミング）でも進ませない
                     bool crosswalkLocked = carIntersectionNode != null && carIntersectionNode.IsCrosswalkLocked(crosswalk);
 
                     if (signalOk && !crosswalkLocked) break;

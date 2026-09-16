@@ -37,6 +37,18 @@ public class TrafficLightManager : MonoBehaviour
     public bool IsPedestrianGreen { get; private set; }
     public TrafficLightPhase CurrentPhase { get; private set; }
 
+    public TrafficLight GetPedLight(CrosswalkDirection dir)
+    {
+        switch (dir)
+        {
+            case CrosswalkDirection.North: return pedNorthLight;
+            case CrosswalkDirection.South: return pedSouthLight;
+            case CrosswalkDirection.East:  return pedEastLight;
+            case CrosswalkDirection.West:  return pedWestLight;
+            default: return null;
+        }
+    }
+
     void Start()
     {
         ApplyPhase(TrafficLightPhase.NS_Green);
@@ -96,7 +108,7 @@ public class TrafficLightManager : MonoBehaviour
                 break;
 
             case TrafficLightPhase.NS_Yellow:
-                IsNS_CarRed = false; 
+                IsNS_CarRed = false;
                 SetCarLights(TrafficLightState.Yellow, TrafficLightState.Red);
                 SetPedLights(TrafficLightState.Red);
                 break;
@@ -110,7 +122,7 @@ public class TrafficLightManager : MonoBehaviour
                 break;
 
             case TrafficLightPhase.EW_Yellow:
-                IsEW_CarRed = false; 
+                IsEW_CarRed = false;
                 SetCarLights(TrafficLightState.Red, TrafficLightState.Yellow);
                 SetPedLights(TrafficLightState.Red);
                 break;

@@ -430,7 +430,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 082fa79782730e04f8400161ee1c1cf5, type: 2}
+  - {fileID: 2100000, guid: 947d0aca0941e1744aec0b4658ea4cdb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -945,6 +945,7 @@ GameObject:
   - component: {fileID: 8771393801242733406}
   - component: {fileID: 361122952651717551}
   - component: {fileID: 3070276813814539880}
+  - component: {fileID: 468789059902911020}
   m_Layer: 0
   m_Name: Signal_Walk_Pole_Main.001
   m_TagString: Untagged
@@ -1048,6 +1049,32 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.2, y: 0.19999997, z: 7.500002}
   m_Center: {x: 0, y: 0.000015258789, z: 2.2500005}
+--- !u!114 &468789059902911020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1030930509457402352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b38d8c6e127e5428b2714d33a2a07f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TrafficLight
+  redLampRenderer: {fileID: 2502615682168310086}
+  yellowLampRenderer: {fileID: 0}
+  greenLampRenderer: {fileID: 5862652017535404578}
+  redPointLight: {fileID: 0}
+  yellowPointLight: {fileID: 0}
+  greenPointLight: {fileID: 0}
+  emissionIntensity: 3
+  dimIntensity: 0.04
+  redEmissionColor: {r: 1, g: 0.1, b: 0.1, a: 1}
+  yellowEmissionColor: {r: 1, g: 0.8, b: 0.05, a: 1}
+  greenEmissionColor: {r: 0.1, g: 1, b: 0.2, a: 1}
+  blinkInterval: 0.5
+  linkedLights:
+  - {fileID: 3599174067097948729}
 --- !u!1 &1183045402735172272
 GameObject:
   m_ObjectHideFlags: 0
@@ -2244,6 +2271,7 @@ GameObject:
   - component: {fileID: 4361835764188563796}
   - component: {fileID: 8494001686242941555}
   - component: {fileID: 3474075555280870772}
+  - component: {fileID: 8454562230843941749}
   m_Layer: 0
   m_Name: Signal_Walk_Pole_Main.004
   m_TagString: Untagged
@@ -2260,7 +2288,7 @@ Transform:
   m_GameObject: {fileID: 1962666564121843729}
   serializedVersion: 2
   m_LocalRotation: {x: 0.000000147514, y: 0.00000020861623, z: 1, w: 0.00000014751397}
-  m_LocalPosition: {x: 0.19924164, y: 0.00047683716, z: -0}
+  m_LocalPosition: {x: 0.19924164, y: 0.00047683716, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2347,6 +2375,32 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.2, y: 0.20000005, z: 7.500002}
   m_Center: {x: -0.000015258789, y: 0, z: 2.2500005}
+--- !u!114 &8454562230843941749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1962666564121843729}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b38d8c6e127e5428b2714d33a2a07f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TrafficLight
+  redLampRenderer: {fileID: 7434762079017106796}
+  yellowLampRenderer: {fileID: 0}
+  greenLampRenderer: {fileID: 7079415198558904710}
+  redPointLight: {fileID: 0}
+  yellowPointLight: {fileID: 0}
+  greenPointLight: {fileID: 0}
+  emissionIntensity: 3
+  dimIntensity: 0.04
+  redEmissionColor: {r: 1, g: 0.1, b: 0.1, a: 1}
+  yellowEmissionColor: {r: 1, g: 0.8, b: 0.05, a: 1}
+  greenEmissionColor: {r: 0.1, g: 1, b: 0.2, a: 1}
+  blinkInterval: 0.5
+  linkedLights:
+  - {fileID: 1352904990302696350}
 --- !u!1 &1969703560474347147
 GameObject:
   m_ObjectHideFlags: 0
@@ -2563,6 +2617,7 @@ GameObject:
   - component: {fileID: 2323911137265358849}
   - component: {fileID: 7902132443462617597}
   - component: {fileID: 3263656647835960661}
+  - component: {fileID: 3599174067097948729}
   m_Layer: 0
   m_Name: Signal_Single_Sign_Light_Walk_LED.001
   m_TagString: Untagged
@@ -2646,6 +2701,31 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &3599174067097948729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2216391390532555134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b38d8c6e127e5428b2714d33a2a07f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TrafficLight
+  redLampRenderer: {fileID: 4676602739633810798}
+  yellowLampRenderer: {fileID: 0}
+  greenLampRenderer: {fileID: 8623578451040768097}
+  redPointLight: {fileID: 0}
+  yellowPointLight: {fileID: 0}
+  greenPointLight: {fileID: 0}
+  emissionIntensity: 3
+  dimIntensity: 0.04
+  redEmissionColor: {r: 1, g: 0.1, b: 0.1, a: 1}
+  yellowEmissionColor: {r: 1, g: 0.8, b: 0.05, a: 1}
+  greenEmissionColor: {r: 0.1, g: 1, b: 0.2, a: 1}
+  blinkInterval: 0.5
+  linkedLights: []
 --- !u!1 &2242092583947364941
 GameObject:
   m_ObjectHideFlags: 0
@@ -2788,6 +2868,7 @@ MonoBehaviour:
   yellowEmissionColor: {r: 1, g: 0.8, b: 0.05, a: 1}
   greenEmissionColor: {r: 0.1, g: 1, b: 0.2, a: 1}
   blinkInterval: 0.5
+  linkedLights: []
 --- !u!1 &2343670438559344001
 GameObject:
   m_ObjectHideFlags: 0
@@ -2945,7 +3026,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 082fa79782730e04f8400161ee1c1cf5, type: 2}
+  - {fileID: 2100000, guid: 947d0aca0941e1744aec0b4658ea4cdb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2980,6 +3061,7 @@ GameObject:
   - component: {fileID: 8726758330100165052}
   - component: {fileID: 1775800154199445875}
   - component: {fileID: 4861673132422066414}
+  - component: {fileID: 1352904990302696350}
   m_Layer: 0
   m_Name: Signal_Single_Sign_Light_Walk_LED.003
   m_TagString: Untagged
@@ -3063,6 +3145,31 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &1352904990302696350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2533040130509268454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b38d8c6e127e5428b2714d33a2a07f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TrafficLight
+  redLampRenderer: {fileID: 1719055913833116324}
+  yellowLampRenderer: {fileID: 0}
+  greenLampRenderer: {fileID: 8220479819449400219}
+  redPointLight: {fileID: 0}
+  yellowPointLight: {fileID: 0}
+  greenPointLight: {fileID: 0}
+  emissionIntensity: 3
+  dimIntensity: 0.04
+  redEmissionColor: {r: 1, g: 0.1, b: 0.1, a: 1}
+  yellowEmissionColor: {r: 1, g: 0.8, b: 0.05, a: 1}
+  greenEmissionColor: {r: 0.1, g: 1, b: 0.2, a: 1}
+  blinkInterval: 0.5
+  linkedLights: []
 --- !u!1 &2561560641707841477
 GameObject:
   m_ObjectHideFlags: 0
@@ -3090,7 +3197,7 @@ Transform:
   m_GameObject: {fileID: 2561560641707841477}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0.000000022571058, z: 0.000000022571058, w: 0.7071068}
-  m_LocalPosition: {x: 0.34519973, y: -0.08538844, z: 4.000002}
+  m_LocalPosition: {x: 0.095199734, y: -0.08538838, z: 4.000002}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3425,7 +3532,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 082fa79782730e04f8400161ee1c1cf5, type: 2}
+  - {fileID: 2100000, guid: 143fdeead55dc2d4a96ef0fa351503db, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4089,7 +4196,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 082fa79782730e04f8400161ee1c1cf5, type: 2}
+  - {fileID: 2100000, guid: 143fdeead55dc2d4a96ef0fa351503db, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4179,7 +4286,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 082fa79782730e04f8400161ee1c1cf5, type: 2}
+  - {fileID: 2100000, guid: 947d0aca0941e1744aec0b4658ea4cdb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4549,7 +4656,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 082fa79782730e04f8400161ee1c1cf5, type: 2}
+  - {fileID: 2100000, guid: 143fdeead55dc2d4a96ef0fa351503db, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4585,6 +4692,7 @@ GameObject:
   - component: {fileID: 4490994089574780339}
   - component: {fileID: 6243151453746722805}
   - component: {fileID: 4667705893658975801}
+  - component: {fileID: 5264655734171537231}
   m_Layer: 0
   m_Name: Signal_Walk_Pole_Main.003
   m_TagString: Untagged
@@ -4688,6 +4796,32 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.2, y: 0.19999997, z: 7.500002}
   m_Center: {x: -0.000030517578, y: 0.000045776367, z: 2.2500005}
+--- !u!114 &5264655734171537231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3386193519526901315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b38d8c6e127e5428b2714d33a2a07f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TrafficLight
+  redLampRenderer: {fileID: 5725162126167300172}
+  yellowLampRenderer: {fileID: 0}
+  greenLampRenderer: {fileID: 2929098049940571318}
+  redPointLight: {fileID: 0}
+  yellowPointLight: {fileID: 0}
+  greenPointLight: {fileID: 0}
+  emissionIntensity: 3
+  dimIntensity: 0.04
+  redEmissionColor: {r: 1, g: 0.1, b: 0.1, a: 1}
+  yellowEmissionColor: {r: 1, g: 0.8, b: 0.05, a: 1}
+  greenEmissionColor: {r: 0.1, g: 1, b: 0.2, a: 1}
+  blinkInterval: 0.5
+  linkedLights:
+  - {fileID: 4880945908526775533}
 --- !u!1 &3546468249889994296
 GameObject:
   m_ObjectHideFlags: 0
@@ -5142,7 +5276,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 082fa79782730e04f8400161ee1c1cf5, type: 2}
+  - {fileID: 2100000, guid: 947d0aca0941e1744aec0b4658ea4cdb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6853,6 +6987,7 @@ GameObject:
   - component: {fileID: 7857337766562451706}
   - component: {fileID: 4666570598898636915}
   - component: {fileID: 678701457384999478}
+  - component: {fileID: 3618837348330924425}
   m_Layer: 0
   m_Name: Signal_Single_Sign_Light_Walk_LED.002
   m_TagString: Untagged
@@ -6936,6 +7071,31 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &3618837348330924425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4968468554621857720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b38d8c6e127e5428b2714d33a2a07f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TrafficLight
+  redLampRenderer: {fileID: 3270022264210638767}
+  yellowLampRenderer: {fileID: 0}
+  greenLampRenderer: {fileID: 8129777596151751978}
+  redPointLight: {fileID: 0}
+  yellowPointLight: {fileID: 0}
+  greenPointLight: {fileID: 0}
+  emissionIntensity: 3
+  dimIntensity: 0.04
+  redEmissionColor: {r: 1, g: 0.1, b: 0.1, a: 1}
+  yellowEmissionColor: {r: 1, g: 0.8, b: 0.05, a: 1}
+  greenEmissionColor: {r: 0.1, g: 1, b: 0.2, a: 1}
+  blinkInterval: 0.5
+  linkedLights: []
 --- !u!1 &5021194038646509000
 GameObject:
   m_ObjectHideFlags: 0
@@ -7078,6 +7238,7 @@ MonoBehaviour:
   yellowEmissionColor: {r: 1, g: 0.8, b: 0.05, a: 1}
   greenEmissionColor: {r: 0.1, g: 1, b: 0.2, a: 1}
   blinkInterval: 0.5
+  linkedLights: []
 --- !u!1 &5033853961638349442
 GameObject:
   m_ObjectHideFlags: 0
@@ -7688,7 +7849,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 082fa79782730e04f8400161ee1c1cf5, type: 2}
+  - {fileID: 2100000, guid: 143fdeead55dc2d4a96ef0fa351503db, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -7763,15 +7924,15 @@ MonoBehaviour:
   allRedDuration: 2
   pedGreenDuration: 15
   pedBlinkDuration: 5
-  altPedGreenDuration: 0
+  altPedGreenDuration: 20
   northLight: {fileID: 1914082639413859107}
   southLight: {fileID: 2795369659576269831}
   eastLight: {fileID: 8299464275622944956}
   westLight: {fileID: 6869802646915946388}
-  pedNorthLight: {fileID: 0}
-  pedSouthLight: {fileID: 0}
-  pedEastLight: {fileID: 0}
-  pedWestLight: {fileID: 0}
+  pedNorthLight: {fileID: 8454562230843941749}
+  pedSouthLight: {fileID: 3905045624365516146}
+  pedEastLight: {fileID: 468789059902911020}
+  pedWestLight: {fileID: 5264655734171537231}
 --- !u!1 &5452448456508523297
 GameObject:
   m_ObjectHideFlags: 0
@@ -7889,7 +8050,7 @@ Transform:
   m_GameObject: {fileID: 5498451869334840407}
   serializedVersion: 2
   m_LocalRotation: {x: -0.000000026186594, y: 0.70710695, z: 0.70710665, w: 0.000000055989013}
-  m_LocalPosition: {x: -0.24973778, y: -1.000001, z: 2.5012813}
+  m_LocalPosition: {x: 0.00026221573, y: -1.0000011, z: 2.5012813}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -8022,7 +8183,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 082fa79782730e04f8400161ee1c1cf5, type: 2}
+  - {fileID: 2100000, guid: 947d0aca0941e1744aec0b4658ea4cdb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -8308,6 +8469,7 @@ GameObject:
   - component: {fileID: 8405476458565569239}
   - component: {fileID: 6395848219447187056}
   - component: {fileID: 7139426558230104871}
+  - component: {fileID: 4880945908526775533}
   m_Layer: 0
   m_Name: Signal_Single_Sign_Light_Walk_LED.004
   m_TagString: Untagged
@@ -8391,6 +8553,31 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &4880945908526775533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5706309188143714931}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b38d8c6e127e5428b2714d33a2a07f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TrafficLight
+  redLampRenderer: {fileID: 1545046874657205278}
+  yellowLampRenderer: {fileID: 0}
+  greenLampRenderer: {fileID: 5625833139613986885}
+  redPointLight: {fileID: 0}
+  yellowPointLight: {fileID: 0}
+  greenPointLight: {fileID: 0}
+  emissionIntensity: 3
+  dimIntensity: 0.04
+  redEmissionColor: {r: 1, g: 0.1, b: 0.1, a: 1}
+  yellowEmissionColor: {r: 1, g: 0.8, b: 0.05, a: 1}
+  greenEmissionColor: {r: 0.1, g: 1, b: 0.2, a: 1}
+  blinkInterval: 0.5
+  linkedLights: []
 --- !u!1 &5723208687411915841
 GameObject:
   m_ObjectHideFlags: 0
@@ -8638,7 +8825,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 082fa79782730e04f8400161ee1c1cf5, type: 2}
+  - {fileID: 2100000, guid: 947d0aca0941e1744aec0b4658ea4cdb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -8804,6 +8991,7 @@ MonoBehaviour:
   yellowEmissionColor: {r: 1, g: 0.8, b: 0.05, a: 1}
   greenEmissionColor: {r: 0.1, g: 1, b: 0.2, a: 1}
   blinkInterval: 0.5
+  linkedLights: []
 --- !u!1 &5953972620114405516
 GameObject:
   m_ObjectHideFlags: 0
@@ -9052,7 +9240,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 082fa79782730e04f8400161ee1c1cf5, type: 2}
+  - {fileID: 2100000, guid: 947d0aca0941e1744aec0b4658ea4cdb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -9088,6 +9276,7 @@ GameObject:
   - component: {fileID: 6661316380601217631}
   - component: {fileID: 2277018536067487799}
   - component: {fileID: 907407660818195122}
+  - component: {fileID: 3905045624365516146}
   m_Layer: 0
   m_Name: Signal_Walk_Pole_Main.002
   m_TagString: Untagged
@@ -9191,6 +9380,32 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.2, y: 0.20000005, z: 7.500002}
   m_Center: {x: 0, y: 0, z: 2.2500005}
+--- !u!114 &3905045624365516146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6185937616939667613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b38d8c6e127e5428b2714d33a2a07f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TrafficLight
+  redLampRenderer: {fileID: 1259675974316142052}
+  yellowLampRenderer: {fileID: 0}
+  greenLampRenderer: {fileID: 4328628219663093861}
+  redPointLight: {fileID: 0}
+  yellowPointLight: {fileID: 0}
+  greenPointLight: {fileID: 0}
+  emissionIntensity: 3
+  dimIntensity: 0.04
+  redEmissionColor: {r: 1, g: 0.1, b: 0.1, a: 1}
+  yellowEmissionColor: {r: 1, g: 0.8, b: 0.05, a: 1}
+  greenEmissionColor: {r: 0.1, g: 1, b: 0.2, a: 1}
+  blinkInterval: 0.5
+  linkedLights:
+  - {fileID: 3618837348330924425}
 --- !u!1 &6365893701878568388
 GameObject:
   m_ObjectHideFlags: 0
@@ -9347,7 +9562,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 082fa79782730e04f8400161ee1c1cf5, type: 2}
+  - {fileID: 2100000, guid: 143fdeead55dc2d4a96ef0fa351503db, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -9988,7 +10203,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 082fa79782730e04f8400161ee1c1cf5, type: 2}
+  - {fileID: 2100000, guid: 143fdeead55dc2d4a96ef0fa351503db, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -10259,7 +10474,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 082fa79782730e04f8400161ee1c1cf5, type: 2}
+  - {fileID: 2100000, guid: 143fdeead55dc2d4a96ef0fa351503db, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -11823,7 +12038,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 082fa79782730e04f8400161ee1c1cf5, type: 2}
+  - {fileID: 2100000, guid: 947d0aca0941e1744aec0b4658ea4cdb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -12483,6 +12698,7 @@ MonoBehaviour:
   yellowEmissionColor: {r: 1, g: 0.8, b: 0.05, a: 1}
   greenEmissionColor: {r: 0.1, g: 1, b: 0.2, a: 1}
   blinkInterval: 0.5
+  linkedLights: []
 --- !u!1 &9023803323757345424
 GameObject:
   m_ObjectHideFlags: 0
@@ -12730,7 +12946,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 082fa79782730e04f8400161ee1c1cf5, type: 2}
+  - {fileID: 2100000, guid: 143fdeead55dc2d4a96ef0fa351503db, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

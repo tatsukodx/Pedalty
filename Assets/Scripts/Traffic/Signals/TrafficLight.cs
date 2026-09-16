@@ -13,8 +13,8 @@ public class TrafficLight : MonoBehaviour
     public Light greenPointLight;
 
     [Header("発光設定")]
-    public float emissionIntensity = 3f; 
-    public float dimIntensity = 0.04f;  
+    public float emissionIntensity = 3f;
+    public float dimIntensity = 0.04f;
     public Color redEmissionColor    = new Color(1f,  0.1f, 0.1f);
     public Color yellowEmissionColor = new Color(1f,  0.8f, 0.05f);
     public Color greenEmissionColor  = new Color(0.1f, 1f,  0.2f);
@@ -22,9 +22,18 @@ public class TrafficLight : MonoBehaviour
     [Header("点滅設定（歩行者信号の点滅用）")]
     public float blinkInterval = 0.5f;
 
+    public TrafficLightState CurrentState { get; private set; } = TrafficLightState.Red;
+    public bool IsBlinking => isBlinking;
+
+    public bool IsCrossableForPedestrian => CurrentState == TrafficLightState.Green && !isBlinking;
+
     private bool  isBlinking = false;
     private float blinkTimer = 0f;
     private bool  blinkState = true;
+
+    [Header("連動させる歩行者信号（同じポールの別ユニットなど）")]
+    [Tooltip("SetState/StartBlinkが呼ばれた際、ここに登録したTrafficLightにも同じ状態を転送する")]
+    public TrafficLight[] linkedLights;
 
     void Start()
     {
@@ -48,6 +57,7 @@ public class TrafficLight : MonoBehaviour
     {
         isBlinking = false;
         blinkTimer = 0f;
+        CurrentState = state;
 
         switch (state)
         {
@@ -69,6 +79,8 @@ public class TrafficLight : MonoBehaviour
                 ApplyLamp(greenLampRenderer,  greenPointLight,  greenEmissionColor,  true);
                 break;
         }
+
+        ForwardToLinkedLights(l => l.SetState(state));
     }
 
     public void StartBlink()
@@ -79,6 +91,17 @@ public class TrafficLight : MonoBehaviour
         ApplyLamp(redLampRenderer,    redPointLight,    redEmissionColor,    false);
         ApplyLamp(yellowLampRenderer, yellowPointLight, yellowEmissionColor, false);
         ApplyLamp(greenLampRenderer,  greenPointLight,  greenEmissionColor,  true);
+
+        ForwardToLinkedLights(l => l.StartBlink());
+    }
+
+    private void ForwardToLinkedLights(System.Action<TrafficLight> action)
+    {
+        if (linkedLights == null) return;
+        foreach (TrafficLight linked in linkedLights)
+        {
+            if (linked != null) action(linked);
+        }
     }
 
     private void ApplyLamp(Renderer rend, Light lt, Color color, bool isOn)
