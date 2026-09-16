@@ -40,6 +40,9 @@ public class CarIntersectionNode : MonoBehaviour
 
     private readonly Dictionary<CarController, ActiveCarInfo> activeCars = new Dictionary<CarController, ActiveCarInfo>();
 
+    // 旋回中の車がいる横断歩道を「使用中」としてロックするためのカウンター。
+    // 同じ横断歩道に向かって複数台が同時に旋回することもあるため、
+    // bool ではなく参照カウントで管理する。
     private readonly Dictionary<Transform, int> lockedCrosswalkCounts = new Dictionary<Transform, int>();
 
     public bool IsCrosswalkLocked(Transform crosswalk)
@@ -69,7 +72,8 @@ public class CarIntersectionNode : MonoBehaviour
         CarController car = other.GetComponent<CarController>();
         if (car != null)
         {
-
+            // 交差点のトリガーに触れた時点で「進入を開始した」ものとして扱い、
+            // 以降 TrafficStopZone が信号の変化で止めてしまわないようにする
             car.SetIntersectionEntered(true);
             StartCoroutine(TurnSmoothly(car, other.transform));
         }
@@ -132,6 +136,8 @@ public class CarIntersectionNode : MonoBehaviour
         bool isLeftTurn = (choice == 2);
         bool crosswalkNeedsLock = choice != 0 && exitCrosswalk != null;
 
+        // CarTurnDecisionZoneで既にロック済みの場合は二重ロックしない。
+        // ロックの解除責任はここから先、必ずこの関数のfinallyが持つ。
         if (crosswalkNeedsLock && !preDecided)
         {
             LockCrosswalk(exitCrosswalk);
@@ -221,6 +227,10 @@ public class CarIntersectionNode : MonoBehaviour
         }
     }
 
+    // 歩行者側で使用：進行方向ではなく「現在位置に一番近い横断歩道」を返す。
+    // 歩行者は道路を横切る向き（車の進行方向とはほぼ直角）に進むため、
+    // GetCrosswalkForDirection にその向きを渡すと車側とズレた横断歩道を参照してしまう。
+    // 位置ベースで判定することで、車側がロックしている横断歩道と必ず一致させる。
     public Transform GetNearestCrosswalk(Vector3 position)
     {
         Transform nearest = null;
@@ -245,19 +255,6 @@ public class CarIntersectionNode : MonoBehaviour
         return nearest;
     }
 
-    public CrosswalkDirection? GetNearestCrosswalkDirection(Vector3 position)
-    {
-        Transform nearest = GetNearestCrosswalk(position);
-        if (nearest == null) return null;
-
-        if (nearest == crosswalkNorth) return CrosswalkDirection.North;
-        if (nearest == crosswalkSouth) return CrosswalkDirection.South;
-        if (nearest == crosswalkEast) return CrosswalkDirection.East;
-        if (nearest == crosswalkWest) return CrosswalkDirection.West;
-
-        return null;
-    }
-
     public bool IsCrosswalkClear(Transform crosswalk)
     {
         if (crosswalk == null) return true;
@@ -267,7 +264,8 @@ public class CarIntersectionNode : MonoBehaviour
 
         foreach (Collider hit in hits)
         {
-
+            // 横断歩道付近の歩道を歩いているだけの歩行者まで巻き込まないよう、
+            // 実際に道路を横断中（IsCrossing）の歩行者だけを対象にする
             NPCWalker walker = hit.GetComponentInParent<NPCWalker>();
             if (walker != null && walker.IsCrossing) return false;
         }

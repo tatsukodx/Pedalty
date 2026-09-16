@@ -15,10 +15,6 @@ public class TrafficLightManager : MonoBehaviour
     public float pedGreenDuration  = 15f;
     public float pedBlinkDuration  = 5f;
 
-    [Header("交互モードの歩行者青時間（秒）")]
-    [Tooltip("交互モードで NS と EW の切り替え時に挿入する歩行者青フェーズの長さ")]
-    public float altPedGreenDuration = 0f;
-
     [Header("車道信号機（4方向）")]
     public TrafficLight northLight;
     public TrafficLight southLight;
@@ -36,18 +32,6 @@ public class TrafficLightManager : MonoBehaviour
     public bool IsEW_CarRed { get; private set; }
     public bool IsPedestrianGreen { get; private set; }
     public TrafficLightPhase CurrentPhase { get; private set; }
-
-    public TrafficLight GetPedLight(CrosswalkDirection dir)
-    {
-        switch (dir)
-        {
-            case CrosswalkDirection.North: return pedNorthLight;
-            case CrosswalkDirection.South: return pedSouthLight;
-            case CrosswalkDirection.East:  return pedEastLight;
-            case CrosswalkDirection.West:  return pedWestLight;
-            default: return null;
-        }
-    }
 
     void Start()
     {
@@ -71,11 +55,6 @@ public class TrafficLightManager : MonoBehaviour
                 yield return StartCoroutine(EnterPhase(TrafficLightPhase.Pedestrian_Green, pedGreenDuration));
                 yield return StartCoroutine(EnterPhase(TrafficLightPhase.Pedestrian_Blink, pedBlinkDuration));
                 yield return StartCoroutine(EnterPhase(TrafficLightPhase.AllRed, allRedDuration));
-            }
-            else if (altPedGreenDuration > 0f)
-            {
-                yield return StartCoroutine(EnterPhase(TrafficLightPhase.Pedestrian_Green, altPedGreenDuration));
-                yield return StartCoroutine(EnterPhase(TrafficLightPhase.AllRed,           allRedDuration));
             }
         }
     }
@@ -102,13 +81,14 @@ public class TrafficLightManager : MonoBehaviour
             case TrafficLightPhase.NS_Green:
                 IsNS_CarGreen = true;
                 IsNS_CarRed   = false;
-                if (cycleMode == CycleMode.Alternating) IsPedestrianGreen = true;
+                IsPedestrianGreen = true;
                 SetCarLights(TrafficLightState.Green, TrafficLightState.Red);
-                SetPedLights(TrafficLightState.Red);
+                SetPedPair(pedEastLight, pedWestLight, TrafficLightState.Green);
+                SetPedPair(pedNorthLight, pedSouthLight, TrafficLightState.Red);
                 break;
 
             case TrafficLightPhase.NS_Yellow:
-                IsNS_CarRed = false;
+                IsNS_CarRed = false; 
                 SetCarLights(TrafficLightState.Yellow, TrafficLightState.Red);
                 SetPedLights(TrafficLightState.Red);
                 break;
@@ -116,13 +96,14 @@ public class TrafficLightManager : MonoBehaviour
             case TrafficLightPhase.EW_Green:
                 IsEW_CarGreen = true;
                 IsEW_CarRed   = false;
-                if (cycleMode == CycleMode.Alternating) IsPedestrianGreen = true;
+                IsPedestrianGreen = true;
                 SetCarLights(TrafficLightState.Red, TrafficLightState.Green);
-                SetPedLights(TrafficLightState.Red);
+                SetPedPair(pedNorthLight, pedSouthLight, TrafficLightState.Green);
+                SetPedPair(pedEastLight, pedWestLight, TrafficLightState.Red);
                 break;
 
             case TrafficLightPhase.EW_Yellow:
-                IsEW_CarRed = false;
+                IsEW_CarRed = false; 
                 SetCarLights(TrafficLightState.Red, TrafficLightState.Yellow);
                 SetPedLights(TrafficLightState.Red);
                 break;
@@ -162,5 +143,11 @@ public class TrafficLightManager : MonoBehaviour
         pedSouthLight?.SetState(state);
         pedEastLight?.SetState(state);
         pedWestLight?.SetState(state);
+    }
+
+    void SetPedPair(TrafficLight a, TrafficLight b, TrafficLightState state)
+    {
+        a?.SetState(state);
+        b?.SetState(state);
     }
 }

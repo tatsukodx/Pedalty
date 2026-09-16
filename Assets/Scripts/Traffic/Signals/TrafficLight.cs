@@ -13,8 +13,8 @@ public class TrafficLight : MonoBehaviour
     public Light greenPointLight;
 
     [Header("発光設定")]
-    public float emissionIntensity = 3f;
-    public float dimIntensity = 0.04f;
+    public float emissionIntensity = 3f; 
+    public float dimIntensity = 0.04f;  
     public Color redEmissionColor    = new Color(1f,  0.1f, 0.1f);
     public Color yellowEmissionColor = new Color(1f,  0.8f, 0.05f);
     public Color greenEmissionColor  = new Color(0.1f, 1f,  0.2f);
@@ -22,18 +22,14 @@ public class TrafficLight : MonoBehaviour
     [Header("点滅設定（歩行者信号の点滅用）")]
     public float blinkInterval = 0.5f;
 
-    public TrafficLightState CurrentState { get; private set; } = TrafficLightState.Red;
-    public bool IsBlinking => isBlinking;
-
-    public bool IsCrossableForPedestrian => CurrentState == TrafficLightState.Green && !isBlinking;
+    [Header("連動させる歩行者信号（同じポールの別ユニットなど）")]
+    [Tooltip("SetState/StartBlinkが呼ばれた際、ここに登録したTrafficLightにも同じ状態を転送する")]
+    public TrafficLight[] linkedLights;
 
     private bool  isBlinking = false;
     private float blinkTimer = 0f;
     private bool  blinkState = true;
-
-    [Header("連動させる歩行者信号（同じポールの別ユニットなど）")]
-    [Tooltip("SetState/StartBlinkが呼ばれた際、ここに登録したTrafficLightにも同じ状態を転送する")]
-    public TrafficLight[] linkedLights;
+    private bool  isForwarding = false;
 
     void Awake()
     {
@@ -57,7 +53,6 @@ public class TrafficLight : MonoBehaviour
     {
         isBlinking = false;
         blinkTimer = 0f;
-        CurrentState = state;
 
         switch (state)
         {
@@ -98,10 +93,13 @@ public class TrafficLight : MonoBehaviour
     private void ForwardToLinkedLights(System.Action<TrafficLight> action)
     {
         if (linkedLights == null) return;
+        if (isForwarding) return;
+        isForwarding = true;
         foreach (TrafficLight linked in linkedLights)
         {
             if (linked != null) action(linked);
         }
+        isForwarding = false;
     }
 
     private void ApplyLamp(Renderer rend, Light lt, Color color, bool isOn)
