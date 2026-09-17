@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class IntersectionNode : MonoBehaviour
 {
@@ -26,6 +27,78 @@ public class IntersectionNode : MonoBehaviour
 
     [Header("BicyclePedestrianモードで、実際に横断歩道を渡りきるまでの距離")]
     public float crosswalkCrossingDistance = 6f;
+
+    [Header("横断開始の間隔")]
+    [Tooltip("待機していた歩行者が一斉に動かないよう、1人ずつずらす秒数")]
+    public float crossingStartInterval = 0.4f;
+
+    // 横断歩道ごとの待機列（到着順）。同じ横断歩道を使う歩行者だけを並ばせる。
+    private static readonly Dictionary<Transform, List<NPCWalker>> waitingQueues = new Dictionary<Transform, List<NPCWalker>>();
+
+    // 横断歩道ごとに、直前の歩行者が出発した時刻
+    private static readonly Dictionary<Transform, float> lastDepartureTimes = new Dictionary<Transform, float>();
+
+    private static void EnqueueWaiter(Transform crosswalk, NPCWalker walker)
+    {
+        if (crosswalk == null || walker == null) return;
+
+        if (!waitingQueues.TryGetValue(crosswalk, out List<NPCWalker> queue))
+        {
+            queue = new List<NPCWalker>();
+            waitingQueues[crosswalk] = queue;
+        }
+
+        queue.RemoveAll(w => w == null);
+
+        if (!queue.Contains(walker))
+        {
+            queue.Add(walker);
+        }
+    }
+
+    private static void DequeueWaiter(Transform crosswalk, NPCWalker walker)
+    {
+        if (crosswalk == null) return;
+
+        if (waitingQueues.TryGetValue(crosswalk, out List<NPCWalker> queue))
+        {
+            queue.Remove(walker);
+            queue.RemoveAll(w => w == null);
+        }
+    }
+
+    private static bool IsMyTurnToStart(Transform crosswalk, NPCWalker walker, float interval)
+    {
+        if (crosswalk == null) return true;
+
+        if (!waitingQueues.TryGetValue(crosswalk, out List<NPCWalker> queue)) return true;
+
+        queue.RemoveAll(w => w == null);
+
+        // 自分が列の先頭でなければ、まだ出発しない
+        if (queue.Count > 0 && queue[0] != walker) return false;
+
+        // 先頭であっても、直前の出発から一定時間空けてから出る
+        if (lastDepartureTimes.TryGetValue(crosswalk, out float lastTime))
+        {
+            if (Time.time - lastTime < interval) return false;
+        }
+
+        return true;
+    }
+
+    private static void MarkDeparted(Transform crosswalk)
+    {
+        if (crosswalk == null) return;
+        lastDepartureTimes[crosswalk] = Time.time;
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        waitingQueues.Clear();
+        lastDepartureTimes.Clear();
+    }
 
     [Header("方向転換時に加えるランダムな横ずれの最大量（歩行者同士が重ならないように）")]
     public float lateralJitterRange = 0.4f;
@@ -105,6 +178,16 @@ public class IntersectionNode : MonoBehaviour
                     $"Car Intersection Nodeの割り当て、またはそちら側のCrosswalk North/South/East/Westの設定を確認してください。", this);
             }
 
+            if (!useOffsetApproach)
+            {
+                Debug.Log($"[IntersectionNode:{name}] 直進横断（オフセットなし）: signalType={signalType}, crosswalk={(crosswalk == null ? "null" : crosswalk.name)}", this);
+            }
+            else
+            {
+                float debugCoord = offsetAlongX ? crosswalk.position.x : crosswalk.position.z;
+                Debug.Log($"[IntersectionNode:{name}] オフセット横断: crosswalk={crosswalk.name}, 角={cornerLateralCoord:F2}, 横断歩道={debugCoord:F2}, 差={(debugCoord - cornerLateralCoord):F3}", this);
+            }
+
             if (useOffsetApproach)
             {
                 // 横断歩道の入口までの横移動自体も、歩道の境界を超える動きになるため、
@@ -134,20 +217,33 @@ public class IntersectionNode : MonoBehaviour
             {
                 walker.SetTrafficStop(true);
 
-                while (walker != null)
+                // 到着順に並ばせる。青になった瞬間に全員が飛び出すのを防ぐ。
+                EnqueueWaiter(crosswalk, walker);
+
+                try
                 {
-                    bool signalOk = manager == null || IsCarLightAllowingCross(crossingNSRoad);
+                    while (walker != null)
+                    {
+                        bool signalOk = manager == null || IsCarLightAllowingCross(crossingNSRoad);
 
-                    // 対応する横断歩道が車の旋回中でロックされている間は、
-                    // 信号が青（歩行者側が進んでよいタイミング）でも進ませない
-                    bool crosswalkLocked = carIntersectionNode != null && carIntersectionNode.IsCrosswalkLocked(crosswalk);
+                        // 対応する横断歩道が車の旋回中でロックされている間は、
+                        // 信号が青（歩行者側が進んでよいタイミング）でも進ませない
+                        bool crosswalkLocked = carIntersectionNode != null && carIntersectionNode.IsCrosswalkLocked(crosswalk);
 
-                    if (signalOk && !crosswalkLocked) break;
-                    yield return null;
+                        bool myTurn = IsMyTurnToStart(crosswalk, walker, crossingStartInterval);
+
+                        if (signalOk && !crosswalkLocked && myTurn) break;
+                        yield return null;
+                    }
+                }
+                finally
+                {
+                    DequeueWaiter(crosswalk, walker);
                 }
 
                 if (walker == null) yield break;
 
+                MarkDeparted(crosswalk);
                 walker.SetTrafficStop(false);
             }
         }
@@ -162,7 +258,7 @@ public class IntersectionNode : MonoBehaviour
             bool forwardAlongX = !offsetAlongX;
             Vector3 pos = npcTransform.position;
             if (forwardAlongX) pos.x = transform.position.x; else pos.z = transform.position.z;
-            npcTransform.position = pos;
+            walker.BeginSnapTo(pos);
         }
         else
         {
@@ -177,7 +273,7 @@ public class IntersectionNode : MonoBehaviour
             Vector3 perpendicular = Vector3.Cross(Vector3.up, nextDirection).normalized;
             pos += perpendicular * Random.Range(-lateralJitterRange, lateralJitterRange);
 
-            npcTransform.position = pos;
+            walker.BeginSnapTo(pos);
         }
         walker.SetDirection(nextDirection);
 

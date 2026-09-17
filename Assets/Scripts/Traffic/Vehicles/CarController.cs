@@ -35,6 +35,19 @@ public class CarController : MonoBehaviour
     public int PlannedTurnChoice { get; private set; } = -1;
     public bool HasEnteredIntersection => hasEnteredIntersection;
 
+    // 歩行者以外の理由（信号・対向車線）で待機しているか
+    public bool IsWaitingForNonPedestrianReason => isLightStopped || isYieldStopped;
+
+    // 現在の速度から停止するまでに必要な距離（おおよそ）
+    public float EstimatedBrakingDistance
+    {
+        get
+        {
+            float decel = Mathf.Max(voluntaryStopDeceleration, 0.01f);
+            return (currentSpeed * currentSpeed) / (2f * decel);
+        }
+    }
+
     Rigidbody rb;
     Vector3 targetDirection;
     float currentSpeed;
@@ -110,7 +123,13 @@ public class CarController : MonoBehaviour
         currentSpeed = Mathf.MoveTowards(currentSpeed, target, decelRate * Time.fixedDeltaTime);
 
         Vector3 forwardVel = transform.forward * currentSpeed;
-        Vector3 lateralVel = ComputeLaneCorrection();
+
+        // 車線補正は走行中のみ効かせる。
+        // 停止中も横に押し続けると、信号待ちの間に少しずつ横滑りして
+        // 縁石やポールに噛み込み、二度と動けなくなることがある。
+        float lateralScale = Mathf.Clamp01(currentSpeed / Mathf.Max(moveSpeed, 0.01f));
+        Vector3 lateralVel = ComputeLaneCorrection() * lateralScale;
+
         Vector3 totalVel = forwardVel + lateralVel;
 
         rb.linearVelocity = new Vector3(totalVel.x, rb.linearVelocity.y, totalVel.z);

@@ -18,6 +18,9 @@ public class TrafficStopZone : MonoBehaviour
 
     private readonly Dictionary<CarController, Coroutine> waitingCars = new Dictionary<CarController, Coroutine>();
 
+    // ゾーンに入った時点で既に青だった車。信号が黄/赤に変わってもそのまま通す。
+    private readonly HashSet<CarController> carsEnteredOnGreen = new HashSet<CarController>();
+
     private bool ComputeIsLaneA(Vector3 dir)
     {
         bool isNSAxis = Mathf.Abs(dir.x) < Mathf.Abs(dir.z);
@@ -35,11 +38,15 @@ public class TrafficStopZone : MonoBehaviour
             if (carsInZone[i] == null)
             {
                 carsInZone.RemoveAt(i);
+                carsEnteredOnGreen.RemoveWhere(c => c == null);
                 continue;
             }
 
             // 既に交差点への進入を開始した車は、信号が変わってもここで止めない
             if (carsInZone[i].HasEnteredIntersection) continue;
+
+            // 青のうちにゾーンへ入った車は、その後黄/赤に変わってもそのまま通す
+            if (carsEnteredOnGreen.Contains(carsInZone[i])) continue;
 
             carsInZone[i].SetTrafficStop(shouldStop);
         }
@@ -53,6 +60,15 @@ public class TrafficStopZone : MonoBehaviour
         if (!carsInZone.Contains(car))
         {
             carsInZone.Add(car);
+
+            if (manager != null)
+            {
+                bool greenNow = isNSDirection ? manager.IsNS_CarGreen : manager.IsEW_CarGreen;
+                if (greenNow)
+                {
+                    carsEnteredOnGreen.Add(car);
+                }
+            }
         }
 
         if (yieldManager != null)
@@ -92,6 +108,7 @@ public class TrafficStopZone : MonoBehaviour
         {
             car.SetTrafficStop(false);
             carsInZone.Remove(car);
+            carsEnteredOnGreen.Remove(car);
 
             if (waitingCars.TryGetValue(car, out Coroutine c))
             {

@@ -31,17 +31,30 @@ public class NPCWalker : MonoBehaviour
         isAtIntersection = value;
     }
 
+    [Header("旋回")]
+    [Tooltip("曲がるときの旋回の速さ。大きいほど小回りが利く")]
+    public float turnSpeed = 6f;
+    [Tooltip("この角度以上の方向転換は、その場で止まってから回る")]
+    public float turnInPlaceAngle = 150f;
+    [Tooltip("その場で回るときの回転の速さ（度/秒）")]
+    public float turnInPlaceSpeed = 180f;
+
+    private bool isTurningInPlace = false;
+
     public void SetDirection(Vector3 direction)
     {
         if (isHit) return; 
 
-        targetDirection = SnapToCardinal(direction);
-        currentMoveDirection = targetDirection; 
-        
-        if (targetDirection != Vector3.zero)
-        {
-            transform.rotation = Quaternion.LookRotation(targetDirection);
-        }
+        Vector3 newDirection = SnapToCardinal(direction);
+        if (newDirection == Vector3.zero) return;
+
+        // 真後ろへの転換など大きく向きを変える場合は、
+        // 歩きながら曲がると歩道からはみ出すため、その場で止まってから回る
+        float angle = Vector3.Angle(transform.forward, newDirection);
+        isTurningInPlace = angle >= turnInPlaceAngle;
+
+        targetDirection = newDirection;
+        currentMoveDirection = targetDirection;
     }
 
     public void SetTrafficStop(bool stop)
@@ -59,6 +72,23 @@ public class NPCWalker : MonoBehaviour
         isCrossing = crossing;
     }
 
+    [Header("進路の矯正")]
+    [Tooltip("矯正時に目標位置へ寄せる速さ（1秒あたりのユニット数）")]
+    public float snapCorrectionSpeed = 3f;
+    [Tooltip("この距離まで近づいたら矯正完了とみなす")]
+    public float snapArriveThreshold = 0.05f;
+
+    private bool isSnapping = false;
+    private Vector3 snapTargetPosition;
+
+    public bool IsSnapping => isSnapping;
+
+    public void BeginSnapTo(Vector3 targetPosition)
+    {
+        snapTargetPosition = targetPosition;
+        isSnapping = true;
+    }
+
     public void SnapAcrossPath(Vector3 nodePosition, Vector3 travelDirection, Vector3 newDirection, float maxOffset = 0.4f)
     {
         Vector3 newPos = transform.position;
@@ -73,7 +103,39 @@ public class NPCWalker : MonoBehaviour
         Vector3 perpendicular = Vector3.Cross(Vector3.up, newDirection).normalized;
         float offset = Random.Range(-maxOffset, maxOffset);
         newPos += perpendicular * offset;
-        transform.position = newPos;
+
+        // 位置を直接書き換えると瞬間移動して見えるため、
+        // 目標だけ決めてFixedUpdateで少しずつ寄せる
+        snapTargetPosition = newPos;
+        isSnapping = true;
+    }
+
+    Vector3 ComputeSnapCorrectionVelocity()
+    {
+        if (!isSnapping) return Vector3.zero;
+
+        Vector3 diff = snapTargetPosition - transform.position;
+        diff.y = 0f;
+
+        // 進行方向の成分は取り除き、横方向のズレだけを埋める。
+        // そうしないと、歩き進むほど目標が後方に取り残されて引き戻されてしまう。
+        Vector3 facing = transform.forward;
+        facing.y = 0f;
+
+        if (facing.sqrMagnitude > 0.0001f)
+        {
+            diff -= Vector3.Project(diff, facing.normalized);
+        }
+
+        if (diff.magnitude <= snapArriveThreshold)
+        {
+            isSnapping = false;
+            return Vector3.zero;
+        }
+
+        // 目標へ向かう速度を返す。位置を直接書き換えないので瞬間移動にならない。
+        Vector3 step = Vector3.ClampMagnitude(diff, snapCorrectionSpeed * Time.fixedDeltaTime);
+        return step / Time.fixedDeltaTime;
     }
 
     Vector3 SnapToCardinal(Vector3 dir)
@@ -126,14 +188,40 @@ public class NPCWalker : MonoBehaviour
 
         currentMoveDirection = targetDirection;
 
-        if (currentMoveDirection != Vector3.zero)
+        if (currentMoveDirection == Vector3.zero)
         {
-            Quaternion targetRot = Quaternion.LookRotation(currentMoveDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.fixedDeltaTime * 5f);
+            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+            return;
         }
 
+        Quaternion targetRot = Quaternion.LookRotation(currentMoveDirection);
+
+        if (isTurningInPlace)
+        {
+            // その場で止まって回りきるまで移動しない
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, turnInPlaceSpeed * Time.fixedDeltaTime);
+
+            if (Quaternion.Angle(transform.rotation, targetRot) > 1f)
+            {
+                rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+                return;
+            }
+
+            isTurningInPlace = false;
+        }
+        else
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.fixedDeltaTime * turnSpeed);
+        }
+
+        // 実際に向いている方向へ進むことで、旋回中は弧を描いて曲がる
+        Vector3 moveDirection = transform.forward;
+        moveDirection.y = 0f;
+        moveDirection.Normalize();
+
         Vector3 sidewalkCorrection = ComputeSidewalkCorrection();
-        Vector3 intendedVelocity = (currentMoveDirection * moveSpeed) + sidewalkCorrection;
+        Vector3 snapCorrection = ComputeSnapCorrectionVelocity();
+        Vector3 intendedVelocity = (moveDirection * moveSpeed) + sidewalkCorrection + snapCorrection;
         Vector3 allowedVelocity = ClampToSidewalk(intendedVelocity);
 
         rb.linearVelocity = new Vector3(allowedVelocity.x, rb.linearVelocity.y, allowedVelocity.z);
@@ -142,6 +230,7 @@ public class NPCWalker : MonoBehaviour
     Vector3 ClampToSidewalk(Vector3 intendedVelocity)
     {
         if (isCrossing) return intendedVelocity;
+        if (isSnapping) return intendedVelocity;
 
         if (!IsOnSidewalk(transform.position)) return intendedVelocity;
 
@@ -178,6 +267,7 @@ public class NPCWalker : MonoBehaviour
     Vector3 ComputeSidewalkCorrection()
     {
         if (isCrossing) return Vector3.zero;
+        if (isSnapping) return Vector3.zero;
 
         Collider[] hits = Physics.OverlapSphere(
             transform.position, sidewalkSearchRadius, ~0, QueryTriggerInteraction.Collide);

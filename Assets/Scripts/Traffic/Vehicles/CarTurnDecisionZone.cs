@@ -6,6 +6,10 @@ public class CarTurnDecisionZone : MonoBehaviour
     [Header("対応する交差点ノード")]
     public CarIntersectionNode intersection;
 
+    [Header("停止位置")]
+    [Tooltip("ゾーンに触れてからこの距離だけ進んだ位置で、歩行者待ちの停止をかける")]
+    public float stopApproachDistance = 3f;
+
     private void OnTriggerEnter(Collider other)
     {
         CarController car = other.GetComponent<CarController>();
@@ -33,6 +37,23 @@ public class CarTurnDecisionZone : MonoBehaviour
         Transform exitCrosswalk = intersection.GetCrosswalkForDirection(nextDirection);
         if (exitCrosswalk == null) yield break;
 
+        // ゾーンに触れた瞬間に止めると停止線の手前すぎる位置で止まるため、
+        // 指定距離だけ進んだ位置で止まるようにする。
+        // 実際にはブレーキ距離があるので、その分だけ手前で停止指示を出す。
+        Vector3 approachStart = carTransform.position;
+
+        while (car != null && !intersection.IsCrosswalkClear(exitCrosswalk))
+        {
+            float traveled = Vector3.Distance(approachStart, carTransform.position);
+            float remaining = stopApproachDistance - traveled;
+
+            if (remaining <= car.EstimatedBrakingDistance) break;
+
+            yield return null;
+        }
+
+        if (car == null) yield break;
+
         car.SetPedestrianStop(true, isLeftTurn);
 
         while (car != null && !intersection.IsCrosswalkClear(exitCrosswalk))
@@ -43,16 +64,39 @@ public class CarTurnDecisionZone : MonoBehaviour
         if (car == null) yield break;
 
         car.SetPedestrianStop(false);
-        intersection.LockCrosswalk(exitCrosswalk);
 
-        while (car != null && !car.HasEnteredIntersection)
+        bool isLocked = false;
+
+        try
         {
-            yield return null;
+            // 交差点に入ってからでは間に合わないため、この段階でロックする。
+            // ただし信号待ちや対向車線待ちで足止めされている間は、
+            // 車がすぐに進めないので歩行者を通せるよう一時的に解除する。
+            while (car != null && !car.HasEnteredIntersection)
+            {
+                bool shouldHoldLock = !car.IsWaitingForNonPedestrianReason;
+
+                if (shouldHoldLock && !isLocked)
+                {
+                    intersection.LockCrosswalk(exitCrosswalk);
+                    isLocked = true;
+                }
+                else if (!shouldHoldLock && isLocked)
+                {
+                    intersection.UnlockCrosswalk(exitCrosswalk);
+                    isLocked = false;
+                }
+
+                yield return null;
+            }
         }
-
-        if (car == null)
+        finally
         {
-            intersection.UnlockCrosswalk(exitCrosswalk);
+            // 交差点に入った後のロックはCarIntersectionNodeが引き継ぐため、ここでは必ず解除する
+            if (isLocked)
+            {
+                intersection.UnlockCrosswalk(exitCrosswalk);
+            }
         }
     }
 }
