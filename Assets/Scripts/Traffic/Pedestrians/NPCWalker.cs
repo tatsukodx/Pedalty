@@ -11,10 +11,6 @@ public class NPCWalker : MonoBehaviour
     private bool isCrossing = false;
     public bool IsCrossing => isCrossing;
 
-    [Header("避けるための設定")]
-    public float sensorDistance = 1.5f; 
-    public float avoidForce = 0.5f;    
-
     [Header("車と衝突した際の吹っ飛び倍率")]
     public float carHitForceMultiplier = 2.0f;
 
@@ -128,7 +124,7 @@ public class NPCWalker : MonoBehaviour
             return;
         }
 
-        AvoidOtherNPCs();
+        currentMoveDirection = targetDirection;
 
         if (currentMoveDirection != Vector3.zero)
         {
@@ -213,28 +209,6 @@ public class NPCWalker : MonoBehaviour
         direction.y = 0f;
         if (direction.sqrMagnitude < 0.01f) return Vector3.zero;
         return direction.normalized * sidewalkCorrectionSpeed;
-    }
-
-    void AvoidOtherNPCs()
-    {
-        currentMoveDirection = targetDirection;
-
-        RaycastHit hit;
-        if (Physics.SphereCast(transform.position + Vector3.up * 0.5f, 0.3f, transform.forward, out hit, sensorDistance))
-        {
-            NPCWalker otherNPC = hit.collider.GetComponent<NPCWalker>();
-            
-            if (otherNPC != null && otherNPC != this && !otherNPC.isHit)
-            {
-                Vector3 relativePos = transform.InverseTransformPoint(hit.collider.transform.position);
-                Vector3 avoidDir = transform.right;
-                if (relativePos.x > 0)
-                {
-                    avoidDir = -transform.right; 
-                }
-                currentMoveDirection = (targetDirection + avoidDir * avoidForce).normalized;
-            }
-        }
     }
 
     void Update()

@@ -27,6 +27,9 @@ public class IntersectionNode : MonoBehaviour
     [Header("BicyclePedestrianモードで、実際に横断歩道を渡りきるまでの距離")]
     public float crosswalkCrossingDistance = 6f;
 
+    [Header("方向転換時に加えるランダムな横ずれの最大量（歩行者同士が重ならないように）")]
+    public float lateralJitterRange = 0.4f;
+
     private void OnTriggerEnter(Collider other)
     {
         NPCWalker walker = other.GetComponentInParent<NPCWalker>();
@@ -67,10 +70,29 @@ public class IntersectionNode : MonoBehaviour
         if (willCross)
         {
             bool crossingNSRoad = Mathf.Abs(nextDirection.x) > Mathf.Abs(nextDirection.z);
-            // 角の現在位置ではなく、これから進む方向に少し進んだ地点を基準にすることで、
-            // 直進・左折・右折のどれを選んでも実際に渡る横断歩道と一致させる
-            Vector3 crossingProbePoint = npcTransform.position + nextDirection.normalized * crossingProbeDistance;
-            crosswalk = carIntersectionNode != null ? carIntersectionNode.GetNearestCrosswalk(crossingProbePoint) : null;
+
+            offsetAlongX = Mathf.Abs(nextDirection.z) > Mathf.Abs(nextDirection.x);
+            cornerLateralCoord = offsetAlongX ? transform.position.x : transform.position.z;
+
+            // 「西 or 東」「南 or 北」など、本来比較すべき2択だけに絞って角に近い方を選ぶ。
+            // 4方向すべてから単純に距離で選ぶと、角の位置によっては軸違いの横断歩道
+            // （例: 南北移動なのに東西の横断歩道より北側の横断歩道の方が近い）を誤って
+            // 選んでしまい、外側へずらす方向が逆になることがあるため。
+            crosswalk = null;
+            if (carIntersectionNode != null)
+            {
+                Transform candidateA = carIntersectionNode.GetCrosswalkForDirection(offsetAlongX ? Vector3.left : Vector3.back);
+                Transform candidateB = carIntersectionNode.GetCrosswalkForDirection(offsetAlongX ? Vector3.right : Vector3.forward);
+
+                if (candidateA == null) crosswalk = candidateB;
+                else if (candidateB == null) crosswalk = candidateA;
+                else
+                {
+                    float coordA = offsetAlongX ? candidateA.position.x : candidateA.position.z;
+                    float coordB = offsetAlongX ? candidateB.position.x : candidateB.position.z;
+                    crosswalk = Mathf.Abs(coordA - cornerLateralCoord) <= Mathf.Abs(coordB - cornerLateralCoord) ? candidateA : candidateB;
+                }
+            }
 
             // 横断歩道が角からずれて配置されている交差点(自転車歩行者信号)でのみ、
             // 曲がる前に横断方向(nextDirection)に対して垂直な軸だけ横断歩道の入り口位置まで歩かせる。
@@ -92,9 +114,6 @@ public class IntersectionNode : MonoBehaviour
 
             if (useOffsetApproach)
             {
-                offsetAlongX = Mathf.Abs(nextDirection.z) > Mathf.Abs(nextDirection.x);
-                cornerLateralCoord = offsetAlongX ? transform.position.x : transform.position.z;
-
                 // 「外側(入口側)」の向きは、実際に使う横断歩道(crosswalk)がノードから見て
                 // どちら側にあるかで判定する(距離は使わず符号だけを見るので、Crosswalkの
                 // Transformの正確な位置に多少ズレがあっても影響しない)。
@@ -147,7 +166,18 @@ public class IntersectionNode : MonoBehaviour
         }
         else
         {
-            walker.SnapAcrossPath(transform.position, currentDir, nextDirection);
+            // 普通の信号、および自転車歩行者信号で横断しない(歩道を進む)場合は、
+            // 曲がる前の方向ではなく、曲がった後の進行方向(nextDirection)に対して
+            // 垂直な軸の座標を、ノード自身の座標にそろえる。
+            bool lateralAlongX = Mathf.Abs(nextDirection.z) > Mathf.Abs(nextDirection.x);
+            Vector3 pos = npcTransform.position;
+            if (lateralAlongX) pos.x = transform.position.x; else pos.z = transform.position.z;
+
+            // 歩行者同士が完全に一列に重ならないよう、ランダムな横ずれを加える
+            Vector3 perpendicular = Vector3.Cross(Vector3.up, nextDirection).normalized;
+            pos += perpendicular * Random.Range(-lateralJitterRange, lateralJitterRange);
+
+            npcTransform.position = pos;
         }
         walker.SetDirection(nextDirection);
 
