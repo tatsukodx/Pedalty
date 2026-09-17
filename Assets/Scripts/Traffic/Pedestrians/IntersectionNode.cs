@@ -77,6 +77,19 @@ public class IntersectionNode : MonoBehaviour
             // 普通の信号(Normal)ではこの処理自体を行わない。
             useOffsetApproach = signalType == SignalType.BicyclePedestrian && crosswalk != null;
 
+            if (signalType == SignalType.BicyclePedestrian && crosswalk == null)
+            {
+                Debug.LogWarning($"[IntersectionNode:{name}] BicyclePedestrianモードですが、対応する横断歩道(crosswalk)が見つかりませんでした。" +
+                    $"Car Intersection Nodeの割り当て、またはそちら側のCrosswalk North/South/East/Westの設定を確認してください。", this);
+            }
+
+            if (useOffsetApproach)
+            {
+                // 横断歩道の入口までの横移動自体も、歩道の境界を超える動きになるため、
+                // ここから isCrossing を true にして ClampToSidewalk のハードクランプを解除しておく
+                walker.SetCrossing(true);
+            }
+
             if (useOffsetApproach)
             {
                 offsetAlongX = Mathf.Abs(nextDirection.z) > Mathf.Abs(nextDirection.x);
@@ -138,7 +151,7 @@ public class IntersectionNode : MonoBehaviour
         }
         walker.SetDirection(nextDirection);
 
-        if (willCross)
+        if (willCross && !useOffsetApproach)
         {
             walker.SetCrossing(true);
         }
