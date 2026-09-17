@@ -16,6 +16,17 @@ public class IntersectionNode : MonoBehaviour
     public float crossingProbeDistance = 2.5f;
     public float crossingProbeRadius = 0.5f;
 
+    public enum SignalType { Normal, BicyclePedestrian }
+
+    [Header("信号タイプ（BicyclePedestrianの場合のみ、横断前後に横断歩道の位置まで往復移動する）")]
+    public SignalType signalType = SignalType.Normal;
+
+    [Header("横断歩道が角からずれている場合に、曲がる前に外側へ歩く距離")]
+    public float crosswalkApproachDistance = 2.4f;
+
+    [Header("BicyclePedestrianモードで、実際に横断歩道を渡りきるまでの距離")]
+    public float crosswalkCrossingDistance = 6f;
+
     private void OnTriggerEnter(Collider other)
     {
         NPCWalker walker = other.GetComponentInParent<NPCWalker>();
@@ -48,6 +59,10 @@ public class IntersectionNode : MonoBehaviour
         walker.SetCrossing(false);
 
         bool willCross = !IsSidewalkAhead(npcTransform.position, nextDirection);
+        Transform crosswalk = null;
+        bool useOffsetApproach = false;
+        bool offsetAlongX = false;
+        float cornerLateralCoord = 0f;
 
         if (willCross)
         {
@@ -55,7 +70,31 @@ public class IntersectionNode : MonoBehaviour
             // 角の現在位置ではなく、これから進む方向に少し進んだ地点を基準にすることで、
             // 直進・左折・右折のどれを選んでも実際に渡る横断歩道と一致させる
             Vector3 crossingProbePoint = npcTransform.position + nextDirection.normalized * crossingProbeDistance;
-            Transform crosswalk = carIntersectionNode != null ? carIntersectionNode.GetNearestCrosswalk(crossingProbePoint) : null;
+            crosswalk = carIntersectionNode != null ? carIntersectionNode.GetNearestCrosswalk(crossingProbePoint) : null;
+
+            // 横断歩道が角からずれて配置されている交差点(自転車歩行者信号)でのみ、
+            // 曲がる前に横断方向(nextDirection)に対して垂直な軸だけ横断歩道の入り口位置まで歩かせる。
+            // 普通の信号(Normal)ではこの処理自体を行わない。
+            useOffsetApproach = signalType == SignalType.BicyclePedestrian && crosswalk != null;
+
+            if (useOffsetApproach)
+            {
+                offsetAlongX = Mathf.Abs(nextDirection.z) > Mathf.Abs(nextDirection.x);
+                cornerLateralCoord = offsetAlongX ? transform.position.x : transform.position.z;
+
+                // 「外側(入口側)」の向きは、実際に使う横断歩道(crosswalk)がノードから見て
+                // どちら側にあるかで判定する(距離は使わず符号だけを見るので、Crosswalkの
+                // Transformの正確な位置に多少ズレがあっても影響しない)。
+                float crosswalkCoordRaw = offsetAlongX ? crosswalk.position.x : crosswalk.position.z;
+                float outwardSign = Mathf.Sign(crosswalkCoordRaw - cornerLateralCoord);
+                float crosswalkLateralCoord = cornerLateralCoord + outwardSign * crosswalkApproachDistance;
+
+                yield return WalkAlongAxisTo(walker, npcTransform, offsetAlongX, crosswalkLateralCoord);
+                if (walker == null) yield break;
+
+                // 横方向への移動で向きが変わっているので、横断方向に戻す
+                walker.SetDirection(nextDirection);
+            }
 
             // 信号待ちが必要な場合(manager あり)、または横断歩道のロック判定が必要な場合(carIntersectionNode あり)は
             // 両方の条件がそろうまで待機する
@@ -81,7 +120,22 @@ public class IntersectionNode : MonoBehaviour
             }
         }
 
-        walker.SnapAcrossPath(transform.position, currentDir, nextDirection);
+        // 前後軸(横断方向に平行な軸)の補正。
+        // BicyclePedestrianモード(useOffsetApproach)では、横方向は既にWalkAlongAxisToで
+        // 正しい位置(横断歩道の入り口)に合わせてあるため、SnapAcrossPathの汎用ロジック
+        // (currentDir基準＋横方向への微小ジッター)を使うと、その横方向オフセットを
+        // 上書きして角に戻してしまう。そのため、その場合は前後軸だけを個別に角の座標へ合わせる。
+        if (useOffsetApproach)
+        {
+            bool forwardAlongX = !offsetAlongX;
+            Vector3 pos = npcTransform.position;
+            if (forwardAlongX) pos.x = transform.position.x; else pos.z = transform.position.z;
+            npcTransform.position = pos;
+        }
+        else
+        {
+            walker.SnapAcrossPath(transform.position, currentDir, nextDirection);
+        }
         walker.SetDirection(nextDirection);
 
         if (willCross)
@@ -89,7 +143,33 @@ public class IntersectionNode : MonoBehaviour
             walker.SetCrossing(true);
         }
 
-        yield return new WaitForSeconds(1.5f);
+        if (useOffsetApproach)
+        {
+            // 固定時間ではなく、実際に横断歩道を渡りきる(前後軸で一定距離進む)まで待つ。
+            // これにより、渡りきる前に南北(戻り)移動が始まってしまうことを防ぐ。
+            bool forwardAlongX = !offsetAlongX;
+            float startForward = forwardAlongX ? npcTransform.position.x : npcTransform.position.z;
+            float dirSign = Mathf.Sign(forwardAlongX ? nextDirection.x : nextDirection.z);
+            float crossingTarget = startForward + dirSign * crosswalkCrossingDistance;
+
+            yield return WalkAlongAxisTo(walker, npcTransform, forwardAlongX, crossingTarget, maxWaitTime: 10f);
+        }
+        else
+        {
+            yield return new WaitForSeconds(1.5f);
+        }
+
+        if (walker != null && useOffsetApproach)
+        {
+            // 横断歩道が角からずれていた場合、渡り終えた後に本来の角のライン(次の角のノードと合うライン)まで戻る
+            yield return WalkAlongAxisTo(walker, npcTransform, offsetAlongX, cornerLateralCoord);
+
+            // 戻り移動で向きが変わっているので、再度もとの進行方向に戻す
+            if (walker != null)
+            {
+                walker.SetDirection(nextDirection);
+            }
+        }
 
         if (walker != null)
         {
@@ -102,6 +182,30 @@ public class IntersectionNode : MonoBehaviour
         bool parallelGreen = (crossingNSRoad ? manager.IsEW_CarGreen : manager.IsNS_CarGreen) && manager.IsPedestrianGreen;
         bool dedicatedPedPhase = manager.CurrentPhase == TrafficLightPhase.Pedestrian_Green;
         return parallelGreen || dedicatedPedPhase;
+    }
+
+    // 横断方向(nextDirection)に対して垂直な軸(alongX ? x : z)だけを対象に、
+    // targetCoordに到達する(通過する)まで、その軸方向へ明示的に歩かせる。
+    // 横断歩道と角のズレ(自転車歩行者信号の入り口までの横移動、渡り終えた後の角への戻り)に使う。
+    // 差がほぼ無い(＝通常の交差点)場合は何もせず即終了する。
+    IEnumerator WalkAlongAxisTo(NPCWalker walker, Transform npcTransform, bool alongX, float targetCoord, float maxWaitTime = 5f)
+    {
+        float current = alongX ? npcTransform.position.x : npcTransform.position.z;
+        if (Mathf.Abs(targetCoord - current) < 0.05f) yield break;
+
+        float sign = Mathf.Sign(targetCoord - current);
+        walker.SetDirection(alongX ? new Vector3(sign, 0f, 0f) : new Vector3(0f, 0f, sign));
+
+        float elapsed = 0f;
+        while (walker != null && elapsed < maxWaitTime)
+        {
+            current = alongX ? npcTransform.position.x : npcTransform.position.z;
+            bool reached = sign >= 0f ? current >= targetCoord : current <= targetCoord;
+            if (reached) yield break;
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
     }
 
     bool IsSidewalkAhead(Vector3 origin, Vector3 direction)
