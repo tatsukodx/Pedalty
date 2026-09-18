@@ -98022,6 +98022,10 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8195054584992802709, guid: ae30a11fc4538da4abe58c84fda6f387, type: 3}
+      propertyPath: walkBoolName
+      value: Iswalking
+      objectReference: {fileID: 0}
+    - target: {fileID: 8195054584992802709, guid: ae30a11fc4538da4abe58c84fda6f387, type: 3}
       propertyPath: snapCorrectionSpeed
       value: 0.2
       objectReference: {fileID: 0}

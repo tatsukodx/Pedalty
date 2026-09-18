@@ -37,8 +37,13 @@ public class NPCWalker : MonoBehaviour
     [Tooltip("この速度以下なら停止アニメーションにする")]
     public float walkAnimationThreshold = 0.1f;
 
+    [Tooltip("空ならStart時に自動で探す。うまく動かない場合はここに直接割り当てる")]
+    public Animator animatorOverride;
+
     private Animator animator;
-    private bool lastWalkState = true;
+    private bool animatorSearchLogged = false;
+    private bool lastWalkState = false;
+    private bool walkStateInitialized = false;
 
     [Header("旋回")]
     [Tooltip("曲がるときの旋回の速さ。大きいほど小回りが利く")]
@@ -239,8 +244,52 @@ public class NPCWalker : MonoBehaviour
         rb.linearVelocity = new Vector3(allowedVelocity.x, rb.linearVelocity.y, allowedVelocity.z);
     }
 
+    Animator FindActiveAnimator()
+    {
+        Animator[] candidates = GetComponentsInChildren<Animator>(true);
+
+        foreach (Animator a in candidates)
+        {
+            if (a == null) continue;
+            if (!a.isActiveAndEnabled) continue;
+            if (a.runtimeAnimatorController == null) continue;
+            return a;
+        }
+
+        return null;
+    }
+
     void UpdateWalkAnimation()
     {
+        // NPCにはAnimatorが複数あり、差し替えたモデル側のAnimatorは
+        // NPCSpawnerによって無効化されている。
+        // 有効かつControllerを持つものだけを対象にする。
+        if (animator == null || !animator.isActiveAndEnabled || animator.runtimeAnimatorController == null)
+        {
+            animator = animatorOverride != null ? animatorOverride : FindActiveAnimator();
+            walkStateInitialized = false;
+
+            if (!animatorSearchLogged)
+            {
+                animatorSearchLogged = true;
+
+                if (animator != null)
+                {
+                    Debug.Log($"[NPCWalker:{name}] Animatorを使用: {animator.gameObject.name} / Controller={animator.runtimeAnimatorController?.name}", animator.gameObject);
+                }
+                else
+                {
+                    Animator[] all = GetComponentsInChildren<Animator>(true);
+                    string detail = $"[NPCWalker:{name}] 使用可能なAnimatorが見つかりません。検出数={all.Length}";
+                    foreach (Animator a in all)
+                    {
+                        detail += $"\n - {a.gameObject.name}: enabled={a.enabled}, activeInHierarchy={a.gameObject.activeInHierarchy}, controller={(a.runtimeAnimatorController == null ? "なし" : a.runtimeAnimatorController.name)}";
+                    }
+                    Debug.LogWarning(detail, gameObject);
+                }
+            }
+        }
+
         if (animator == null) return;
 
         // 実際の水平方向の速度で判定するため、
@@ -251,9 +300,10 @@ public class NPCWalker : MonoBehaviour
 
         bool walking = v.magnitude > walkAnimationThreshold;
 
-        if (walking == lastWalkState) return;
+        if (walkStateInitialized && walking == lastWalkState) return;
 
         lastWalkState = walking;
+        walkStateInitialized = true;
         animator.SetBool(walkBoolName, walking);
     }
 
