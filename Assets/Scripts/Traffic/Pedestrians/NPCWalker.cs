@@ -31,6 +31,15 @@ public class NPCWalker : MonoBehaviour
         isAtIntersection = value;
     }
 
+    [Header("アニメーション")]
+    [Tooltip("歩行/停止を切り替えるAnimatorのbool名")]
+    public string walkBoolName = "IsWalking";
+    [Tooltip("この速度以下なら停止アニメーションにする")]
+    public float walkAnimationThreshold = 0.1f;
+
+    private Animator animator;
+    private bool lastWalkState = true;
+
     [Header("旋回")]
     [Tooltip("曲がるときの旋回の速さ。大きいほど小回りが利く")]
     public float turnSpeed = 6f;
@@ -154,6 +163,9 @@ public class NPCWalker : MonoBehaviour
         rb.isKinematic = false; 
         rb.useGravity = true;
 
+        // Animatorは見た目側(子オブジェクト)にあるため、子階層から探す
+        animator = GetComponentInChildren<Animator>();
+
         Collider myCol = GetComponent<Collider>();
         if (myCol != null)
         {
@@ -225,6 +237,24 @@ public class NPCWalker : MonoBehaviour
         Vector3 allowedVelocity = ClampToSidewalk(intendedVelocity);
 
         rb.linearVelocity = new Vector3(allowedVelocity.x, rb.linearVelocity.y, allowedVelocity.z);
+    }
+
+    void UpdateWalkAnimation()
+    {
+        if (animator == null) return;
+
+        // 実際の水平方向の速度で判定するため、
+        // 信号待ち・交差点での一時停止・その場回転中など、
+        // どの理由で止まっていても停止アニメーションになる
+        Vector3 v = rb.linearVelocity;
+        v.y = 0f;
+
+        bool walking = v.magnitude > walkAnimationThreshold;
+
+        if (walking == lastWalkState) return;
+
+        lastWalkState = walking;
+        animator.SetBool(walkBoolName, walking);
     }
 
     Vector3 ClampToSidewalk(Vector3 intendedVelocity)
@@ -303,6 +333,8 @@ public class NPCWalker : MonoBehaviour
 
     void Update()
     {
+        UpdateWalkAnimation();
+
         if (transform.position.y < -10f)
         {
             Destroy(gameObject);

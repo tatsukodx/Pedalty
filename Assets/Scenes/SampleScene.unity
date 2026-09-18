@@ -318,6 +318,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 873389802}
+  stopApproachDistance: 6
 --- !u!1001 &5709826
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1601,6 +1602,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 75610556}
+  stopApproachDistance: 6
 --- !u!1001 &28799294
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2736,6 +2738,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 75610556}
+  stopApproachDistance: 6
 --- !u!1 &46133038 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: e3c71c50de390ec4190b877211ba0717, type: 3}
@@ -6511,6 +6514,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 873389802}
+  stopApproachDistance: 6
 --- !u!1 &144994102
 GameObject:
   m_ObjectHideFlags: 0
@@ -6764,6 +6768,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 1374207895}
+  stopApproachDistance: 6
 --- !u!1 &149651719 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: e3c71c50de390ec4190b877211ba0717, type: 3}
@@ -10248,6 +10253,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 873389802}
+  stopApproachDistance: 6
 --- !u!1001 &227886065
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14718,6 +14724,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 1621321578}
+  stopApproachDistance: 6
 --- !u!4 &318819329 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 121f662ea65e2cf40a50c66470757a9e, type: 3}
@@ -18137,6 +18144,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 75610556}
+  stopApproachDistance: 6
 --- !u!1 &384780131 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: e3c71c50de390ec4190b877211ba0717, type: 3}
@@ -45063,6 +45071,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 1374207895}
+  stopApproachDistance: 6
 --- !u!4 &1011187285 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400002, guid: 0b6fafa63b69b174584365f2641586a4, type: 3}
@@ -45991,6 +46000,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 580389900}
+  stopApproachDistance: 6
 --- !u!1001 &1028938383
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -46695,6 +46705,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 75610556}
+  stopApproachDistance: 6
 --- !u!4 &1051155939 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 931fa17f0ab17504bbfc8903e54e6a16, type: 3}
@@ -47182,6 +47193,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 873389802}
+  stopApproachDistance: 6
 --- !u!1 &1067102845
 GameObject:
   m_ObjectHideFlags: 0
@@ -48411,6 +48423,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 580389900}
+  stopApproachDistance: 6
 --- !u!1001 &1081395560
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -48857,6 +48870,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 727530892}
+  stopApproachDistance: 6
 --- !u!1001 &1085863481
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -55150,6 +55164,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 727530892}
+  stopApproachDistance: 6
 --- !u!4 &1240522257 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 9ccda285cd5f1ce4fa00133b50ba5cbc, type: 3}
@@ -60458,6 +60473,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 1374207895}
+  stopApproachDistance: 6
 --- !u!1 &1367463336
 GameObject:
   m_ObjectHideFlags: 0
@@ -62374,6 +62390,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 1621321578}
+  stopApproachDistance: 6
 --- !u!4 &1397639370 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 31bbda51eeab02f44a8e92a7da2f5ff8, type: 3}
@@ -63407,6 +63424,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 727530892}
+  stopApproachDistance: 6
 --- !u!1 &1421581577 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: e3c71c50de390ec4190b877211ba0717, type: 3}
@@ -67567,6 +67585,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 580389900}
+  stopApproachDistance: 6
 --- !u!1 &1522108060 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: fbe896a67df88784abb1f38733468a13, type: 3}
@@ -68847,6 +68866,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 1621321578}
+  stopApproachDistance: 6
 --- !u!4 &1544799540 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 31bbda51eeab02f44a8e92a7da2f5ff8, type: 3}
@@ -69083,6 +69103,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 1621321578}
+  stopApproachDistance: 6
 --- !u!1001 &1547976756
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -79383,6 +79404,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 580389900}
+  stopApproachDistance: 6
 --- !u!1 &1766290709
 GameObject:
   m_ObjectHideFlags: 0
@@ -87421,6 +87443,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 727530892}
+  stopApproachDistance: 6
 --- !u!4 &1915603226 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 752637772482204386, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
@@ -88923,6 +88946,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarTurnDecisionZone
   intersection: {fileID: 1374207895}
+  stopApproachDistance: 6
 --- !u!1 &1957806722 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: f84563c4522be5e4bbef79b6a74da743, type: 3}
