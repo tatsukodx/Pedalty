@@ -35,6 +35,42 @@
       "violationName": "右側通行（逆走）",
       "description": "普通自転車専用通行帯の中でも、自転車は道路の左側端に寄って\n通行しなければなりません。\n専用通行帯内であっても右側（対向車線側）を通行することは\n「逆走」となり、通行区分違反となります。",
       "penaltyAmount": 6000
+    },
+    {
+      "id": "traffic_light",
+      "triggerArea": "",
+      "triggerSide": "",
+      "category": "信号無視",
+      "violationName": "信号無視",
+      "description": "自転車は「車両」なので、車両用信号機の表示に従わなければ\nなりません。\n赤信号のときは停止線の直前で停止し、青信号になるまで\n交差点に進入してはいけません。",
+      "penaltyAmount": 6000
+    },
+    {
+      "id": "no_stop",
+      "triggerArea": "",
+      "triggerSide": "",
+      "category": "指定場所一時不停止等",
+      "violationName": "一時不停止",
+      "description": "「止まれ」の標識がある場所では、停止線の直前で一時停止\nしなければなりません。\n停止した上で、交差する道路を通行する車両や歩行者の\n安全を確認してから進行する必要があります。",
+      "penaltyAmount": 5000
+    },
+    {
+      "id": "bell_misuse",
+      "triggerArea": "",
+      "triggerSide": "",
+      "category": "警音器使用制限違反",
+      "violationName": "警音器使用制限違反",
+      "description": "ベル（警音器）は、「警笛鳴らせ」の標識がある場所や、\n危険を防止するためやむを得ない場合以外は鳴らしては\nいけません。\n歩行者をどかす目的で鳴らす行為は違反となります。",
+      "penaltyAmount": 3000
+    },
+    {
+      "id": "pedestrian_collision",
+      "triggerArea": "",
+      "triggerSide": "",
+      "category": "安全運転義務違反",
+      "violationName": "歩行者との衝突",
+      "description": "歩行者に接触・衝突する行為は安全運転義務違反です。\n歩行者の通行を妨げるおそれがあるときは、徐行または\n一時停止しなければなりません。\n事故を起こした場合は、救護義務・報告義務も生じます。",
+      "penaltyAmount": 6000
     }
   ]
 }
