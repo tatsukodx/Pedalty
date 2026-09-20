@@ -404,9 +404,11 @@ public class NPCWalker : MonoBehaviour
         {
             if (!isHit)
             {
-                isHit = true; 
+                isHit = true;
                 rb.isKinematic = false;
                 rb.constraints = RigidbodyConstraints.None;
+
+                TrafficViolationDetector.Instance?.ReportViolationById("pedestrian_collision");
 
                 Rigidbody bikeRb = collision.gameObject.GetComponent<Rigidbody>();
                 if (bikeRb != null)
