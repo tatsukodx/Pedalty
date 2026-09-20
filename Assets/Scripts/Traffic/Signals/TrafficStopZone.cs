@@ -21,6 +21,9 @@ public class TrafficStopZone : MonoBehaviour
     // ゾーンに入った時点で既に青だった車。信号が黄/赤に変わってもそのまま通す。
     private readonly HashSet<CarController> carsEnteredOnGreen = new HashSet<CarController>();
 
+    private BicycleController playerInZone;
+    private bool playerEnteredOnGreen;
+
     private bool ComputeIsLaneA(Vector3 dir)
     {
         bool isNSAxis = Mathf.Abs(dir.x) < Mathf.Abs(dir.z);
@@ -54,6 +57,14 @@ public class TrafficStopZone : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        BicycleController player = other.GetComponentInParent<BicycleController>();
+        if (player != null)
+        {
+            playerInZone = player;
+            playerEnteredOnGreen = IsGreenForThisZone();
+            return;
+        }
+
         CarController car = other.GetComponentInParent<CarController>();
         if (car == null) return;
 
@@ -84,6 +95,20 @@ public class TrafficStopZone : MonoBehaviour
         }
     }
 
+    private bool IsGreenForThisZone()
+    {
+        if (manager == null) return false;
+
+        return isNSDirection ? manager.IsNS_CarGreen : manager.IsEW_CarGreen;
+    }
+
+    private bool IsRedForThisZone()
+    {
+        if (manager == null) return false;
+
+        return isNSDirection ? manager.IsNS_CarRed : manager.IsEW_CarRed;
+    }
+
     private IEnumerator WaitUntilCanEnter(CarController car, bool isLaneA)
     {
         car.SetYieldStop(true);
@@ -103,6 +128,19 @@ public class TrafficStopZone : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
+        BicycleController player = other.GetComponentInParent<BicycleController>();
+        if (player != null && player == playerInZone)
+        {
+            playerInZone = null;
+
+            // 停止線を越えて交差点に進入した時点で赤ならば信号無視
+            if (!playerEnteredOnGreen && IsRedForThisZone())
+            {
+                TrafficViolationDetector.Instance?.ReportViolationById("traffic_light");
+            }
+            return;
+        }
+
         CarController car = other.GetComponentInParent<CarController>();
         if (car != null)
         {
