@@ -11,9 +11,8 @@ public class NPCWalker : MonoBehaviour
     private bool isCrossing = false;
     public bool IsCrossing => isCrossing;
 
-    [Header("避けるための設定")]
-    public float sensorDistance = 1.5f; 
-    public float avoidForce = 0.5f;    
+    [Header("車と衝突した際の吹っ飛び倍率")]
+    public float carHitForceMultiplier = 2.0f;
 
     [Header("安全設定")]
     public float birthSafetyTime = 0.5f;
@@ -32,17 +31,44 @@ public class NPCWalker : MonoBehaviour
         isAtIntersection = value;
     }
 
+    [Header("アニメーション")]
+    [Tooltip("歩行/停止を切り替えるAnimatorのbool名")]
+    public string walkBoolName = "IsWalking";
+    [Tooltip("この速度以下なら停止アニメーションにする")]
+    public float walkAnimationThreshold = 0.1f;
+
+    [Tooltip("空ならStart時に自動で探す。うまく動かない場合はここに直接割り当てる")]
+    public Animator animatorOverride;
+
+    private Animator animator;
+    private bool animatorSearchLogged = false;
+    private bool lastWalkState = false;
+    private bool walkStateInitialized = false;
+
+    [Header("旋回")]
+    [Tooltip("曲がるときの旋回の速さ。大きいほど小回りが利く")]
+    public float turnSpeed = 6f;
+    [Tooltip("この角度以上の方向転換は、その場で止まってから回る")]
+    public float turnInPlaceAngle = 150f;
+    [Tooltip("その場で回るときの回転の速さ（度/秒）")]
+    public float turnInPlaceSpeed = 180f;
+
+    private bool isTurningInPlace = false;
+
     public void SetDirection(Vector3 direction)
     {
         if (isHit) return; 
 
-        targetDirection = SnapToCardinal(direction);
-        currentMoveDirection = targetDirection; 
-        
-        if (targetDirection != Vector3.zero)
-        {
-            transform.rotation = Quaternion.LookRotation(targetDirection);
-        }
+        Vector3 newDirection = SnapToCardinal(direction);
+        if (newDirection == Vector3.zero) return;
+
+        // 真後ろへの転換など大きく向きを変える場合は、
+        // 歩きながら曲がると歩道からはみ出すため、その場で止まってから回る
+        float angle = Vector3.Angle(transform.forward, newDirection);
+        isTurningInPlace = angle >= turnInPlaceAngle;
+
+        targetDirection = newDirection;
+        currentMoveDirection = targetDirection;
     }
 
     public void SetTrafficStop(bool stop)
@@ -60,6 +86,23 @@ public class NPCWalker : MonoBehaviour
         isCrossing = crossing;
     }
 
+    [Header("進路の矯正")]
+    [Tooltip("矯正時に目標位置へ寄せる速さ（1秒あたりのユニット数）")]
+    public float snapCorrectionSpeed = 3f;
+    [Tooltip("この距離まで近づいたら矯正完了とみなす")]
+    public float snapArriveThreshold = 0.05f;
+
+    private bool isSnapping = false;
+    private Vector3 snapTargetPosition;
+
+    public bool IsSnapping => isSnapping;
+
+    public void BeginSnapTo(Vector3 targetPosition)
+    {
+        snapTargetPosition = targetPosition;
+        isSnapping = true;
+    }
+
     public void SnapAcrossPath(Vector3 nodePosition, Vector3 travelDirection, Vector3 newDirection, float maxOffset = 0.4f)
     {
         Vector3 newPos = transform.position;
@@ -74,7 +117,39 @@ public class NPCWalker : MonoBehaviour
         Vector3 perpendicular = Vector3.Cross(Vector3.up, newDirection).normalized;
         float offset = Random.Range(-maxOffset, maxOffset);
         newPos += perpendicular * offset;
-        transform.position = newPos;
+
+        // 位置を直接書き換えると瞬間移動して見えるため、
+        // 目標だけ決めてFixedUpdateで少しずつ寄せる
+        snapTargetPosition = newPos;
+        isSnapping = true;
+    }
+
+    Vector3 ComputeSnapCorrectionVelocity()
+    {
+        if (!isSnapping) return Vector3.zero;
+
+        Vector3 diff = snapTargetPosition - transform.position;
+        diff.y = 0f;
+
+        // 進行方向の成分は取り除き、横方向のズレだけを埋める。
+        // そうしないと、歩き進むほど目標が後方に取り残されて引き戻されてしまう。
+        Vector3 facing = transform.forward;
+        facing.y = 0f;
+
+        if (facing.sqrMagnitude > 0.0001f)
+        {
+            diff -= Vector3.Project(diff, facing.normalized);
+        }
+
+        if (diff.magnitude <= snapArriveThreshold)
+        {
+            isSnapping = false;
+            return Vector3.zero;
+        }
+
+        // 目標へ向かう速度を返す。位置を直接書き換えないので瞬間移動にならない。
+        Vector3 step = Vector3.ClampMagnitude(diff, snapCorrectionSpeed * Time.fixedDeltaTime);
+        return step / Time.fixedDeltaTime;
     }
 
     Vector3 SnapToCardinal(Vector3 dir)
@@ -92,6 +167,9 @@ public class NPCWalker : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.isKinematic = false; 
         rb.useGravity = true;
+
+        // Animatorは見た目側(子オブジェクト)にあるため、子階層から探す
+        animator = GetComponentInChildren<Animator>();
 
         Collider myCol = GetComponent<Collider>();
         if (myCol != null)
@@ -125,24 +203,114 @@ public class NPCWalker : MonoBehaviour
             return;
         }
 
-        AvoidOtherNPCs();
+        currentMoveDirection = targetDirection;
 
-        if (currentMoveDirection != Vector3.zero)
+        if (currentMoveDirection == Vector3.zero)
         {
-            Quaternion targetRot = Quaternion.LookRotation(currentMoveDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.fixedDeltaTime * 5f);
+            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+            return;
         }
 
+        Quaternion targetRot = Quaternion.LookRotation(currentMoveDirection);
+
+        if (isTurningInPlace)
+        {
+            // その場で止まって回りきるまで移動しない
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, turnInPlaceSpeed * Time.fixedDeltaTime);
+
+            if (Quaternion.Angle(transform.rotation, targetRot) > 1f)
+            {
+                rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+                return;
+            }
+
+            isTurningInPlace = false;
+        }
+        else
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.fixedDeltaTime * turnSpeed);
+        }
+
+        // 実際に向いている方向へ進むことで、旋回中は弧を描いて曲がる
+        Vector3 moveDirection = transform.forward;
+        moveDirection.y = 0f;
+        moveDirection.Normalize();
+
         Vector3 sidewalkCorrection = ComputeSidewalkCorrection();
-        Vector3 intendedVelocity = (currentMoveDirection * moveSpeed) + sidewalkCorrection;
+        Vector3 snapCorrection = ComputeSnapCorrectionVelocity();
+        Vector3 intendedVelocity = (moveDirection * moveSpeed) + sidewalkCorrection + snapCorrection;
         Vector3 allowedVelocity = ClampToSidewalk(intendedVelocity);
 
         rb.linearVelocity = new Vector3(allowedVelocity.x, rb.linearVelocity.y, allowedVelocity.z);
     }
 
+    Animator FindActiveAnimator()
+    {
+        Animator[] candidates = GetComponentsInChildren<Animator>(true);
+
+        foreach (Animator a in candidates)
+        {
+            if (a == null) continue;
+            if (!a.isActiveAndEnabled) continue;
+            if (a.runtimeAnimatorController == null) continue;
+            return a;
+        }
+
+        return null;
+    }
+
+    void UpdateWalkAnimation()
+    {
+        // NPCにはAnimatorが複数あり、差し替えたモデル側のAnimatorは
+        // NPCSpawnerによって無効化されている。
+        // 有効かつControllerを持つものだけを対象にする。
+        if (animator == null || !animator.isActiveAndEnabled || animator.runtimeAnimatorController == null)
+        {
+            animator = animatorOverride != null ? animatorOverride : FindActiveAnimator();
+            walkStateInitialized = false;
+
+            if (!animatorSearchLogged)
+            {
+                animatorSearchLogged = true;
+
+                if (animator != null)
+                {
+                    Debug.Log($"[NPCWalker:{name}] Animatorを使用: {animator.gameObject.name} / Controller={animator.runtimeAnimatorController?.name}", animator.gameObject);
+                }
+                else
+                {
+                    Animator[] all = GetComponentsInChildren<Animator>(true);
+                    string detail = $"[NPCWalker:{name}] 使用可能なAnimatorが見つかりません。検出数={all.Length}";
+                    foreach (Animator a in all)
+                    {
+                        detail += $"\n - {a.gameObject.name}: enabled={a.enabled}, activeInHierarchy={a.gameObject.activeInHierarchy}, controller={(a.runtimeAnimatorController == null ? "なし" : a.runtimeAnimatorController.name)}";
+                    }
+                    Debug.LogWarning(detail, gameObject);
+                }
+            }
+        }
+
+        if (animator == null) return;
+
+        // 実際の水平方向の速度で判定するため、
+        // 信号待ち・交差点での一時停止・その場回転中など、
+        // どの理由で止まっていても停止アニメーションになる
+        Vector3 v = rb.linearVelocity;
+        v.y = 0f;
+
+        bool walking = v.magnitude > walkAnimationThreshold;
+
+        if (walkStateInitialized && walking == lastWalkState) return;
+
+        lastWalkState = walking;
+        walkStateInitialized = true;
+        animator.SetBool(walkBoolName, walking);
+    }
+
     Vector3 ClampToSidewalk(Vector3 intendedVelocity)
     {
         if (isCrossing) return intendedVelocity;
+        if (isSnapping) return intendedVelocity;
 
         if (!IsOnSidewalk(transform.position)) return intendedVelocity;
 
@@ -179,6 +347,7 @@ public class NPCWalker : MonoBehaviour
     Vector3 ComputeSidewalkCorrection()
     {
         if (isCrossing) return Vector3.zero;
+        if (isSnapping) return Vector3.zero;
 
         Collider[] hits = Physics.OverlapSphere(
             transform.position, sidewalkSearchRadius, ~0, QueryTriggerInteraction.Collide);
@@ -212,30 +381,10 @@ public class NPCWalker : MonoBehaviour
         return direction.normalized * sidewalkCorrectionSpeed;
     }
 
-    void AvoidOtherNPCs()
-    {
-        currentMoveDirection = targetDirection;
-
-        RaycastHit hit;
-        if (Physics.SphereCast(transform.position + Vector3.up * 0.5f, 0.3f, transform.forward, out hit, sensorDistance))
-        {
-            NPCWalker otherNPC = hit.collider.GetComponent<NPCWalker>();
-            
-            if (otherNPC != null && otherNPC != this && !otherNPC.isHit)
-            {
-                Vector3 relativePos = transform.InverseTransformPoint(hit.collider.transform.position);
-                Vector3 avoidDir = transform.right;
-                if (relativePos.x > 0)
-                {
-                    avoidDir = -transform.right; 
-                }
-                currentMoveDirection = (targetDirection + avoidDir * avoidForce).normalized;
-            }
-        }
-    }
-
     void Update()
     {
+        UpdateWalkAnimation();
+
         if (transform.position.y < -10f)
         {
             Destroy(gameObject);
@@ -265,6 +414,27 @@ public class NPCWalker : MonoBehaviour
                     Vector3 flyDirection = bikeRb.linearVelocity;
                     flyDirection.y = Mathf.Max(flyDirection.y, 5f); 
                     rb.AddForce(flyDirection * 2.0f, ForceMode.Impulse);
+                }
+
+                Destroy(gameObject, 3f);
+            }
+            return;
+        }
+
+        if (collision.gameObject.GetComponent<CarController>() != null)
+        {
+            if (!isHit)
+            {
+                isHit = true;
+                rb.isKinematic = false;
+                rb.constraints = RigidbodyConstraints.None;
+
+                Rigidbody carRb = collision.gameObject.GetComponent<Rigidbody>();
+                if (carRb != null)
+                {
+                    Vector3 flyDirection = carRb.linearVelocity;
+                    flyDirection.y = Mathf.Max(flyDirection.y, 5f);
+                    rb.AddForce(flyDirection * carHitForceMultiplier, ForceMode.Impulse);
                 }
 
                 Destroy(gameObject, 3f);

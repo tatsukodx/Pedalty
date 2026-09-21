@@ -22,11 +22,16 @@ public class TrafficLight : MonoBehaviour
     [Header("点滅設定（歩行者信号の点滅用）")]
     public float blinkInterval = 0.5f;
 
+    [Header("連動させる歩行者信号（同じポールの別ユニットなど）")]
+    [Tooltip("SetState/StartBlinkが呼ばれた際、ここに登録したTrafficLightにも同じ状態を転送する")]
+    public TrafficLight[] linkedLights;
+
     private bool  isBlinking = false;
     private float blinkTimer = 0f;
     private bool  blinkState = true;
+    private bool  isForwarding = false;
 
-    void Start()
+    void Awake()
     {
         SetState(TrafficLightState.Red);
     }
@@ -69,6 +74,8 @@ public class TrafficLight : MonoBehaviour
                 ApplyLamp(greenLampRenderer,  greenPointLight,  greenEmissionColor,  true);
                 break;
         }
+
+        ForwardToLinkedLights(l => l.SetState(state));
     }
 
     public void StartBlink()
@@ -79,6 +86,20 @@ public class TrafficLight : MonoBehaviour
         ApplyLamp(redLampRenderer,    redPointLight,    redEmissionColor,    false);
         ApplyLamp(yellowLampRenderer, yellowPointLight, yellowEmissionColor, false);
         ApplyLamp(greenLampRenderer,  greenPointLight,  greenEmissionColor,  true);
+
+        ForwardToLinkedLights(l => l.StartBlink());
+    }
+
+    private void ForwardToLinkedLights(System.Action<TrafficLight> action)
+    {
+        if (linkedLights == null) return;
+        if (isForwarding) return;
+        isForwarding = true;
+        foreach (TrafficLight linked in linkedLights)
+        {
+            if (linked != null) action(linked);
+        }
+        isForwarding = false;
     }
 
     private void ApplyLamp(Renderer rend, Light lt, Color color, bool isOn)

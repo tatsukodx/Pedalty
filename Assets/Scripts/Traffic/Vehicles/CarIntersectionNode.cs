@@ -45,20 +45,22 @@ public class CarIntersectionNode : MonoBehaviour
     // bool ではなく参照カウントで管理する。
     private readonly Dictionary<Transform, int> lockedCrosswalkCounts = new Dictionary<Transform, int>();
 
+    private readonly HashSet<CarController> carsInTrigger = new HashSet<CarController>();
+
     public bool IsCrosswalkLocked(Transform crosswalk)
     {
         if (crosswalk == null) return false;
         return lockedCrosswalkCounts.TryGetValue(crosswalk, out int count) && count > 0;
     }
 
-    private void LockCrosswalk(Transform crosswalk)
+    public void LockCrosswalk(Transform crosswalk)
     {
         if (crosswalk == null) return;
         lockedCrosswalkCounts.TryGetValue(crosswalk, out int count);
         lockedCrosswalkCounts[crosswalk] = count + 1;
     }
 
-    private void UnlockCrosswalk(Transform crosswalk)
+    public void UnlockCrosswalk(Transform crosswalk)
     {
         if (crosswalk == null) return;
         if (lockedCrosswalkCounts.TryGetValue(crosswalk, out int count))
@@ -72,6 +74,10 @@ public class CarIntersectionNode : MonoBehaviour
         CarController car = other.GetComponent<CarController>();
         if (car != null)
         {
+            // 交差点のトリガーに触れた時点で「進入を開始した」ものとして扱い、
+            // 以降 TrafficStopZone が信号の変化で止めてしまわないようにする
+            car.SetIntersectionEntered(true);
+            carsInTrigger.Add(car);
             StartCoroutine(TurnSmoothly(car, other.transform));
         }
     }
@@ -80,6 +86,8 @@ public class CarIntersectionNode : MonoBehaviour
     {
         CarController car = other.GetComponent<CarController>();
         if (car == null) return;
+
+        carsInTrigger.Remove(car);
 
         if (activeCars.TryGetValue(car, out ActiveCarInfo info))
         {
@@ -129,65 +137,73 @@ public class CarIntersectionNode : MonoBehaviour
         Transform exitCrosswalk = GetCrosswalkForDirection(nextDirection);
 
         bool isLeftTurn = (choice == 2);
+        bool crosswalkNeedsLock = choice != 0 && exitCrosswalk != null;
 
-        bool needsEntryCheck = entryCrosswalk != null;
-        bool needsExitCheck = !preDecided && exitCrosswalk != null;
-
-        if (needsEntryCheck || needsExitCheck)
-        {
-            car.SetPedestrianStop(true, isLeftTurn);
-
-
-            while (car != null && ((needsEntryCheck && !IsCrosswalkClear(entryCrosswalk)) || (needsExitCheck && !IsCrosswalkClear(exitCrosswalk))))
-            {
-                yield return null;
-            }
-
-            if (car == null) yield break;
-
-            car.SetPedestrianStop(false);
-
-            float traveledWhileWaiting = Vector3.Distance(entryPosition, carTransform.position);
-            targetDistance = Mathf.Max(minimumTurnDistance, targetDistance - traveledWhileWaiting);
-        }
-
-        bool isNSAxis = Mathf.Abs(currentDir.x) < Mathf.Abs(currentDir.z);
-        CarYieldManager relevantManager = isNSAxis ? nsYieldManager : ewYieldManager;
-        bool isLaneA = isNSAxis ? currentDir.z >= 0f : currentDir.x >= 0f;
-
-        if (relevantManager != null)
-        {
-            activeCars[car] = new ActiveCarInfo { manager = relevantManager, isLaneA = isLaneA };
-        }
-
-        if (choice == 0 || targetDistance <= 0.01f)
-        {
-            if (car != null) car.SetDirection(nextDirection);
-            yield break;
-        }
-
-        Vector3 startPosition = carTransform.position;
-        Quaternion startRot = Quaternion.LookRotation(currentDir);
-        Quaternion endRot = Quaternion.LookRotation(nextDirection);
-
-        // 旋回開始：ここから曲がり終わるまでは車を優先する。
-        // 出口側の横断歩道をロックし、歩行者側には「進んでよい」判定を出させない。
-        LockCrosswalk(exitCrosswalk);
+        // 交差点に入った時点でロックする（手前のCarTurnDecisionZoneから引き継ぐ形になる）。
+        // ここから先は既に交差点内なので、歩行者を通すわけにはいかない。
+        bool hasLockedCrosswalk = false;
 
         try
         {
-            while (car != null)
+            if (crosswalkNeedsLock)
             {
-                // ロックしていても、旋回中に何らかの理由で歩行者が入ってきた場合の保険として、
-                // 継続してチェックし続ける
-                if (exitCrosswalk != null && !IsCrosswalkClear(exitCrosswalk))
+                LockCrosswalk(exitCrosswalk);
+                hasLockedCrosswalk = true;
+            }
+
+            bool needsEntryCheck = entryCrosswalk != null;
+            bool needsExitCheck = !preDecided && exitCrosswalk != null;
+
+            if (needsEntryCheck || needsExitCheck)
+            {
+                car.SetPedestrianStop(true, isLeftTurn);
+
+                while (car != null && ((needsEntryCheck && !IsCrosswalkClear(entryCrosswalk)) || (needsExitCheck && !IsCrosswalkClear(exitCrosswalk))))
                 {
-                    car.SetPedestrianStop(true, isLeftTurn);
-                    yield return new WaitForFixedUpdate();
-                    continue;
+                    yield return null;
                 }
 
+                if (car == null) yield break;
+
                 car.SetPedestrianStop(false);
+
+                float traveledWhileWaiting = Vector3.Distance(entryPosition, carTransform.position);
+                targetDistance = Mathf.Max(minimumTurnDistance, targetDistance - traveledWhileWaiting);
+            }
+
+            bool isNSAxis = Mathf.Abs(currentDir.x) < Mathf.Abs(currentDir.z);
+            CarYieldManager relevantManager = isNSAxis ? nsYieldManager : ewYieldManager;
+            bool isLaneA = isNSAxis ? currentDir.z >= 0f : currentDir.x >= 0f;
+
+            if (relevantManager != null)
+            {
+                activeCars[car] = new ActiveCarInfo { manager = relevantManager, isLaneA = isLaneA };
+            }
+
+            if (choice == 0 || targetDistance <= 0.01f)
+            {
+                if (car != null) car.SetDirection(nextDirection);
+
+                // 直進でも、交差点のトリガーを抜けきるまでは進入済み扱いを維持する
+                while (car != null && carsInTrigger.Contains(car))
+                {
+                    yield return new WaitForFixedUpdate();
+                }
+
+                yield break;
+            }
+
+            Vector3 startPosition = carTransform.position;
+            Quaternion startRot = Quaternion.LookRotation(currentDir);
+            Quaternion endRot = Quaternion.LookRotation(nextDirection);
+
+            while (car != null)
+            {
+                // 歩行者がいる間は停止指示を出すが、向きの更新は止めない。
+                // 減速して止まりきるまでの間も進んだ距離に応じて曲がり続けることで、
+                // 停止解除の瞬間に角度が飛ぶのを防ぐ。
+                bool blockedByPedestrian = exitCrosswalk != null && !IsCrosswalkClear(exitCrosswalk);
+                car.SetPedestrianStop(blockedByPedestrian, isLeftTurn);
 
                 float traveled = Vector3.Distance(startPosition, carTransform.position);
                 float t = Mathf.Clamp01(traveled / targetDistance);
@@ -195,15 +211,29 @@ public class CarIntersectionNode : MonoBehaviour
                 Vector3 interpolatedDir = Quaternion.Slerp(startRot, endRot, t) * Vector3.forward;
                 car.SetDirection(interpolatedDir);
 
-                if (t >= 1f) yield break;
+                if (t >= 1f && !blockedByPedestrian) break;
 
+                yield return new WaitForFixedUpdate();
+            }
+
+            // 旋回が終わっても、交差点のトリガーを抜けきるまでは進入済み扱いを維持する
+            while (car != null && carsInTrigger.Contains(car))
+            {
                 yield return new WaitForFixedUpdate();
             }
         }
         finally
         {
-            // 旋回完了（または車が消滅した場合も含む）：ロックを解除して歩行者を通す
-            UnlockCrosswalk(exitCrosswalk);
+            if (car != null)
+            {
+                car.SetPedestrianStop(false);
+                car.SetIntersectionEntered(false);
+            }
+
+            if (hasLockedCrosswalk)
+            {
+                UnlockCrosswalk(exitCrosswalk);
+            }
         }
     }
 
@@ -219,6 +249,34 @@ public class CarIntersectionNode : MonoBehaviour
         }
     }
 
+    // 歩行者側で使用：進行方向ではなく「現在位置に一番近い横断歩道」を返す。
+    // 歩行者は道路を横切る向き（車の進行方向とはほぼ直角）に進むため、
+    // GetCrosswalkForDirection にその向きを渡すと車側とズレた横断歩道を参照してしまう。
+    // 位置ベースで判定することで、車側がロックしている横断歩道と必ず一致させる。
+    public Transform GetNearestCrosswalk(Vector3 position)
+    {
+        Transform nearest = null;
+        float nearestSqrDist = float.MaxValue;
+
+        void Check(Transform cw)
+        {
+            if (cw == null) return;
+            float sqrDist = (cw.position - position).sqrMagnitude;
+            if (sqrDist < nearestSqrDist)
+            {
+                nearestSqrDist = sqrDist;
+                nearest = cw;
+            }
+        }
+
+        Check(crosswalkNorth);
+        Check(crosswalkSouth);
+        Check(crosswalkEast);
+        Check(crosswalkWest);
+
+        return nearest;
+    }
+
     public bool IsCrosswalkClear(Transform crosswalk)
     {
         if (crosswalk == null) return true;
@@ -228,10 +286,7 @@ public class CarIntersectionNode : MonoBehaviour
 
         foreach (Collider hit in hits)
         {
-            // 横断歩道付近の歩道を歩いているだけの歩行者まで巻き込まないよう、
-            // 実際に道路を横断中（IsCrossing）の歩行者だけを対象にする
-            NPCWalker walker = hit.GetComponentInParent<NPCWalker>();
-            if (walker != null && walker.IsCrossing) return false;
+            if (hit.GetComponentInParent<NPCWalker>() != null) return false;
         }
 
         return true;
@@ -240,7 +295,6 @@ public class CarIntersectionNode : MonoBehaviour
 #if UNITY_EDITOR
     void OnDrawGizmos()
     {
-        Gizmos.color = new Color(1f, 1f, 0f, 0.35f);
         Vector3 size = new Vector3(crosswalkWidth, crosswalkHeight, crosswalkDepth);
 
         DrawCrosswalkGizmo(crosswalkNorth, size);
@@ -252,9 +306,31 @@ public class CarIntersectionNode : MonoBehaviour
     void DrawCrosswalkGizmo(Transform crosswalk, Vector3 size)
     {
         if (crosswalk == null) return;
+
+        bool occupied = !IsCrosswalkClear(crosswalk);
+        bool locked = IsCrosswalkLocked(crosswalk);
+
         Matrix4x4 oldMatrix = Gizmos.matrix;
         Gizmos.matrix = Matrix4x4.TRS(crosswalk.position, crosswalk.rotation, Vector3.one);
+
+        if (occupied)
+        {
+            Gizmos.color = Color.red;
+        }
+        else if (locked)
+        {
+            Gizmos.color = Color.cyan;
+        }
+        else
+        {
+            Gizmos.color = Color.yellow;
+        }
+
+        Gizmos.DrawWireCube(Vector3.zero, size);
+
+        Gizmos.color = new Color(Gizmos.color.r, Gizmos.color.g, Gizmos.color.b, 0.15f);
         Gizmos.DrawCube(Vector3.zero, size);
+
         Gizmos.matrix = oldMatrix;
     }
 #endif

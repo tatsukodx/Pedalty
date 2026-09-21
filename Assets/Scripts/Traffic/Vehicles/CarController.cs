@@ -23,12 +23,30 @@ public class CarController : MonoBehaviour
     [Tooltip("左折は奥の横断歩道（対向側）を確認するため、通常の歩行者待ちよりさらに強めにブレーキをかけて、より手前で停止させる")]
     public float leftTurnPedestrianStopDeceleration = 22f;
 
+    [Header("デバッグ表示")]
+    [SerializeField] private string stopReasonDebug = "走行中";
+
     bool isLightStopped = false;
     bool isYieldStopped = false;
     bool isPedestrianStopped = false;
     bool isLeftTurnPedestrianStop = false;
+    bool hasEnteredIntersection = false;
 
     public int PlannedTurnChoice { get; private set; } = -1;
+    public bool HasEnteredIntersection => hasEnteredIntersection;
+
+    // 歩行者以外の理由（信号・対向車線）で待機しているか
+    public bool IsWaitingForNonPedestrianReason => isLightStopped || isYieldStopped;
+
+    // 現在の速度から停止するまでに必要な距離（おおよそ）
+    public float EstimatedBrakingDistance
+    {
+        get
+        {
+            float decel = Mathf.Max(voluntaryStopDeceleration, 0.01f);
+            return (currentSpeed * currentSpeed) / (2f * decel);
+        }
+    }
 
     Rigidbody rb;
     Vector3 targetDirection;
@@ -58,6 +76,16 @@ public class CarController : MonoBehaviour
     {
         isPedestrianStopped = stop;
         isLeftTurnPedestrianStop = stop && isLeftTurn;
+    }
+
+    public void SetIntersectionEntered(bool entered)
+    {
+        hasEnteredIntersection = entered;
+
+        if (entered)
+        {
+            isLightStopped = false;
+        }
     }
 
     public void SetPlannedTurn(int choice)
@@ -95,11 +123,31 @@ public class CarController : MonoBehaviour
         currentSpeed = Mathf.MoveTowards(currentSpeed, target, decelRate * Time.fixedDeltaTime);
 
         Vector3 forwardVel = transform.forward * currentSpeed;
-        Vector3 lateralVel = ComputeLaneCorrection();
+
+        // 車線補正は走行中のみ効かせる。
+        // 停止中も横に押し続けると、信号待ちの間に少しずつ横滑りして
+        // 縁石やポールに噛み込み、二度と動けなくなることがある。
+        float lateralScale = Mathf.Clamp01(currentSpeed / Mathf.Max(moveSpeed, 0.01f));
+        Vector3 lateralVel = ComputeLaneCorrection() * lateralScale;
+
         Vector3 totalVel = forwardVel + lateralVel;
 
         rb.linearVelocity = new Vector3(totalVel.x, rb.linearVelocity.y, totalVel.z);
         rb.angularVelocity = Vector3.zero;
+
+        UpdateStopReasonDebug(obstacleAhead);
+    }
+
+    void UpdateStopReasonDebug(bool obstacleAhead)
+    {
+        string reason = "";
+
+        if (isLightStopped) reason += "信号待ち / ";
+        if (isYieldStopped) reason += "対向車線を待機 / ";
+        if (isPedestrianStopped) reason += "歩行者の横断を待機 / ";
+        if (obstacleAhead) reason += "障害物 / ";
+
+        stopReasonDebug = reason == "" ? "走行中" : reason.Substring(0, reason.Length - 3);
     }
 
     Vector3 ComputeLaneCorrection()
