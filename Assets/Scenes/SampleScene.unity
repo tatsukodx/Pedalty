@@ -41561,6 +41561,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
+      propertyPath: greenDuration
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: yellowDuration
       value: 5
       objectReference: {fileID: 0}
@@ -70663,6 +70667,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
+      propertyPath: greenDuration
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: yellowDuration
       value: 5
       objectReference: {fileID: 0}
@@ -73840,6 +73848,10 @@ PrefabInstance:
     - target: {fileID: 3294062322166412593, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
+      propertyPath: greenDuration
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: yellowDuration
@@ -86443,6 +86455,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
+      propertyPath: greenDuration
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: yellowDuration
       value: 5
       objectReference: {fileID: 0}
@@ -90024,6 +90040,10 @@ PrefabInstance:
     - target: {fileID: 3294062322166412593, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
+      propertyPath: greenDuration
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: yellowDuration
@@ -93994,6 +94014,10 @@ PrefabInstance:
     - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: cycleMode
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
+      propertyPath: greenDuration
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 4213948154808489333, guid: e66a859e1269a67468c3634f00fb2ea7, type: 3}
       propertyPath: yellowDuration
