@@ -9,6 +9,22 @@
             "clearTimeSeconds": 62.67427444458008
         },
         {
+            "recordId": "d77b0d3be43c4b93947fd8159bdaf7a9",
+            "playerName": "092015410",
+            "playedAt": "2026-09-20T15:41:01+09:00",
+            "violationCount": 4,
+            "fineAmount": 23000,
+            "clearTimeSeconds": 63.004032135009769
+        },
+        {
+            "recordId": "0498c929f57c43c49ea61318f3f2c1a1",
+            "playerName": "091923590",
+            "playedAt": "2026-09-19T23:59:00+09:00",
+            "violationCount": 16,
+            "fineAmount": 92000,
+            "clearTimeSeconds": 64.59696197509766
+        },
+        {
             "recordId": "1cbd95988fe2420282d4489d72c27b2d",
             "playerName": "090815330",
             "playedAt": "2026-09-08T15:33:17+09:00",
@@ -55,6 +71,14 @@
             "violationCount": 18,
             "fineAmount": 105000,
             "clearTimeSeconds": 87.4030532836914
+        },
+        {
+            "recordId": "051502b1d31146629bece1a0ecc50aee",
+            "playerName": "092015390",
+            "playedAt": "2026-09-20T15:39:39+09:00",
+            "violationCount": 22,
+            "fineAmount": 127000,
+            "clearTimeSeconds": 91.01853942871094
         },
         {
             "recordId": "fc2c188c325543d3b7617a1534449849",
