@@ -31,6 +31,20 @@ public class CarIntersectionNode : MonoBehaviour
     [Tooltip("判定する高さ（上下方向）")]
     public float crosswalkHeight = 3f;
 
+    [Header("自転車道の位置（省略可、判定用の空オブジェクトを配置してドラッグ）")]
+    public Transform bikeLaneNorth;
+    public Transform bikeLaneSouth;
+    public Transform bikeLaneEast;
+    public Transform bikeLaneWest;
+
+    [Header("自転車道の判定範囲（TransformのローカルZ軸を車の進行方向とする）")]
+    [Tooltip("自転車が走る向きに沿った幅")]
+    public float bikeLaneWidth = 6f;
+    [Tooltip("車の進行方向にあたる奥行き")]
+    public float bikeLaneDepth = 2f;
+    [Tooltip("判定する高さ（上下方向）")]
+    public float bikeLaneHeight = 3f;
+
     private class ActiveCarInfo
     {
 
@@ -136,6 +150,9 @@ public class CarIntersectionNode : MonoBehaviour
         Transform entryCrosswalk = GetCrosswalkForDirection(-currentDir);
         Transform exitCrosswalk = GetCrosswalkForDirection(nextDirection);
 
+        // 曲がる際に横切る自転車道（直進する場合は横切らない）
+        Transform exitBikeLane = choice == 0 ? null : GetBikeLaneForDirection(nextDirection);
+
         bool isLeftTurn = (choice == 2);
         bool crosswalkNeedsLock = choice != 0 && exitCrosswalk != null;
 
@@ -151,14 +168,17 @@ public class CarIntersectionNode : MonoBehaviour
                 hasLockedCrosswalk = true;
             }
 
+            bool needsBikeLaneCheck = exitBikeLane != null;
             bool needsEntryCheck = entryCrosswalk != null;
             bool needsExitCheck = !preDecided && exitCrosswalk != null;
 
-            if (needsEntryCheck || needsExitCheck)
+            if (needsEntryCheck || needsExitCheck || needsBikeLaneCheck)
             {
                 car.SetPedestrianStop(true, isLeftTurn);
 
-                while (car != null && ((needsEntryCheck && !IsCrosswalkClear(entryCrosswalk)) || (needsExitCheck && !IsCrosswalkClear(exitCrosswalk))))
+                while (car != null && ((needsEntryCheck && !IsCrosswalkClear(entryCrosswalk))
+                    || (needsExitCheck && !IsCrosswalkClear(exitCrosswalk))
+                    || !IsBikeLaneClear(exitBikeLane)))
                 {
                     yield return null;
                 }
@@ -202,7 +222,8 @@ public class CarIntersectionNode : MonoBehaviour
                 // 歩行者がいる間は停止指示を出すが、向きの更新は止めない。
                 // 減速して止まりきるまでの間も進んだ距離に応じて曲がり続けることで、
                 // 停止解除の瞬間に角度が飛ぶのを防ぐ。
-                bool blockedByPedestrian = exitCrosswalk != null && !IsCrosswalkClear(exitCrosswalk);
+                bool blockedByPedestrian = (exitCrosswalk != null && !IsCrosswalkClear(exitCrosswalk))
+                    || !IsBikeLaneClear(exitBikeLane);
                 car.SetPedestrianStop(blockedByPedestrian, isLeftTurn);
 
                 float traveled = Vector3.Distance(startPosition, carTransform.position);
@@ -277,6 +298,33 @@ public class CarIntersectionNode : MonoBehaviour
         return nearest;
     }
 
+    public Transform GetBikeLaneForDirection(Vector3 dir)
+    {
+        if (Mathf.Abs(dir.x) > Mathf.Abs(dir.z))
+        {
+            return dir.x >= 0f ? bikeLaneEast : bikeLaneWest;
+        }
+        else
+        {
+            return dir.z >= 0f ? bikeLaneNorth : bikeLaneSouth;
+        }
+    }
+
+    public bool IsBikeLaneClear(Transform bikeLane)
+    {
+        if (bikeLane == null) return true;
+
+        Vector3 halfExtents = new Vector3(bikeLaneWidth * 0.5f, bikeLaneHeight * 0.5f, bikeLaneDepth * 0.5f);
+        Collider[] hits = Physics.OverlapBox(bikeLane.position, halfExtents, bikeLane.rotation, ~0, QueryTriggerInteraction.Ignore);
+
+        foreach (Collider hit in hits)
+        {
+            if (hit.GetComponentInParent<BicycleController>() != null) return false;
+        }
+
+        return true;
+    }
+
     public bool IsCrosswalkClear(Transform crosswalk)
     {
         if (crosswalk == null) return true;
@@ -297,10 +345,34 @@ public class CarIntersectionNode : MonoBehaviour
     {
         Vector3 size = new Vector3(crosswalkWidth, crosswalkHeight, crosswalkDepth);
 
+        Vector3 bikeSize = new Vector3(bikeLaneWidth, bikeLaneHeight, bikeLaneDepth);
+        DrawBikeLaneGizmo(bikeLaneNorth, bikeSize);
+        DrawBikeLaneGizmo(bikeLaneSouth, bikeSize);
+        DrawBikeLaneGizmo(bikeLaneEast, bikeSize);
+        DrawBikeLaneGizmo(bikeLaneWest, bikeSize);
+
         DrawCrosswalkGizmo(crosswalkNorth, size);
         DrawCrosswalkGizmo(crosswalkSouth, size);
         DrawCrosswalkGizmo(crosswalkEast, size);
         DrawCrosswalkGizmo(crosswalkWest, size);
+    }
+
+    void DrawBikeLaneGizmo(Transform bikeLane, Vector3 size)
+    {
+        if (bikeLane == null) return;
+
+        bool occupied = !IsBikeLaneClear(bikeLane);
+
+        Matrix4x4 oldMatrix = Gizmos.matrix;
+        Gizmos.matrix = Matrix4x4.TRS(bikeLane.position, bikeLane.rotation, Vector3.one);
+
+        Gizmos.color = occupied ? Color.red : new Color(0.3f, 0.8f, 1f);
+        Gizmos.DrawWireCube(Vector3.zero, size);
+
+        Gizmos.color = new Color(Gizmos.color.r, Gizmos.color.g, Gizmos.color.b, 0.15f);
+        Gizmos.DrawCube(Vector3.zero, size);
+
+        Gizmos.matrix = oldMatrix;
     }
 
     void DrawCrosswalkGizmo(Transform crosswalk, Vector3 size)
