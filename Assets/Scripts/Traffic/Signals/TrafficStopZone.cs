@@ -21,8 +21,13 @@ public class TrafficStopZone : MonoBehaviour
     // ゾーンに入った時点で既に青だった車。信号が黄/赤に変わってもそのまま通す。
     private readonly HashSet<CarController> carsEnteredOnGreen = new HashSet<CarController>();
 
-    private BicycleController playerInZone;
-    private bool playerEnteredOnGreen;
+    [Header("プレイヤーの信号無視判定")]
+    [Tooltip("停止ゾーンは車線しか覆っていないため、自転車レーンや歩道を走るプレイヤーも判定できるよう道路を横切る向きに広げる量")]
+    public float playerLateralMargin = 5f;
+
+    private BoxCollider boxCollider;
+    private BicycleController player;
+    private bool playerWasInZone;
 
     private bool ComputeIsLaneA(Vector3 dir)
     {
@@ -30,9 +35,16 @@ public class TrafficStopZone : MonoBehaviour
         return isNSAxis ? dir.z >= 0f : dir.x >= 0f;
     }
 
+    void Awake()
+    {
+        boxCollider = GetComponent<BoxCollider>();
+    }
+
     void Update()
     {
         if (manager == null) return;
+
+        UpdatePlayerSignalCheck();
 
         bool shouldStop = isNSDirection ? !manager.IsNS_CarGreen : !manager.IsEW_CarGreen;
 
@@ -55,16 +67,41 @@ public class TrafficStopZone : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter(Collider other)
+    private void UpdatePlayerSignalCheck()
     {
-        BicycleController player = other.GetComponentInParent<BicycleController>();
-        if (player != null)
+        if (boxCollider == null) return;
+
+        if (player == null)
         {
-            playerInZone = player;
-            playerEnteredOnGreen = IsGreenForThisZone();
-            return;
+            player = FindAnyObjectByType<BicycleController>();
+            if (player == null) return;
         }
 
+        bool inZone = IsPlayerInZone();
+
+        // ゾーンを抜ける＝停止線を越えて交差点に進入した瞬間。その時点の信号で判定する
+        if (!inZone && playerWasInZone && IsRedForThisZone())
+        {
+            TrafficViolationDetector.Instance?.ReportViolationById("traffic_light");
+        }
+
+        playerWasInZone = inZone;
+    }
+
+    private bool IsPlayerInZone()
+    {
+        Bounds bounds = boxCollider.bounds;
+        bounds.Expand(isNSDirection
+            ? new Vector3(playerLateralMargin * 2f, 0f, 0f)
+            : new Vector3(0f, 0f, playerLateralMargin * 2f));
+
+        Vector3 p = player.transform.position;
+        return p.x >= bounds.min.x && p.x <= bounds.max.x
+            && p.z >= bounds.min.z && p.z <= bounds.max.z;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
         CarController car = other.GetComponentInParent<CarController>();
         if (car == null) return;
 
@@ -95,13 +132,6 @@ public class TrafficStopZone : MonoBehaviour
         }
     }
 
-    private bool IsGreenForThisZone()
-    {
-        if (manager == null) return false;
-
-        return isNSDirection ? manager.IsNS_CarGreen : manager.IsEW_CarGreen;
-    }
-
     private bool IsRedForThisZone()
     {
         if (manager == null) return false;
@@ -128,19 +158,6 @@ public class TrafficStopZone : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
-        BicycleController player = other.GetComponentInParent<BicycleController>();
-        if (player != null && player == playerInZone)
-        {
-            playerInZone = null;
-
-            // 停止線を越えて交差点に進入した時点で赤ならば信号無視
-            if (!playerEnteredOnGreen && IsRedForThisZone())
-            {
-                TrafficViolationDetector.Instance?.ReportViolationById("traffic_light");
-            }
-            return;
-        }
-
         CarController car = other.GetComponentInParent<CarController>();
         if (car != null)
         {
