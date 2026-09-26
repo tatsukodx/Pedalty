@@ -17,6 +17,8 @@ public class PenaltyController : MonoBehaviour
 
     public int CurrentViolationCount => violationCount;
 
+    public bool IsViolationPopupVisible => violationPopup != null && violationPopup.activeSelf;
+
     private void Start()
     {
         fineDisplay = FindAnyObjectByType<FineDisplayUI>();

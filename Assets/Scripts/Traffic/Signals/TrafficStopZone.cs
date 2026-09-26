@@ -21,30 +21,15 @@ public class TrafficStopZone : MonoBehaviour
     // ゾーンに入った時点で既に青だった車。信号が黄/赤に変わってもそのまま通す。
     private readonly HashSet<CarController> carsEnteredOnGreen = new HashSet<CarController>();
 
-    [Header("プレイヤーの信号無視判定")]
-    [Tooltip("停止ゾーンは車線しか覆っていないため、自転車レーンや歩道を走るプレイヤーも判定できるよう道路を横切る向きに広げる量")]
-    public float playerLateralMargin = 5f;
-
-    private BoxCollider boxCollider;
-    private BicycleController player;
-    private bool playerWasInZone;
-
     private bool ComputeIsLaneA(Vector3 dir)
     {
         bool isNSAxis = Mathf.Abs(dir.x) < Mathf.Abs(dir.z);
         return isNSAxis ? dir.z >= 0f : dir.x >= 0f;
     }
 
-    void Awake()
-    {
-        boxCollider = GetComponent<BoxCollider>();
-    }
-
     void Update()
     {
         if (manager == null) return;
-
-        UpdatePlayerSignalCheck();
 
         bool shouldStop = isNSDirection ? !manager.IsNS_CarGreen : !manager.IsEW_CarGreen;
 
@@ -65,39 +50,6 @@ public class TrafficStopZone : MonoBehaviour
 
             carsInZone[i].SetTrafficStop(shouldStop);
         }
-    }
-
-    private void UpdatePlayerSignalCheck()
-    {
-        if (boxCollider == null) return;
-
-        if (player == null)
-        {
-            player = FindAnyObjectByType<BicycleController>();
-            if (player == null) return;
-        }
-
-        bool inZone = IsPlayerInZone();
-
-        // ゾーンを抜ける＝停止線を越えて交差点に進入した瞬間。その時点の信号で判定する
-        if (!inZone && playerWasInZone && IsRedForThisZone())
-        {
-            TrafficViolationDetector.Instance?.ReportViolationById("traffic_light");
-        }
-
-        playerWasInZone = inZone;
-    }
-
-    private bool IsPlayerInZone()
-    {
-        Bounds bounds = boxCollider.bounds;
-        bounds.Expand(isNSDirection
-            ? new Vector3(playerLateralMargin * 2f, 0f, 0f)
-            : new Vector3(0f, 0f, playerLateralMargin * 2f));
-
-        Vector3 p = player.transform.position;
-        return p.x >= bounds.min.x && p.x <= bounds.max.x
-            && p.z >= bounds.min.z && p.z <= bounds.max.z;
     }
 
     void OnTriggerEnter(Collider other)
@@ -130,13 +82,6 @@ public class TrafficStopZone : MonoBehaviour
                 waitingCars[car] = c;
             }
         }
-    }
-
-    private bool IsRedForThisZone()
-    {
-        if (manager == null) return false;
-
-        return isNSDirection ? manager.IsNS_CarRed : manager.IsEW_CarRed;
     }
 
     private IEnumerator WaitUntilCanEnter(CarController car, bool isLaneA)

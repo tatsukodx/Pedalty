@@ -17,6 +17,11 @@ public class InputManager : MonoBehaviour
     [Header("ブレーキ制御")]
     [SerializeField] BicycleController bicycleController;
 
+    PenaltyController penaltyController;
+
+    // 違反ポップアップ表示中もUpdateは動き続けるため、押しても走行中のイベントは発火させない
+    bool IsRideInputBlocked => penaltyController != null && penaltyController.IsViolationPopupVisible;
+
     public bool IsBraking { get; private set; }
     public bool AnyButtonPressed { get; private set; }
 
@@ -45,6 +50,8 @@ public class InputManager : MonoBehaviour
         {
             bicycleController = FindAnyObjectByType<BicycleController>();
         }
+
+        penaltyController = FindAnyObjectByType<PenaltyController>();
     }
 
     void Update()
@@ -95,7 +102,7 @@ public class InputManager : MonoBehaviour
                 {
                     OnMenuNext?.Invoke();
                 }
-                else
+                else if (!IsRideInputBlocked)
                 {
                     OnBellRing?.Invoke();
                 }
