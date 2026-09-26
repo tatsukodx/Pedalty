@@ -29,15 +29,21 @@ public class TrafficViolationDetector : MonoBehaviour
     [Header("違反データ（JSON）")]
     [SerializeField] private TextAsset violationDataJson;
 
+    // 動的生成されるNPCなど、Inspectorで参照を張れない側から違反を報告するためのアクセサ
+    public static TrafficViolationDetector Instance { get; private set; }
+
     private readonly Dictionary<(RoadAreaType, RoadSide), ViolationInfo> violationsByCondition = new Dictionary<(RoadAreaType, RoadSide), ViolationInfo>();
+    private readonly Dictionary<string, ViolationInfo> violationsById = new Dictionary<string, ViolationInfo>();
 
     private RoadAreaType previousArea = RoadAreaType.None;
     private RoadSide previousSide = RoadSide.None;
     private bool previousBikeLaneExistsNearby = false;
     private bool previousParkedCarNearby = false;
+    private bool previousSidewalkRidingAllowed = false;
 
     private void Awake()
     {
+        Instance = this;
         LoadViolationData();
     }
 
@@ -58,6 +64,11 @@ public class TrafficViolationDetector : MonoBehaviour
 
         foreach (ViolationInfo info in list.violations)
         {
+            violationsById[info.id] = info;
+
+            // triggerAreaが空の違反は通行区分では判定できないため、各所からID指定で報告する
+            if (string.IsNullOrEmpty(info.triggerArea)) continue;
+
             if (!System.Enum.TryParse(info.triggerArea, out RoadAreaType area))
             {
                 Debug.LogWarning($"[TrafficViolationDetector] 不明なtriggerArea \"{info.triggerArea}\" (id={info.id}) をスキップしました。");
@@ -83,6 +94,7 @@ public class TrafficViolationDetector : MonoBehaviour
         RoadSide currentSide = laneDetector.currentSide;
         bool bikeLaneExistsNearby = laneDetector.bikeLaneExistsNearby;
         bool parkedCarNearby = laneDetector.parkedCarNearby;
+        bool sidewalkRidingAllowed = laneDetector.sidewalkRidingAllowed;
 
         if (GameDebugMode.IsEnabled)
         {
@@ -91,20 +103,22 @@ public class TrafficViolationDetector : MonoBehaviour
             previousSide = currentSide;
             previousBikeLaneExistsNearby = bikeLaneExistsNearby;
             previousParkedCarNearby = parkedCarNearby;
+            previousSidewalkRidingAllowed = sidewalkRidingAllowed;
             return;
         }
 
-        if (currentArea != previousArea || currentSide != previousSide || bikeLaneExistsNearby != previousBikeLaneExistsNearby || parkedCarNearby != previousParkedCarNearby)
+        if (currentArea != previousArea || currentSide != previousSide || bikeLaneExistsNearby != previousBikeLaneExistsNearby || parkedCarNearby != previousParkedCarNearby || sidewalkRidingAllowed != previousSidewalkRidingAllowed)
         {
-            CheckViolation(currentArea, currentSide, bikeLaneExistsNearby, parkedCarNearby);
+            CheckViolation(currentArea, currentSide, bikeLaneExistsNearby, parkedCarNearby, sidewalkRidingAllowed);
             previousArea = currentArea;
             previousSide = currentSide;
             previousBikeLaneExistsNearby = bikeLaneExistsNearby;
             previousParkedCarNearby = parkedCarNearby;
+            previousSidewalkRidingAllowed = sidewalkRidingAllowed;
         }
     }
 
-    private void CheckViolation(RoadAreaType area, RoadSide side, bool bikeLaneExistsNearby, bool parkedCarNearby)
+    private void CheckViolation(RoadAreaType area, RoadSide side, bool bikeLaneExistsNearby, bool parkedCarNearby, bool sidewalkRidingAllowed)
     {
         if (area == RoadAreaType.Road && side == RoadSide.Left && !bikeLaneExistsNearby)
         {
@@ -113,6 +127,12 @@ public class TrafficViolationDetector : MonoBehaviour
 
         // 路上駐車を避けるための一時的な歩道通行は道路交通法上の除外対象
         if (area == RoadAreaType.Sidewalk && parkedCarNearby)
+        {
+            return;
+        }
+
+        // 「自転車及び歩行者専用」標識がある区間の歩道は通行できる
+        if (area == RoadAreaType.Sidewalk && sidewalkRidingAllowed)
         {
             return;
         }
@@ -127,6 +147,17 @@ public class TrafficViolationDetector : MonoBehaviour
         {
             ReportViolation(violation);
         }
+    }
+
+    public void ReportViolationById(string id)
+    {
+        if (!violationsById.TryGetValue(id, out ViolationInfo violation))
+        {
+            Debug.LogWarning($"[TrafficViolationDetector] 違反ID \"{id}\" がviolations.jsonにありません。");
+            return;
+        }
+
+        ReportViolation(violation);
     }
 
     private void ReportViolation(ViolationInfo violation)

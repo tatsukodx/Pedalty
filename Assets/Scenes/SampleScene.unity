@@ -18266,6 +18266,7 @@ MonoBehaviour:
   currentSide: 0
   bikeLaneExistsNearby: 0
   parkedCarNearby: 0
+  sidewalkRidingAllowed: 0
   minSpeedForDirection: 0.5
 --- !u!114 &415440748
 MonoBehaviour:
@@ -22394,8 +22395,28 @@ PrefabInstance:
     - {fileID: 6557487791977022584, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
     - {fileID: 3253690475224542059, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7389401183797579229, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 521903341}
   m_SourcePrefab: {fileID: 100100000, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+--- !u!1 &521903340 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7389401183797579229, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+  m_PrefabInstance: {fileID: 521903339}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &521903341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 521903340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b267605becd8d344805727bf25e0d09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SidewalkRidingAllowed
 --- !u!4 &522976886 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4243100736330820217, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
@@ -44995,8 +45016,28 @@ PrefabInstance:
     - {fileID: 6557487791977022584, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
     - {fileID: 3253690475224542059, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7389401183797579229, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1085863483}
   m_SourcePrefab: {fileID: 100100000, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+--- !u!1 &1085863482 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7389401183797579229, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+  m_PrefabInstance: {fileID: 1085863481}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1085863483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1085863482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b267605becd8d344805727bf25e0d09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SidewalkRidingAllowed
 --- !u!4 &1086626368 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: cc0981408e7c8db4f9f80a57938fd5e3, type: 3}
@@ -78580,6 +78621,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BellController
   bellClip: {fileID: 8300000, guid: 8d54cbea393acc241b7f1ac8ccd05cdf, type: 3}
+  hazardCheckRadius: 3
 --- !u!4 &1889574121
 Transform:
   m_ObjectHideFlags: 0

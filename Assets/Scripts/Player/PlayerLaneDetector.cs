@@ -30,6 +30,7 @@ public class PlayerLaneDetector : MonoBehaviour
     public RoadSide currentSide = RoadSide.None;
     public bool bikeLaneExistsNearby = false;
     public bool parkedCarNearby = false;
+    public bool sidewalkRidingAllowed = false;
 
     [Tooltip("この速さ(m/s)未満のときは進行方向が不安定なため、直前に判定した進行方向をそのまま使う")]
     public float minSpeedForDirection = 0.5f;
@@ -49,6 +50,7 @@ public class PlayerLaneDetector : MonoBehaviour
         Collider[] hits = Physics.OverlapSphere(transform.position, sensorRadius, ~0, QueryTriggerInteraction.Collide);
         RoadAreaType detectedArea = RoadAreaType.None;
         RoadSide detectedSide = RoadSide.None;
+        bool detectedRidingAllowed = false;
         float closestDistance = float.MaxValue;
 
         foreach (Collider hit in hits)
@@ -62,11 +64,13 @@ public class PlayerLaneDetector : MonoBehaviour
                 closestDistance = distance;
                 detectedArea = type;
                 detectedSide = side;
+                detectedRidingAllowed = type == RoadAreaType.Sidewalk && hit.GetComponent<SidewalkRidingAllowed>() != null;
             }
         }
 
         currentArea = detectedArea;
         currentSide = detectedSide;
+        sidewalkRidingAllowed = detectedRidingAllowed;
 
         bikeLaneExistsNearby = DetectBikeLaneNearby();
         parkedCarNearby = DetectParkedCarNearby();
