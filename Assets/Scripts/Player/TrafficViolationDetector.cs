@@ -32,14 +32,12 @@ public class TrafficViolationDetector : MonoBehaviour
     [Header("信号無視の判定")]
     [Tooltip("交差点の中心からこの距離に入った時点で、進行方向の信号が赤なら信号無視とする")]
     [SerializeField] private float intersectionRadius = 8f;
-
-    // 動的生成されるNPCなど、Inspectorで参照を張れない側から違反を報告するためのアクセサ
+    
     public static TrafficViolationDetector Instance { get; private set; }
 
     private readonly Dictionary<(RoadAreaType, RoadSide), ViolationInfo> violationsByCondition = new Dictionary<(RoadAreaType, RoadSide), ViolationInfo>();
     private readonly Dictionary<string, ViolationInfo> violationsById = new Dictionary<string, ViolationInfo>();
 
-    // 交差点の中心は、同じ信号マネージャーを共有する停止ゾーン4個の平均位置から求める
     private class IntersectionArea
     {
         public TrafficLightManager manager;
@@ -49,6 +47,7 @@ public class TrafficViolationDetector : MonoBehaviour
 
     private readonly List<IntersectionArea> intersections = new List<IntersectionArea>();
     private Transform player;
+    private bool playerInsideIntersection;
 
     private RoadAreaType previousArea = RoadAreaType.None;
     private RoadSide previousSide = RoadSide.None;
@@ -102,6 +101,8 @@ public class TrafficViolationDetector : MonoBehaviour
 
     private void CheckIntersectionEntry()
     {
+        playerInsideIntersection = false;
+
         if (player == null) return;
 
         Vector3 playerPosition = player.position;
@@ -112,7 +113,8 @@ public class TrafficViolationDetector : MonoBehaviour
             float dz = playerPosition.z - intersection.center.z;
             bool inside = dx * dx + dz * dz <= intersectionRadius * intersectionRadius;
 
-            // 交差点に進入した瞬間だけを見るので、遠ざかるときは判定しない
+            if (inside) playerInsideIntersection = true;
+
             if (inside && !intersection.playerWasInside && IsRedForPlayerDirection(intersection.manager))
             {
                 ReportViolationById("traffic_light");
@@ -149,7 +151,6 @@ public class TrafficViolationDetector : MonoBehaviour
         {
             violationsById[info.id] = info;
 
-            // triggerAreaが空の違反は通行区分では判定できないため、各所からID指定で報告する
             if (string.IsNullOrEmpty(info.triggerArea)) continue;
 
             if (!System.Enum.TryParse(info.triggerArea, out RoadAreaType area))
@@ -174,6 +175,8 @@ public class TrafficViolationDetector : MonoBehaviour
         CheckIntersectionEntry();
 
         if (laneDetector == null) return;
+
+        if (playerInsideIntersection) return;
 
         RoadAreaType currentArea = laneDetector.currentArea;
         RoadSide currentSide = laneDetector.currentSide;
