@@ -11,9 +11,12 @@ public class BellController : MonoBehaviour
     public float hazardCheckRadius = 3f;
 
     private AudioSource audioSource;
+    private PenaltyController penaltyController;
 
     void Awake()
     {
+        penaltyController = FindAnyObjectByType<PenaltyController>();
+
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
 
@@ -27,6 +30,9 @@ public class BellController : MonoBehaviour
 
     public void RingBell()
     {
+        // 違反ポップアップ表示中も入力は届くため、押すたびに罰金が加算されないよう無視する
+        if (penaltyController != null && penaltyController.IsViolationPopupVisible) return;
+
         Debug.Log("チリンチリン！ (ベルが鳴りました)");
 
         if (bellClip != null) audioSource.PlayOneShot(bellClip, audioSource.volume);
