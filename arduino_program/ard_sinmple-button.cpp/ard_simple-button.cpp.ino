@@ -1,6 +1,6 @@
 #include "config.h"
 
-// 全ピン内蔵プルアップ（ピン↔GND接続）。離している=HIGH、押している=LOW
+// 全ピン内蔵プルアップ（ピン↔GND接続） 離している=HIGH、押している=LOW
 #define IS_PRESSED(v) ((v) == LOW)
 
 bool rightState = false;
@@ -52,14 +52,16 @@ void calcVelocity()
 int readPot()
 {
   uint16_t sum = 0;
-  for (uint8_t i = 0; i < POT_SAMPLES; i++) sum += analogRead(PIN_POT);
+  for (uint8_t i = 0; i < POT_SAMPLES; i++)
+    sum += analogRead(PIN_POT);
   return sum / POT_SAMPLES;
 }
 
 void updatePot(uint32_t now)
 {
   // 単純な大小比較だと millis() のロールオーバー時に送信が止まる
-  if ((int32_t)(now - potNextMs) < 0) return;
+  if ((int32_t)(now - potNextMs) < 0)
+    return;
   potNextMs = now + POT_PERIOD_MS;
 
   Serial.print(F("POT,"));
@@ -72,7 +74,8 @@ void updateButtons(uint32_t now)
   bool r = debounce(IS_PRESSED(digitalRead(PIN_BTN_RIGHT)), rightRaw, rightState, rightChangedAt);
   bool l = debounce(IS_PRESSED(digitalRead(PIN_BTN_LEFT)), leftRaw, leftState, leftChangedAt);
 
-  if ((int32_t)(now - btnNextMs) < 0) return;
+  if ((int32_t)(now - btnNextMs) < 0)
+    return;
   btnNextMs = now + BTN_PERIOD_MS;
 
   // 押=1 / 離=0 で送信
