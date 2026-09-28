@@ -10,7 +10,7 @@
 #define PIN_BTN_RIGHT     3
 #define PIN_BTN_LEFT      4
 #define BTN_PERIOD_MS     50
-#define BTN_DEBOUNCE_MS   30
+#define BTN_DEBOUNCE_MS   100
 
 // マグネットセンサ
 #define PIN_MAGNET        2
