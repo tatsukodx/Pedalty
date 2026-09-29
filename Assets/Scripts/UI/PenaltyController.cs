@@ -13,6 +13,7 @@ public class PenaltyController : MonoBehaviour
     [SerializeField] private Button closeButton;
 
     private FineDisplayUI fineDisplay;
+    private InputManager inputManager;
     private int violationCount;
 
     public int CurrentViolationCount => violationCount;
@@ -36,6 +37,15 @@ public class PenaltyController : MonoBehaviour
         {
             closeButton.onClick.AddListener(HideViolationPopup);
         }
+
+        // Arduinoの物理ボタンはキーボード入力として届かないため、InputManager経由で受け取る
+        inputManager = FindAnyObjectByType<InputManager>();
+        inputManager?.OnViolationPopupBack?.AddListener(HideViolationPopup);
+    }
+
+    private void OnDestroy()
+    {
+        inputManager?.OnViolationPopupBack?.RemoveListener(HideViolationPopup);
     }
 
     public void AddPenalty(int amount)
@@ -48,14 +58,6 @@ public class PenaltyController : MonoBehaviour
     public int GetCurrentPenalty()
     {
         return fineDisplay != null ? fineDisplay.CurrentFineAmount : 0;
-    }
-
-    private void Update()
-    {
-        if (violationPopup != null && violationPopup.activeSelf && Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            HideViolationPopup();
-        }
     }
 
     public void ShowViolationPopup(ViolationInfo violation)
