@@ -176,9 +176,9 @@ public sealed class GameFlowUI : MonoBehaviour
         prompt.text = "左右どちらかのボタンを押してください";
 
         CreateChoiceCard(card.transform, "RulesChoice", new Vector2(-145f, -85f), Cyan,
-            "左ボタン", "ルール説明を読む", "左クリック / J / ←");
+            "左ボタン", "ルール説明を読む", "左クリック / J");
         CreateChoiceCard(card.transform, "StartChoice", new Vector2(145f, -85f), Yellow,
-            "右ボタン", "ゲームを始める", "K / →");
+            "右ボタン", "ゲームを始める", "K");
 
         TextMeshProUGUI note = CreateText(card.transform, "StartNote", new Vector2(0f, -171f),
             new Vector2(560f, 26f), 13f, TextAlignmentOptions.Center, new Color(0.66f, 0.7f, 0.76f, 1f));
@@ -244,9 +244,9 @@ public sealed class GameFlowUI : MonoBehaviour
         }
 
         rulesLeftActionText = CreateChoiceCard(card.transform, "RulesLeft", new Vector2(-150f, -197f), Cyan,
-            "左ボタン", "前のページへ", "左クリック / J / ←");
+            "左ボタン", "前のページへ", "左クリック / J");
         rulesRightActionText = CreateChoiceCard(card.transform, "RulesRight", new Vector2(150f, -197f), Yellow,
-            "右ボタン", "次のページへ", "K / →");
+            "右ボタン", "次のページへ", "K");
     }
 
     void BuildCountdownPanel()
@@ -278,9 +278,9 @@ public sealed class GameFlowUI : MonoBehaviour
             new Vector2(510f, 50f), 29f, TextAlignmentOptions.Center, Yellow);
 
         CreateChoiceCard(card.transform, "RankingChoice", new Vector2(-145f, -116f), Cyan,
-            "左ボタン", "記録を見る", "左クリック / J / ←");
+            "左ボタン", "記録を見る", "左クリック / J");
         CreateChoiceCard(card.transform, "RetryChoice", new Vector2(145f, -116f), Yellow,
-            "右ボタン", "リトライ", "K / →");
+            "右ボタン", "リトライ", "K");
 
         TextMeshProUGUI note = CreateText(card.transform, "RetryNote", new Vector2(0f, -194f),
             new Vector2(560f, 22f), 12f, TextAlignmentOptions.Center, new Color(0.66f, 0.7f, 0.76f, 1f));
@@ -317,9 +317,9 @@ public sealed class GameFlowUI : MonoBehaviour
         }
 
         CreateChoiceCard(card.transform, "RankingHomeChoice", new Vector2(-135f, -178f), Cyan,
-            "左ボタン", "スタート画面へ戻る", "左クリック / J / ←");
+            "左ボタン", "スタート画面へ戻る", "左クリック / J");
         CreateChoiceCard(card.transform, "RankingRetryChoice", new Vector2(135f, -178f), Yellow,
-            "右ボタン", "リトライ", "K / →");
+            "右ボタン", "リトライ", "K");
     }
 
     void CreateRankingColumnHeaders(Transform parent, float y, bool showRank)

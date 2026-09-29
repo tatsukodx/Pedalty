@@ -17,6 +17,9 @@ public class InputManager : MonoBehaviour
     [Header("ブレーキ制御")]
     [SerializeField] BicycleController bicycleController;
 
+    [Header("違反ポップアップ中のイベント")]
+    public UnityEvent OnViolationPopupBack;
+
     PenaltyController penaltyController;
 
     // 違反ポップアップ表示中もUpdateは動き続けるため、押しても走行中のイベントは発火させない
@@ -62,8 +65,9 @@ public class InputManager : MonoBehaviour
 
         if (!isArduinoActive)
         {
-            curLeft = Input.GetMouseButton(0) || Input.GetKey(KeyCode.J) || Input.GetKey(KeyCode.LeftArrow);
-            curRight = Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.RightArrow);
+            // 矢印キーはハンドル操作(Input.GetAxis("Horizontal"))に使われるため、ボタンには割り当てない
+            curLeft = Input.GetMouseButton(0) || Input.GetKey(KeyCode.J);
+            curRight = Input.GetKey(KeyCode.K);
         }
 
         if (isArduinoActive)
@@ -89,6 +93,11 @@ public class InputManager : MonoBehaviour
                 if (isMenuState)
                 {
                     OnMenuBack?.Invoke();
+                }
+                else if (IsRideInputBlocked)
+                {
+                    // ポップアップを閉じるだけ。ブレーキを掛けるとUIが点灯したまま残る
+                    OnViolationPopupBack?.Invoke();
                 }
                 else
                 {
