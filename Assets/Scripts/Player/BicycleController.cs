@@ -12,8 +12,7 @@ public class BicycleController : MonoBehaviour
     [Header("回転速度")]
     public float turnSpeed = 90f;
 
-    [Header("--- ジャンプ・空中設定 ---")]
-    public float jumpForce = 5f;
+    [Header("--- 空中設定 ---")]
     [Header("空中でのペダリングの効きやすさ（0.2 = 地面の20%の推進力）")]
     [Range(0f, 1f)]
     public float airPropulsionInfluence = 0.2f;
@@ -132,6 +131,12 @@ public class BicycleController : MonoBehaviour
             currentSpeed = Mathf.Clamp(speedInForwardDirection, -maxSpeed, maxSpeed);
         }
 
+        // 地面を離れた瞬間に、その時の速度を空中の速度として引き継ぐ
+        if (!grounded && wasGroundedLastFrame)
+        {
+            airVelocityVector = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        }
+
         Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         Vector3 flatForward = new Vector3(transform.forward.x, 0f, transform.forward.z).normalized;
         float realHorizontalSpeed = Vector3.Dot(flatVelocity, flatForward);
@@ -198,12 +203,6 @@ public class BicycleController : MonoBehaviour
 
             Vector3 airMovement = blockedByRoadEnd ? Vector3.zero : airVelocityVector;
             rb.linearVelocity = new Vector3(airMovement.x, rb.linearVelocity.y, airMovement.z);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Space) && grounded)
-        {
-            airVelocityVector = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
 
         if (transform.position.y < respawnThresholdY)
