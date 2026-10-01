@@ -103,6 +103,62 @@
             "violationCount": 13,
             "fineAmount": 73000,
             "clearTimeSeconds": 101.5150375366211
+        },
+        {
+            "recordId": "5ffda33f6e1a4b0b9b66f3409efd6e96",
+            "playerName": "093016330",
+            "playedAt": "2026-09-30T16:33:13+09:00",
+            "violationCount": 9,
+            "fineAmount": 48000,
+            "clearTimeSeconds": 132.3088836669922
+        },
+        {
+            "recordId": "020be5ad97f542b6ae26ee4d879a7d8f",
+            "playerName": "093016180",
+            "playedAt": "2026-09-30T16:18:14+09:00",
+            "violationCount": 11,
+            "fineAmount": 59000,
+            "clearTimeSeconds": 140.07199096679688
+        },
+        {
+            "recordId": "4cd52fe4306645c7af985f9b7aa06f43",
+            "playerName": "093016300",
+            "playedAt": "2026-09-30T16:30:21+09:00",
+            "violationCount": 23,
+            "fineAmount": 130000,
+            "clearTimeSeconds": 210.80796813964845
+        },
+        {
+            "recordId": "6735bbce212a4ace9d501fdc17446a26",
+            "playerName": "093016510",
+            "playedAt": "2026-09-30T16:51:08+09:00",
+            "violationCount": 2,
+            "fineAmount": 11000,
+            "clearTimeSeconds": 310.8555603027344
+        },
+        {
+            "recordId": "b3fc56193efa4b409f96ee5ff3b75c02",
+            "playerName": "093016410",
+            "playedAt": "2026-09-30T16:41:47+09:00",
+            "violationCount": 11,
+            "fineAmount": 63000,
+            "clearTimeSeconds": 337.99932861328127
+        },
+        {
+            "recordId": "73624e06fe224a45a36f2b8cee3d8cc8",
+            "playerName": "093016110",
+            "playedAt": "2026-09-30T16:11:19+09:00",
+            "violationCount": 33,
+            "fineAmount": 182000,
+            "clearTimeSeconds": 408.5354919433594
+        },
+        {
+            "recordId": "78c4980d6425455c84e6374b81415566",
+            "playerName": "093016010",
+            "playedAt": "2026-09-30T16:01:57+09:00",
+            "violationCount": 21,
+            "fineAmount": 118000,
+            "clearTimeSeconds": 465.3128356933594
         }
     ]
 }
