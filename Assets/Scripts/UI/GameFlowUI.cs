@@ -505,16 +505,11 @@ public sealed class GameFlowUI : MonoBehaviour
                 }
                 break;
             case FlowState.Results:
-                bool retryInDebugMode = GameDebugMode.IsEnabled;
-                ResetWorldActors();
-                BeginMenuInputGuard();
-                StartCountdown(retryInDebugMode);
-                break;
             case FlowState.Ranking:
-                bool rankingRetryInDebugMode = GameDebugMode.IsEnabled;
+                // リトライ時はそのまま開始せず、開始画面へ戻す
                 ResetWorldActors();
                 BeginMenuInputGuard();
-                StartCountdown(rankingRetryInDebugMode);
+                ShowStartMenu();
                 break;
         }
     }

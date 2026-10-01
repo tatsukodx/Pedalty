@@ -18,6 +18,9 @@ public class HandleAngleConverter : MonoBehaviour
     [Tooltip("1.0=リニア。大きいほど中央が鈍く、端で目一杯効く")]
     [Range(1f, 3f)] public float expo = 1.5f;
 
+    [Tooltip("角度に対する曲がる感度（1.0=従来）。小さいほど同じ角度でも緩やかに曲がる")]
+    [Range(0.1f, 1f)] public float sensitivity = 0.6f;
+
     [Tooltip("追従の時定数[秒]。小さいほどキビキビ、大きいほど滑らか")]
     [Range(0.01f, 0.3f)] public float smoothTau = 0.06f;
 
@@ -112,6 +115,6 @@ public class HandleAngleConverter : MonoBehaviour
 
         a = (a - deadZone) / (1f - deadZone);
         a = Mathf.Pow(a, expo);
-        return a * Mathf.Sign(t);
+        return a * sensitivity * Mathf.Sign(t);
     }
 }

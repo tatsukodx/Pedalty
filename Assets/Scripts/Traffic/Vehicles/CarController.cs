@@ -23,6 +23,16 @@ public class CarController : MonoBehaviour
     [Tooltip("左折は奥の横断歩道（対向側）を確認するため、通常の歩行者待ちよりさらに強めにブレーキをかけて、より手前で停止させる")]
     public float leftTurnPedestrianStopDeceleration = 22f;
 
+    [Header("曲がる時の速度倍率")]
+    [Range(0.1f, 1f)] public float turnSpeedMultiplier = 0.7f;
+
+    [Header("自転車検知（前方の箱判定）")]
+    public float bicycleDetectWidth = 2.4f;
+
+    [Header("ウインカー")]
+    public float blinkerInterval = 0.4f;
+    public Vector3 blinkerLocalOffset = new Vector3(0.9f, 0.8f, 2.2f);
+
     [Header("デバッグ表示")]
     [SerializeField] private string stopReasonDebug = "走行中";
 
@@ -31,6 +41,11 @@ public class CarController : MonoBehaviour
     bool isPedestrianStopped = false;
     bool isLeftTurnPedestrianStop = false;
     bool hasEnteredIntersection = false;
+
+    bool isTurning = false;
+    int blinkerChoice = -1;
+    GameObject blinkerLeft;
+    GameObject blinkerRight;
 
     public int PlannedTurnChoice { get; private set; } = -1;
     public bool HasEnteredIntersection => hasEnteredIntersection;
@@ -98,6 +113,18 @@ public class CarController : MonoBehaviour
         PlannedTurnChoice = -1;
     }
 
+    // 旋回中は速度を落とす
+    public void SetTurning(bool turning)
+    {
+        isTurning = turning;
+    }
+
+    // ウインカー: 1=右, 2=左, それ以外=消灯
+    public void SetBlinker(int choice)
+    {
+        blinkerChoice = choice;
+    }
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -105,6 +132,38 @@ public class CarController : MonoBehaviour
         rb.isKinematic = false;
         rb.mass = mass;
         targetDirection = transform.forward;
+        CreateBlinkers();
+    }
+
+    void CreateBlinkers()
+    {
+        blinkerLeft = CreateBlinker(new Vector3(-blinkerLocalOffset.x, blinkerLocalOffset.y, blinkerLocalOffset.z));
+        blinkerRight = CreateBlinker(blinkerLocalOffset);
+    }
+
+    GameObject CreateBlinker(Vector3 localPos)
+    {
+        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        Destroy(go.GetComponent<Collider>());
+        go.name = "Blinker";
+        go.transform.SetParent(transform, false);
+        go.transform.localPosition = localPos;
+        go.transform.localScale = Vector3.one * 0.35f;
+        Renderer r = go.GetComponent<Renderer>();
+        r.material.color = new Color(1f, 0.55f, 0f);
+        r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        go.SetActive(false);
+        return go;
+    }
+
+    void UpdateBlinkers()
+    {
+        if (blinkerLeft == null || blinkerRight == null) return;
+
+        int choice = blinkerChoice != -1 ? blinkerChoice : PlannedTurnChoice;
+        bool on = Mathf.Repeat(Time.time, blinkerInterval * 2f) < blinkerInterval;
+        blinkerRight.SetActive(on && choice == 1);
+        blinkerLeft.SetActive(on && choice == 2);
     }
 
     void FixedUpdate()
@@ -116,7 +175,8 @@ public class CarController : MonoBehaviour
         bool obstacleAhead = HasObstacleAhead();
         bool voluntaryStop = isLightStopped || isYieldStopped || isPedestrianStopped;
 
-        float target = (obstacleAhead || voluntaryStop) ? 0f : moveSpeed;
+        float cruiseSpeed = isTurning ? moveSpeed * turnSpeedMultiplier : moveSpeed;
+        float target = (obstacleAhead || voluntaryStop) ? 0f : cruiseSpeed;
         float voluntaryDecel = isLeftTurnPedestrianStop ? leftTurnPedestrianStopDeceleration : voluntaryStopDeceleration;
         float decelRate = (!obstacleAhead && voluntaryStop) ? voluntaryDecel : acceleration;
 
@@ -219,11 +279,25 @@ public class CarController : MonoBehaviour
             }
         }
 
+        // SphereCastは開始位置で重なっている相手や、旋回中に斜め前にいる相手を取りこぼすことがあるため、
+        // 自転車だけは進行方向（現在の向きと目標方向の中間）の箱で追加判定する
+        Vector3 lookDir = (transform.forward + targetDirection).normalized;
+        if (lookDir.sqrMagnitude < 0.001f) lookDir = transform.forward;
+        Vector3 boxCenter = transform.position + Vector3.up * 1f + transform.forward * frontOffset + lookDir * (checkDistance * 0.5f);
+        Vector3 halfExtents = new Vector3(bicycleDetectWidth * 0.5f, 1.5f, checkDistance * 0.5f + frontOffset * 0.5f);
+        Collider[] boxHits = Physics.OverlapBox(boxCenter, halfExtents, Quaternion.LookRotation(lookDir), ~0, QueryTriggerInteraction.Ignore);
+        foreach (Collider c in boxHits)
+        {
+            if (c.GetComponentInParent<BicycleController>() != null) return true;
+        }
+
         return false;
     }
 
     void Update()
     {
+        UpdateBlinkers();
+
         if (transform.position.y < -10f)
         {
             Destroy(gameObject);

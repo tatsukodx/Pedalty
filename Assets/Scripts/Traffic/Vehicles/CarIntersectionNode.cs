@@ -154,6 +154,7 @@ public class CarIntersectionNode : MonoBehaviour
         Transform exitBikeLane = choice == 0 ? null : GetBikeLaneForDirection(nextDirection);
 
         bool isLeftTurn = (choice == 2);
+        car.SetBlinker(choice);
         bool crosswalkNeedsLock = choice != 0 && exitCrosswalk != null;
 
         // 交差点に入った時点でロックする（手前のCarTurnDecisionZoneから引き継ぐ形になる）。
@@ -216,6 +217,7 @@ public class CarIntersectionNode : MonoBehaviour
             Vector3 startPosition = carTransform.position;
             Quaternion startRot = Quaternion.LookRotation(currentDir);
             Quaternion endRot = Quaternion.LookRotation(nextDirection);
+            car.SetTurning(true);
 
             while (car != null)
             {
@@ -247,6 +249,8 @@ public class CarIntersectionNode : MonoBehaviour
         {
             if (car != null)
             {
+                car.SetTurning(false);
+                car.SetBlinker(-1);
                 car.SetPedestrianStop(false);
                 car.SetIntersectionEntered(false);
             }
@@ -323,6 +327,25 @@ public class CarIntersectionNode : MonoBehaviour
         }
 
         return true;
+    }
+
+    public bool HasBikeCrossings => bikeLaneNorth != null || bikeLaneSouth != null || bikeLaneEast != null || bikeLaneWest != null;
+
+    // 自転車が交差点内の自転車横断帯（自転車道の判定ゾーン）上にいるか
+    public bool IsInBikeCrossing(Vector3 point, float margin)
+    {
+        return IsInBox(bikeLaneNorth, point, margin) || IsInBox(bikeLaneSouth, point, margin)
+            || IsInBox(bikeLaneEast, point, margin) || IsInBox(bikeLaneWest, point, margin);
+    }
+
+    bool IsInBox(Transform box, Vector3 point, float margin)
+    {
+        if (box == null) return false;
+
+        Vector3 local = Quaternion.Inverse(box.rotation) * (point - box.position);
+        return Mathf.Abs(local.x) <= bikeLaneWidth * 0.5f + margin
+            && Mathf.Abs(local.y) <= bikeLaneHeight * 0.5f + margin
+            && Mathf.Abs(local.z) <= bikeLaneDepth * 0.5f + margin;
     }
 
     public bool IsCrosswalkClear(Transform crosswalk)

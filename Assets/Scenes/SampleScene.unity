@@ -18261,7 +18261,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLaneDetector
   sensorRadius: 1
   bikeLaneCheckRadius: 6
-  parkedCarCheckRadius: 2.5
+  parkedCarCheckRadius: 5
   currentArea: 0
   currentSide: 0
   bikeLaneExistsNearby: 0

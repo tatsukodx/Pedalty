@@ -60,7 +60,11 @@ public class BicycleController : MonoBehaviour
     private bool isAtRoadEnd;
     private Vector3 roadEndOutwardDirection;
 
+    private BicycleRecovery recovery;
+
     public bool ControlEnabled => controlEnabled;
+    public Vector3 StartPosition => startPosition;
+    public Quaternion StartRotation => startRotation;
 
     public void ApplyBrake(bool brake)
     {
@@ -96,6 +100,10 @@ public class BicycleController : MonoBehaviour
 
         startPosition = transform.position;
         startRotation = transform.rotation;
+
+        recovery = GetComponent<BicycleRecovery>();
+        if (recovery == null) recovery = gameObject.AddComponent<BicycleRecovery>();
+
         initialized = true;
     }
 
@@ -237,8 +245,20 @@ public class BicycleController : MonoBehaviour
     public void ResetToStart()
     {
         InitializeIfNeeded();
-        transform.position = startPosition;
-        transform.rotation = startRotation;
+        recovery?.CancelAndClear();
+        TeleportTo(startPosition, startRotation);
+    }
+
+    public void TeleportTo(Vector3 position, Quaternion rotation)
+    {
+        InitializeIfNeeded();
+        transform.position = position;
+        transform.rotation = rotation;
+        if (rb != null)
+        {
+            rb.position = position;
+            rb.rotation = rotation;
+        }
 
         StopMovement();
         currentSteerAngle = 0f;
@@ -301,22 +321,23 @@ public class BicycleController : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         if (!controlEnabled) return;
+        if (recovery != null && recovery.IsRecovering) return;
 
         ContactPoint contact = collision.contacts[0];
-        Vector3 bounceDirection = contact.normal;
+        if (Mathf.Abs(contact.normal.y) > 0.5f) return;
 
-        if (Mathf.Abs(bounceDirection.y) > 0.5f) return;
+        // 歩行者との接触はNPCWalker側で違反として扱う
+        if (collision.collider.GetComponentInParent<NPCWalker>() != null) return;
 
-        bounceDirection.y = 0;
-        bounceDirection.Normalize();
+        // 縁石などの低い段差は衝突扱いにしない
+        bool isCar = collision.collider.GetComponentInParent<CarController>() != null;
+        float bottom = boxCollider != null ? boxCollider.bounds.min.y : transform.position.y;
+        if (!isCar && contact.point.y < bottom + 0.35f) return;
 
-        float impactSpeed = Mathf.Max(Mathf.Abs(currentSpeed), 2.0f);
-        Vector3 bounceForce = bounceDirection * impactSpeed * wallBounceForce;
-
-        rb.AddForce(bounceForce, ForceMode.Impulse);
-
-        currentSpeed = -currentSpeed * 0.2f; 
-        airVelocityVector = bounceDirection * (airVelocityVector.magnitude * 0.2f);
+        // 跳ね返すと後ろ向きに進んで逆走判定になるため、暗転して直前の安全な位置へ戻す
+        currentSpeed = 0f;
+        airVelocityVector = Vector3.zero;
+        recovery?.RecoverFromCollision();
     }
 
     private bool IsGrounded()

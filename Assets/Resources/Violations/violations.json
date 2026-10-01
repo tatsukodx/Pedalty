@@ -46,6 +46,24 @@
       "penaltyAmount": 6000
     },
     {
+      "id": "bicycle_signal",
+      "triggerArea": "",
+      "triggerSide": "",
+      "category": "信号無視",
+      "violationName": "信号無視（自転車歩行者専用信号）",
+      "description": "「歩行者・自転車専用」の表示がある歩行者用信号機がある\n交差点では、自転車は車両用信号ではなく、この信号に\n従わなければなりません。\n赤信号のときは横断を始めてはいけません。",
+      "penaltyAmount": 6000
+    },
+    {
+      "id": "bike_crossing",
+      "triggerArea": "",
+      "triggerSide": "",
+      "category": "通行区分違反",
+      "violationName": "自転車横断帯通行義務違反",
+      "description": "交差点の付近に自転車横断帯（自転車道）があるときは、\n自転車はその自転車横断帯を通行して道路を横断しなければ\nなりません。\n横断帯以外の場所を斜めに横切るなどの行為は違反となります。",
+      "penaltyAmount": 5000
+    },
+    {
       "id": "no_stop",
       "triggerArea": "",
       "triggerSide": "",

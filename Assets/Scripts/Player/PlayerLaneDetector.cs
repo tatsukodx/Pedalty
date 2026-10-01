@@ -24,13 +24,16 @@ public class PlayerLaneDetector : MonoBehaviour
     public float bikeLaneCheckRadius = 6f;
 
     [Tooltip("路上駐車車両を避けるための歩道通行許可を判定する範囲")]
-    public float parkedCarCheckRadius = 3f;
+    public float parkedCarCheckRadius = 5f;
 
     public RoadAreaType currentArea = RoadAreaType.None;
     public RoadSide currentSide = RoadSide.None;
     public bool bikeLaneExistsNearby = false;
     public bool parkedCarNearby = false;
     public bool sidewalkRidingAllowed = false;
+
+    // 現在いるレーンの進行方向（自転車の向きに近い側へ揃えたもの）。テレポート時の向き補正に使う
+    public Vector3 currentLaneForward = Vector3.zero;
 
     [Tooltip("この速さ(m/s)未満のときは進行方向が不安定なため、直前に判定した進行方向をそのまま使う")]
     public float minSpeedForDirection = 0.5f;
@@ -51,6 +54,7 @@ public class PlayerLaneDetector : MonoBehaviour
         RoadAreaType detectedArea = RoadAreaType.None;
         RoadSide detectedSide = RoadSide.None;
         bool detectedRidingAllowed = false;
+        Vector3 detectedLaneForward = Vector3.zero;
         float closestDistance = float.MaxValue;
 
         foreach (Collider hit in hits)
@@ -65,12 +69,14 @@ public class PlayerLaneDetector : MonoBehaviour
                 detectedArea = type;
                 detectedSide = side;
                 detectedRidingAllowed = type == RoadAreaType.Sidewalk && hit.GetComponent<SidewalkRidingAllowed>() != null;
+                detectedLaneForward = GetLaneForward(hit.transform);
             }
         }
 
         currentArea = detectedArea;
         currentSide = detectedSide;
         sidewalkRidingAllowed = detectedRidingAllowed;
+        currentLaneForward = detectedLaneForward;
 
         bikeLaneExistsNearby = DetectBikeLaneNearby();
         parkedCarNearby = DetectParkedCarNearby();
@@ -87,6 +93,27 @@ public class PlayerLaneDetector : MonoBehaviour
         {
             lastMovingDirection = velocity.normalized;
         }
+    }
+
+    Vector3 GetLaneForward(Transform hitTransform)
+    {
+        Transform centerLine = FindCenterLine(hitTransform);
+        if (centerLine == null) return Vector3.zero;
+
+        Vector3 f = centerLine.forward;
+        f.y = 0f;
+        if (f.sqrMagnitude < 0.0001f) return Vector3.zero;
+        f.Normalize();
+        return Vector3.Dot(f, FacingDirection()) >= 0f ? f : -f;
+    }
+
+    // 衝突で押し戻された時など、一時的に後ろへ動いただけで左右が反転しないよう、
+    // 速度ではなく車体の向きを進行方向として使う
+    Vector3 FacingDirection()
+    {
+        Vector3 f = transform.forward;
+        f.y = 0f;
+        return f.sqrMagnitude > 0.0001f ? f.normalized : lastMovingDirection;
     }
 
     bool DetectBikeLaneNearby()
@@ -153,7 +180,7 @@ public class PlayerLaneDetector : MonoBehaviour
 
         if (roadForward.sqrMagnitude > 0.0001f)
         {
-            float forwardDot = Vector3.Dot(lastMovingDirection.normalized, roadForward.normalized);
+            float forwardDot = Vector3.Dot(FacingDirection(), roadForward.normalized);
             if (forwardDot < 0f)
             {
                 side = (side == RoadSide.Right) ? RoadSide.Left : RoadSide.Right;

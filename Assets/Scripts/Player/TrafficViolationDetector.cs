@@ -43,17 +43,32 @@ public class TrafficViolationDetector : MonoBehaviour
         public TrafficLightManager manager;
         public Vector3 center;
         public bool playerWasInside;
+        public CarIntersectionNode node;
+        public bool passedBikeCrossing;
+        public Vector3 entryPosition;
+        public Vector3 entryForward;
     }
+
+    [Header("自転車横断帯の通行判定")]
+    [Tooltip("CarIntersectionNodeをこの距離内で探して、交差点に紐付ける")]
+    [SerializeField] private float nodeSearchRadius = 15f;
+    [Tooltip("自転車横断帯の判定ゾーンを少し広げる余裕[m]")]
+    [SerializeField] private float bikeCrossingMargin = 0.5f;
 
     private readonly List<IntersectionArea> intersections = new List<IntersectionArea>();
     private Transform player;
     private bool playerInsideIntersection;
 
-    private RoadAreaType previousArea = RoadAreaType.None;
-    private RoadSide previousSide = RoadSide.None;
-    private bool previousBikeLaneExistsNearby = false;
-    private bool previousParkedCarNearby = false;
-    private bool previousSidewalkRidingAllowed = false;
+    [Header("レーン違反の猶予")]
+    [Tooltip("違反レーンにこの秒数い続けたらアウトにする")]
+    [SerializeField] private float laneViolationGraceSeconds = 2f;
+
+    private ViolationInfo pendingViolation;
+    private float pendingTimer;
+    private bool pendingReported;
+
+    // 違反していない場所を走っているか（テレポート先の記録に使う）
+    public bool IsPlayerInLegalLane { get; private set; }
 
     private void Awake()
     {
@@ -91,12 +106,33 @@ public class TrafficViolationDetector : MonoBehaviour
             Vector3 sum = Vector3.zero;
             foreach (Vector3 position in pair.Value) sum += position;
 
+            Vector3 center = sum / pair.Value.Count;
             intersections.Add(new IntersectionArea
             {
                 manager = pair.Key,
-                center = sum / pair.Value.Count
+                center = center,
+                node = FindNearestNode(center)
             });
         }
+    }
+
+    private CarIntersectionNode FindNearestNode(Vector3 center)
+    {
+        CarIntersectionNode nearest = null;
+        float best = nodeSearchRadius;
+
+        foreach (CarIntersectionNode node in FindObjectsByType<CarIntersectionNode>(FindObjectsSortMode.None))
+        {
+            Vector3 d = node.transform.position - center;
+            d.y = 0f;
+            if (d.magnitude < best)
+            {
+                best = d.magnitude;
+                nearest = node;
+            }
+        }
+
+        return nearest;
     }
 
     private void CheckIntersectionEntry()
@@ -115,19 +151,77 @@ public class TrafficViolationDetector : MonoBehaviour
 
             if (inside) playerInsideIntersection = true;
 
-            if (inside && !intersection.playerWasInside && IsRedForPlayerDirection(intersection.manager))
+            if (inside && !intersection.playerWasInside)
             {
-                ReportViolationById("traffic_light");
+                intersection.entryPosition = playerPosition;
+                intersection.entryForward = player.forward;
+
+                // 自転車歩行者専用信号がある交差点は専用の違反として扱う
+                string lightId = intersection.manager.bicycleFollowsPedestrianSignal ? "bicycle_signal" : "traffic_light";
+                if (!GameDebugMode.IsEnabled && IsRedForPlayerDirection(intersection.manager)
+                    && violationsById.TryGetValue(lightId, out ViolationInfo lightViolation))
+                {
+                    // 交差点に入る前の位置へ戻す
+                    ReportViolation(lightViolation, true, intersection.center, intersectionRadius + 2f);
+                }
+            }
+
+            // 横断帯ゾーンは交差点の判定半径より外側に置かれていることもあるため、少し広い範囲で見る
+            bool nearIntersection = dx * dx + dz * dz <= (intersectionRadius + 6f) * (intersectionRadius + 6f);
+            if (nearIntersection && intersection.node != null && intersection.node.IsInBikeCrossing(playerPosition, bikeCrossingMargin))
+            {
+                intersection.passedBikeCrossing = true;
+            }
+
+            // 交差点を渡りきった（入った所から離れた所へ抜けた）のに、自転車横断帯を一度も通っていなければ違反
+            if (!inside && intersection.playerWasInside)
+            {
+                Vector3 crossed = playerPosition - intersection.entryPosition;
+                crossed.y = 0f;
+                bool recovering = player.GetComponent<BicycleRecovery>() is BicycleRecovery r && r.IsRecovering;
+
+                if (!GameDebugMode.IsEnabled && !recovering && !intersection.passedBikeCrossing
+                    && intersection.node != null && intersection.node.HasBikeCrossings
+                    && crossed.magnitude >= intersectionRadius
+                    && IsStraightCrossing(intersection.entryForward, crossed)
+                    && violationsById.TryGetValue("bike_crossing", out ViolationInfo crossingViolation))
+                {
+                    ReportViolation(crossingViolation, true, intersection.center, intersectionRadius + 2f);
+                }
+            }
+
+            // 交差点から十分離れたら、次の横断に備えて通過記録を消す
+            if (!nearIntersection)
+            {
+                intersection.passedBikeCrossing = false;
             }
 
             intersection.playerWasInside = inside;
         }
     }
 
+    // 入った時の向きと抜けた方向がほぼ同じなら「道路を横断した」とみなす（左折で角を曲がっただけの場合は除外）
+    private bool IsStraightCrossing(Vector3 entryForward, Vector3 crossed)
+    {
+        entryForward.y = 0f;
+        if (entryForward.sqrMagnitude < 0.0001f) return false;
+        return Vector3.Angle(entryForward, crossed) < 45f;
+    }
+
     private bool IsRedForPlayerDirection(TrafficLightManager manager)
     {
         Vector3 forward = player.forward;
         bool travelingNS = Mathf.Abs(forward.z) >= Mathf.Abs(forward.x);
+
+        // 自転車歩行者専用信号がある交差点は歩行者信号に従う（点滅中の進入は許容）
+        if (manager.bicycleFollowsPedestrianSignal)
+        {
+            TrafficLightPhase phase = manager.CurrentPhase;
+            bool pedOn = manager.IsPedestrianGreen || manager.IsPedestrianBlinking;
+            bool rightPhase = phase == TrafficLightPhase.Pedestrian_Green || phase == TrafficLightPhase.Pedestrian_Blink
+                || (travelingNS ? phase == TrafficLightPhase.NS_Green : phase == TrafficLightPhase.EW_Green);
+            return !(pedOn && rightPhase);
+        }
 
         return travelingNS ? manager.IsNS_CarRed : manager.IsEW_CarRed;
     }
@@ -176,65 +270,56 @@ public class TrafficViolationDetector : MonoBehaviour
 
         if (laneDetector == null) return;
 
-        if (playerInsideIntersection) return;
+        ViolationInfo current = playerInsideIntersection ? null : FindLaneViolation(
+            laneDetector.currentArea, laneDetector.currentSide,
+            laneDetector.bikeLaneExistsNearby, laneDetector.parkedCarNearby, laneDetector.sidewalkRidingAllowed);
 
-        RoadAreaType currentArea = laneDetector.currentArea;
-        RoadSide currentSide = laneDetector.currentSide;
-        bool bikeLaneExistsNearby = laneDetector.bikeLaneExistsNearby;
-        bool parkedCarNearby = laneDetector.parkedCarNearby;
-        bool sidewalkRidingAllowed = laneDetector.sidewalkRidingAllowed;
+        IsPlayerInLegalLane = !playerInsideIntersection && current == null && laneDetector.currentArea != RoadAreaType.None;
 
-        if (GameDebugMode.IsEnabled)
+        BicycleRecovery recovery = player != null ? player.GetComponent<BicycleRecovery>() : null;
+        bool recovering = recovery != null && recovery.IsRecovering;
+
+        if (GameDebugMode.IsEnabled || recovering || current == null || current != pendingViolation)
         {
-
-            previousArea = currentArea;
-            previousSide = currentSide;
-            previousBikeLaneExistsNearby = bikeLaneExistsNearby;
-            previousParkedCarNearby = parkedCarNearby;
-            previousSidewalkRidingAllowed = sidewalkRidingAllowed;
+            pendingViolation = current;
+            pendingTimer = 0f;
+            pendingReported = false;
             return;
         }
 
-        if (currentArea != previousArea || currentSide != previousSide || bikeLaneExistsNearby != previousBikeLaneExistsNearby || parkedCarNearby != previousParkedCarNearby || sidewalkRidingAllowed != previousSidewalkRidingAllowed)
+        // 一定時間続けて違反レーンにいた場合のみアウトにする（多少のはみ出しや逆走は許容）
+        pendingTimer += Time.deltaTime;
+        if (!pendingReported && pendingTimer >= laneViolationGraceSeconds)
         {
-            CheckViolation(currentArea, currentSide, bikeLaneExistsNearby, parkedCarNearby, sidewalkRidingAllowed);
-            previousArea = currentArea;
-            previousSide = currentSide;
-            previousBikeLaneExistsNearby = bikeLaneExistsNearby;
-            previousParkedCarNearby = parkedCarNearby;
-            previousSidewalkRidingAllowed = sidewalkRidingAllowed;
+            pendingReported = true;
+            ReportViolation(pendingViolation, true, null, 0f);
         }
     }
 
-    private void CheckViolation(RoadAreaType area, RoadSide side, bool bikeLaneExistsNearby, bool parkedCarNearby, bool sidewalkRidingAllowed)
+    private ViolationInfo FindLaneViolation(RoadAreaType area, RoadSide side, bool bikeLaneExistsNearby, bool parkedCarNearby, bool sidewalkRidingAllowed)
     {
+        if (area == RoadAreaType.None) return null;
+
         if (area == RoadAreaType.Road && side == RoadSide.Left && !bikeLaneExistsNearby)
         {
-            return;
+            return null;
         }
 
-        // 路上駐車を避けるための一時的な歩道通行は道路交通法上の除外対象
-        if (area == RoadAreaType.Sidewalk && parkedCarNearby)
+        // 路上駐車を避けるための一時的な歩道・車道通行は除外対象
+        if (parkedCarNearby && area != RoadAreaType.BikeLane)
         {
-            return;
+            return null;
         }
 
         // 「自転車及び歩行者専用」標識がある区間の歩道は通行できる
         if (area == RoadAreaType.Sidewalk && sidewalkRidingAllowed)
         {
-            return;
+            return null;
         }
 
-        if (violationsByCondition.TryGetValue((area, side), out ViolationInfo violation))
-        {
-            ReportViolation(violation);
-            return;
-        }
-
-        if (violationsByCondition.TryGetValue((area, RoadSide.None), out violation))
-        {
-            ReportViolation(violation);
-        }
+        if (violationsByCondition.TryGetValue((area, side), out ViolationInfo violation)) return violation;
+        if (violationsByCondition.TryGetValue((area, RoadSide.None), out violation)) return violation;
+        return null;
     }
 
     public void ReportViolationById(string id)
@@ -245,10 +330,23 @@ public class TrafficViolationDetector : MonoBehaviour
             return;
         }
 
-        ReportViolation(violation);
+        ReportViolation(violation, false, null, 0f);
     }
 
-    private void ReportViolation(ViolationInfo violation)
+    private void ReportViolation(ViolationInfo violation, bool teleport, Vector3? avoidCenter, float avoidRadius)
+    {
+        BicycleRecovery recovery = player != null ? player.GetComponent<BicycleRecovery>() : null;
+        if (teleport && recovery != null)
+        {
+            // 暗転して違反前の位置へ戻してから違反画面を出す
+            recovery.RecoverFromViolation(avoidCenter, avoidRadius, () => ShowPopup(violation));
+            return;
+        }
+
+        ShowPopup(violation);
+    }
+
+    private void ShowPopup(ViolationInfo violation)
     {
         if (penaltyController == null)
         {

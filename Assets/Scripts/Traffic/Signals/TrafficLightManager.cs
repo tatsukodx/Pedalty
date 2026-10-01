@@ -36,6 +36,9 @@ public class TrafficLightManager : MonoBehaviour
     public bool IsEW_CarRed { get; private set; }
     public bool IsPedestrianGreen { get; private set; }
     public bool IsPedestrianBlinking { get; private set; }
+    [Tooltip("自転車歩行者専用信号がある交差点。自転車は車両用ではなく歩行者用信号で信号無視を判定する")]
+    public bool bicycleFollowsPedestrianSignal = false;
+
     public TrafficLightPhase CurrentPhase { get; private set; }
 
     void Start()
