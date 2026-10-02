@@ -168,7 +168,16 @@ public class PlayerLaneDetector : MonoBehaviour
         f.y = 0f;
         if (f.sqrMagnitude < 0.0001f) return Vector3.zero;
         f.Normalize();
-        return IsReversed(centerLine, f) ? -f : f;
+
+        // 自転車の向きではなく、レーンの位置から「逆走にならない向き」を返す。
+        // 左側通行なので、中央線の左側にあるレーンは道路の基準方向、右側にあるレーンはその逆向きが正しい。
+        // （向きに合わせると、逆を向いた状態で記録した位置へ戻った時に逆走方向へ矯正されてしまう）
+        Vector3 right = centerLine.right;
+        right.y = 0f;
+        Vector3 toLane = hitTransform.position - centerLine.position;
+        toLane.y = 0f;
+        bool onLeftHalf = Vector3.Dot(toLane, right) < 0f;
+        return onLeftHalf ? f : -f;
     }
 
     // 向きが道路方向から reverseAngleThreshold 以上ずれたら逆向き、(180 - しきい値)以内に戻ったら順向きに切り替える。

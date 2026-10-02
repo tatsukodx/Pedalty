@@ -75,6 +75,7 @@ public class CarSpawner : MonoBehaviour
         GameObject visual = Instantiate(model, newCar.transform);
         visual.transform.localPosition = Vector3.zero;
         visual.transform.localRotation = Quaternion.identity;
+        SpawnFadeIn.Apply(visual);
 
         CarController controller = newCar.GetComponent<CarController>();
         if (controller != null)

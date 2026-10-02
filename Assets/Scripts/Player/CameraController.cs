@@ -12,6 +12,9 @@ public class CameraController : MonoBehaviour
     public float firstPersonHeight = 1.2f;
     public float firstPersonForward = 0.2f;
 
+    // 違反ポップアップ着地時の画面の揺れ（PenaltyControllerから設定）
+    public static Vector3 ShakeOffset = Vector3.zero;
+
     private float currentX = 0.0f;
     private float currentY = 20.0f;
 
@@ -35,6 +38,6 @@ public class CameraController : MonoBehaviour
         Vector3 targetPos = target.position + (target.up * firstPersonHeight) + (target.forward * firstPersonForward);
 
         transform.rotation = rotation;
-        transform.position = targetPos;
+        transform.position = targetPos + rotation * ShakeOffset;
     }
 }

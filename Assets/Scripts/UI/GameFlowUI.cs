@@ -621,11 +621,62 @@ public sealed class GameFlowUI : MonoBehaviour
             FindAnyObjectByType<PenaltyController>()?.ClearViolationPopupForDebugMode();
         }
 
+        // スタート画面から始める時は、先にスタート画面を上へ飛ばしてからカウントダウンに移る
+        bool fromStartMenu = state == FlowState.StartMenu && startPanel.activeSelf;
+
         state = FlowState.Countdown;
         inputManager.isMenuState = true;
         Time.timeScale = 0f;
+        countdownCoroutine = StartCoroutine(fromStartMenu ? StartMenuExitThenCountdown() : CountdownSequence());
+        if (!fromStartMenu) SetOnlyPanel(countdownPanel);
+    }
+
+    const float StartMenuExitDuration = 0.5f;
+    const float StartMenuExitDistance = 900f;
+
+    // スタート画面を上へ加速しながらフェードアウトさせて非表示にし、その後カウントダウンへ
+    IEnumerator StartMenuExitThenCountdown()
+    {
+        RectTransform rect = startPanel.GetComponent<RectTransform>();
+        CanvasGroup group = GetStartPanelGroup();
+        Vector2 home = rect.anchoredPosition;
+
+        float t = 0f;
+        while (t < StartMenuExitDuration)
+        {
+            t += Time.unscaledDeltaTime;
+            float k = Mathf.Clamp01(t / StartMenuExitDuration);
+            rect.anchoredPosition = home + new Vector2(0f, StartMenuExitDistance * k * k);
+            group.alpha = 1f - k;
+            yield return null;
+        }
+
+        ResetStartPanelPose();
         SetOnlyPanel(countdownPanel);
-        countdownCoroutine = StartCoroutine(CountdownSequence());
+        yield return CountdownSequence();
+    }
+
+    Vector2 startPanelHome;
+    bool startPanelHomeSaved;
+
+    CanvasGroup GetStartPanelGroup()
+    {
+        if (!startPanelHomeSaved)
+        {
+            startPanelHome = startPanel.GetComponent<RectTransform>().anchoredPosition;
+            startPanelHomeSaved = true;
+        }
+        CanvasGroup group = startPanel.GetComponent<CanvasGroup>();
+        if (group == null) group = startPanel.AddComponent<CanvasGroup>();
+        return group;
+    }
+
+    // 次にスタート画面を表示した時に元の位置・不透明で出るよう戻す
+    void ResetStartPanelPose()
+    {
+        CanvasGroup group = GetStartPanelGroup();
+        group.alpha = 1f;
+        startPanel.GetComponent<RectTransform>().anchoredPosition = startPanelHome;
     }
 
     IEnumerator CountdownSequence()
@@ -634,12 +685,10 @@ public sealed class GameFlowUI : MonoBehaviour
         foreach (string number in numbers)
         {
             countdownText.text = number;
-            countdownText.color = Color.white;
-            yield return new WaitForSecondsRealtime(1f);
+            yield return AnimateCountdownWord(Color.white, 0.3f, 0.4f, 0.3f);
         }
 
         countdownText.text = "START";
-        countdownText.color = Yellow;
         countdownText.fontSize = 105f;
 
         state = FlowState.Playing;
@@ -649,10 +698,72 @@ public sealed class GameFlowUI : MonoBehaviour
         gameTimer.BeginTiming();
         debugModeText.gameObject.SetActive(GameDebugMode.IsEnabled);
 
-        yield return new WaitForSecondsRealtime(0.7f);
+        // START は表示している時間を少し長めにする
+        yield return AnimateCountdownWord(Yellow, 0.3f, 0.9f, 0.35f);
         countdownPanel.SetActive(false);
-        countdownText.fontSize = 150f;
+        ResetCountdownText();
         countdownCoroutine = null;
+    }
+
+    const float CountdownSlideDistance = 600f;
+    const float CountdownDriftDistance = 40f;
+
+    // 左から透明→不透明になりながら減速して中央へ（止まりきらずにゆっくり流れ続ける）、
+    // その後右へ加速しながら透明になって消える。カウントダウン中は Time.timeScale = 0 なので実時間で動かす
+    IEnumerator AnimateCountdownWord(Color color, float inDuration, float holdDuration, float outDuration)
+    {
+        RectTransform rect = countdownText.rectTransform;
+        float t;
+
+        // 入り: 減速するが、最後も少し速度が残るように（完全な減速カーブと等速を混ぜる）
+        t = 0f;
+        while (t < inDuration)
+        {
+            t += Time.unscaledDeltaTime;
+            float k = Mathf.Clamp01(t / inDuration);
+            float eased = Mathf.Lerp(k, 1f - (1f - k) * (1f - k), 0.8f);
+            SetCountdownPose(rect, color, Mathf.Lerp(-CountdownSlideDistance, -CountdownDriftDistance, eased), k);
+            yield return null;
+        }
+
+        // 中央付近: 止まらずにゆっくり右へ流れる
+        t = 0f;
+        while (t < holdDuration)
+        {
+            t += Time.unscaledDeltaTime;
+            float k = Mathf.Clamp01(t / holdDuration);
+            SetCountdownPose(rect, color, Mathf.Lerp(-CountdownDriftDistance, CountdownDriftDistance, k), 1f);
+            yield return null;
+        }
+
+        // 出: 加速しながら右へ、透明になって消える
+        t = 0f;
+        while (t < outDuration)
+        {
+            t += Time.unscaledDeltaTime;
+            float k = Mathf.Clamp01(t / outDuration);
+            float eased = Mathf.Lerp(k, k * k, 0.8f);
+            SetCountdownPose(rect, color, Mathf.Lerp(CountdownDriftDistance, CountdownSlideDistance, eased), 1f - k);
+            yield return null;
+        }
+
+        SetCountdownPose(rect, color, CountdownSlideDistance, 0f);
+    }
+
+    void SetCountdownPose(RectTransform rect, Color color, float x, float alpha)
+    {
+        rect.anchoredPosition = new Vector2(x, 0f);
+        color.a = alpha;
+        countdownText.color = color;
+    }
+
+    void ResetCountdownText()
+    {
+        countdownText.fontSize = 150f;
+        countdownText.rectTransform.anchoredPosition = Vector2.zero;
+        Color c = countdownText.color;
+        c.a = 1f;
+        countdownText.color = c;
     }
 
     void HandleGoal(float finalTime)
@@ -767,7 +878,8 @@ public sealed class GameFlowUI : MonoBehaviour
 
         StopCoroutine(countdownCoroutine);
         countdownCoroutine = null;
-        countdownText.fontSize = 150f;
+        ResetCountdownText();
+        ResetStartPanelPose();
     }
 
     void OnDestroy()

@@ -78,6 +78,10 @@ public class NPCSpawner : MonoBehaviour
 
             StartCoroutine(ReplaceVisualCoroutine(walker.gameObject, chosenModel));
         }
+        else
+        {
+            SpawnFadeIn.Apply(newNPC);
+        }
 
         if (walker != null && randomPointIndex < moveDirections.Length)
         {
@@ -109,6 +113,7 @@ public class NPCSpawner : MonoBehaviour
         visual.transform.localPosition = Vector3.zero;
         
         visual.transform.localRotation = Quaternion.identity;
+        SpawnFadeIn.Apply(visual);
 
         Animator childAnimator = visual.GetComponent<Animator>();
         Animator baseAnimator = bodyObj.GetComponent<Animator>();

@@ -348,6 +348,33 @@ public class CarIntersectionNode : MonoBehaviour
             && Mathf.Abs(local.z) <= bikeLaneDepth * 0.5f + margin;
     }
 
+    public bool HasCrosswalks => crosswalkNorth != null || crosswalkSouth != null || crosswalkEast != null || crosswalkWest != null;
+
+    // 横断歩道の判定範囲（歩行者横断中の確認に使う箱）に入っているか。入っていればその横断歩道を返す
+    public Transform GetCrosswalkAt(Vector3 point, float margin)
+    {
+        foreach (Transform cw in new[] { crosswalkNorth, crosswalkSouth, crosswalkEast, crosswalkWest })
+        {
+            if (cw == null) continue;
+            Vector3 local = Quaternion.Inverse(cw.rotation) * (point - cw.position);
+            if (Mathf.Abs(local.x) <= crosswalkWidth * 0.5f + margin
+                && Mathf.Abs(local.y) <= crosswalkHeight * 0.5f + margin
+                && Mathf.Abs(local.z) <= crosswalkDepth * 0.5f + margin)
+            {
+                return cw;
+            }
+        }
+        return null;
+    }
+
+    // 横断歩道の判定範囲の薄い方向（＝車道を進む車や自転車が横断歩道を通り抜ける向き）
+    public Vector3 GetCrosswalkPassAxis(Transform crosswalk)
+    {
+        Vector3 axis = crosswalkWidth < crosswalkDepth ? crosswalk.right : crosswalk.forward;
+        axis.y = 0f;
+        return axis.normalized;
+    }
+
     public bool IsCrosswalkClear(Transform crosswalk)
     {
         if (crosswalk == null) return true;

@@ -49,8 +49,13 @@ public class TrafficLight : MonoBehaviour
         }
     }
 
+    // 現在の表示（点滅中は Green のまま IsBlinking が true）
+    public TrafficLightState CurrentState { get; private set; } = TrafficLightState.Red;
+    public bool IsBlinking => isBlinking;
+
     public void SetState(TrafficLightState state)
     {
+        CurrentState = state;
         isBlinking = false;
         blinkTimer = 0f;
 
