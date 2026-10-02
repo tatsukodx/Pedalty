@@ -31,7 +31,18 @@ public class CarController : MonoBehaviour
 
     [Header("ウインカー")]
     public float blinkerInterval = 0.4f;
+    [Tooltip("オンにすると、車のモデルの大きさから前後左右の角に自動でウインカーを配置する")]
+    public bool autoPlaceBlinkers = true;
+    [Tooltip("自動配置しない場合の位置（右前。左・後ろは反転して使う）")]
     public Vector3 blinkerLocalOffset = new Vector3(0.9f, 0.8f, 2.2f);
+    public float blinkerSize = 0.3f;
+    public Color blinkerColor = new Color(1f, 0.5f, 0f);
+    [Tooltip("光らせる強さ")]
+    public float blinkerEmission = 4f;
+    [Tooltip("前のウインカーの位置補正（x=外側へ, y=上へ, z=前へ）[m]。プレイ中に変えるとすぐ反映される")]
+    public Vector3 frontBlinkerAdjust = Vector3.zero;
+    [Tooltip("後ろのウインカーの位置補正（x=外側へ, y=上へ, z=後ろへ）[m]。プレイ中に変えるとすぐ反映される")]
+    public Vector3 rearBlinkerAdjust = Vector3.zero;
 
     [Header("デバッグ表示")]
     [SerializeField] private string stopReasonDebug = "走行中";
@@ -46,6 +57,12 @@ public class CarController : MonoBehaviour
     int blinkerChoice = -1;
     GameObject blinkerLeft;
     GameObject blinkerRight;
+    // 自動計算した右前の角の位置と後ろのZ（補正前）
+    Vector3 blinkerBaseCorner;
+    float blinkerBaseRearZ;
+    // [0]=右前 [1]=右後 [2]=左前 [3]=左後
+    readonly Transform[] blinkerLamps = new Transform[4];
+    CarBlinkerOffset modelBlinkerOffset;
 
     public int PlannedTurnChoice { get; private set; } = -1;
     public bool HasEnteredIntersection => hasEnteredIntersection;
@@ -137,23 +154,107 @@ public class CarController : MonoBehaviour
 
     void CreateBlinkers()
     {
-        blinkerLeft = CreateBlinker(new Vector3(-blinkerLocalOffset.x, blinkerLocalOffset.y, blinkerLocalOffset.z));
-        blinkerRight = CreateBlinker(blinkerLocalOffset);
+        // 右前の角の位置（ローカル座標）。左側・後ろ側は反転して使う
+        Vector3 corner = blinkerLocalOffset;
+        float rearZ = -blinkerLocalOffset.z;
+
+        if (autoPlaceBlinkers && TryGetModelLocalBounds(out Bounds b))
+        {
+            // 車体の角から少し外側に出して、車体に埋もれないようにする
+            float half = blinkerSize * 0.5f;
+            corner = new Vector3(b.max.x - half * 0.5f, b.center.y + b.extents.y * 0.1f, b.max.z + half * 0.3f);
+            rearZ = b.min.z - half * 0.3f;
+        }
+
+        blinkerBaseCorner = corner;
+        blinkerBaseRearZ = rearZ;
+        modelBlinkerOffset = GetComponentInChildren<CarBlinkerOffset>();
+
+        blinkerRight = CreateBlinkerSide("Blinker_R", 0);
+        blinkerLeft = CreateBlinkerSide("Blinker_L", 2);
+        ApplyBlinkerPositions();
     }
 
-    GameObject CreateBlinker(Vector3 localPos)
+    // 自動計算した位置に、全車共通の補正と車種ごとの補正（CarBlinkerOffset）を足して配置する
+    void ApplyBlinkerPositions()
+    {
+        Vector3 front = frontBlinkerAdjust;
+        Vector3 rear = rearBlinkerAdjust;
+        if (modelBlinkerOffset != null)
+        {
+            front += modelBlinkerOffset.frontAdjust;
+            rear += modelBlinkerOffset.rearAdjust;
+        }
+
+        float frontX = blinkerBaseCorner.x + front.x;
+        float rearX = blinkerBaseCorner.x + rear.x;
+        Vector3 rightFront = new Vector3(frontX, blinkerBaseCorner.y + front.y, blinkerBaseCorner.z + front.z);
+        Vector3 rightRear = new Vector3(rearX, blinkerBaseCorner.y + rear.y, blinkerBaseRearZ - rear.z);
+
+        SetLamp(0, rightFront);
+        SetLamp(1, rightRear);
+        SetLamp(2, new Vector3(-rightFront.x, rightFront.y, rightFront.z));
+        SetLamp(3, new Vector3(-rightRear.x, rightRear.y, rightRear.z));
+
+        float size = blinkerSize;
+        foreach (Transform lamp in blinkerLamps) if (lamp != null) lamp.localScale = Vector3.one * size;
+    }
+
+    void SetLamp(int index, Vector3 localPos)
+    {
+        // ランプは片側ごとの親の下にあるが、親は車の原点にあるので車のローカル座標をそのまま使える
+        if (blinkerLamps[index] != null) blinkerLamps[index].localPosition = localPos;
+    }
+
+    // 車のモデル（子のRenderer）全体を、この車のローカル座標での範囲として求める
+    bool TryGetModelLocalBounds(out Bounds bounds)
+    {
+        bounds = new Bounds();
+        bool found = false;
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
+        {
+            if (r is ParticleSystemRenderer) continue;
+            Bounds wb = r.bounds;
+            Vector3 c = wb.center, e = wb.extents;
+            for (int i = 0; i < 8; i++)
+            {
+                Vector3 world = c + new Vector3((i & 1) == 0 ? -e.x : e.x, (i & 2) == 0 ? -e.y : e.y, (i & 4) == 0 ? -e.z : e.z);
+                Vector3 local = transform.InverseTransformPoint(world);
+                if (!found) { bounds = new Bounds(local, Vector3.zero); found = true; }
+                else bounds.Encapsulate(local);
+            }
+        }
+        return found;
+    }
+
+    // 片側（前・後ろ）のウインカーをまとめた親を作る。親を表示/非表示にして点滅させる
+    GameObject CreateBlinkerSide(string name, int firstLampIndex)
+    {
+        GameObject side = new GameObject(name);
+        side.transform.SetParent(transform, false);
+        blinkerLamps[firstLampIndex] = CreateBlinkerLamp(side.transform, Vector3.zero);
+        blinkerLamps[firstLampIndex + 1] = CreateBlinkerLamp(side.transform, Vector3.zero);
+        side.SetActive(false);
+        return side;
+    }
+
+    Transform CreateBlinkerLamp(Transform parent, Vector3 localPos)
     {
         GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         Destroy(go.GetComponent<Collider>());
-        go.name = "Blinker";
-        go.transform.SetParent(transform, false);
+        go.name = "Lamp";
+        go.transform.SetParent(parent, false);
         go.transform.localPosition = localPos;
-        go.transform.localScale = Vector3.one * 0.35f;
+        go.transform.localScale = Vector3.one * blinkerSize;
+
         Renderer r = go.GetComponent<Renderer>();
-        r.material.color = new Color(1f, 0.55f, 0f);
+        Material m = r.material;
+        m.color = blinkerColor;
+        // 昼間でも目立つように発光させる
+        m.EnableKeyword("_EMISSION");
+        m.SetColor("_EmissionColor", blinkerColor * blinkerEmission);
         r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        go.SetActive(false);
-        return go;
+        return go.transform;
     }
 
     void UpdateBlinkers()
@@ -162,6 +263,11 @@ public class CarController : MonoBehaviour
 
         int choice = blinkerChoice != -1 ? blinkerChoice : PlannedTurnChoice;
         bool on = Mathf.Repeat(Time.time, blinkerInterval * 2f) < blinkerInterval;
+
+#if UNITY_EDITOR
+        // プレイ中にInspectorで補正値を変えた時にすぐ反映させる（調整用）
+        ApplyBlinkerPositions();
+#endif
         blinkerRight.SetActive(on && choice == 1);
         blinkerLeft.SetActive(on && choice == 2);
     }

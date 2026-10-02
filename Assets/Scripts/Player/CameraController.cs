@@ -20,6 +20,9 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
+        // 前回のプレイで揺れの途中に終了していても、揺れが残らないようにする
+        ShakeOffset = Vector3.zero;
+
         Cursor.lockState = CursorLockMode.Locked;
 
         if (target != null)

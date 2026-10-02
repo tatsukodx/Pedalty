@@ -102,3 +102,18 @@ MonoBehaviour:
   obstacleCheckDistance: 6
   obstacleCheckRadius: 1.2
   mass: 10000
+  vehicleLength: 6
+  brakingSafetyBuffer: 2
+  voluntaryStopDeceleration: 14
+  leftTurnPedestrianStopDeceleration: 22
+  turnSpeedMultiplier: 0.7
+  bicycleDetectWidth: 2.4
+  blinkerInterval: 0.4
+  autoPlaceBlinkers: 1
+  blinkerLocalOffset: {x: 0.9, y: 0.8, z: 2.2}
+  blinkerSize: 0.3
+  blinkerColor: {r: 1, g: 0.5, b: 0, a: 1}
+  blinkerEmission: 4
+  frontBlinkerAdjust: {x: -0.5, y: -0.1, z: -0.1}
+  rearBlinkerAdjust: {x: -0.5, y: -0.2, z: -0.2}
+  stopReasonDebug: "\u8D70\u884C\u4E2D"

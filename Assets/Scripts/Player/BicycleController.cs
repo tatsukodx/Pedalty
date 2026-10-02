@@ -262,7 +262,8 @@ public class BicycleController : MonoBehaviour
 
         StopMovement();
         currentSteerAngle = 0f;
-        isBraking = false;
+        // isBraking は InputManager がボタンの変化時にだけ送ってくるため、ここで解除しない
+        // （ブレーキを握ったままテレポートすると、離して押し直すまでブレーキが効かなくなる）
         SetRoadEndBoundary(false, Vector3.zero);
 
         if (handlebar != null)
