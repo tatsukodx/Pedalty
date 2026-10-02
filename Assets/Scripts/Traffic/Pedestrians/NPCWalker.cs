@@ -55,6 +55,20 @@ public class NPCWalker : MonoBehaviour
 
     private bool isTurningInPlace = false;
 
+    [Header("自転車をよける・待つ")]
+    [Tooltip("この距離以内に自転車がいると反応する")]
+    public float bicycleAvoidRadius = 4f;
+    [Tooltip("進行方向の前方この距離以内に、こちらへ向かってくる自転車がいれば立ち止まって待つ")]
+    public float bicycleWaitDistance = 3f;
+    [Tooltip("横によける速さ")]
+    public float bicycleSidestepSpeed = 1.5f;
+    [Tooltip("待ち続ける最大時間[秒]。自転車がそばで止まったままでも歩き出せるようにする")]
+    public float bicycleMaxWaitTime = 3f;
+
+    private static Transform bicycleTransform;
+    private static Rigidbody bicycleRb;
+    private float bicycleWaitTimer = 0f;
+
     public void SetDirection(Vector3 direction)
     {
         if (isHit) return; 
@@ -236,12 +250,69 @@ public class NPCWalker : MonoBehaviour
         moveDirection.y = 0f;
         moveDirection.Normalize();
 
+        if (ShouldWaitForBicycle(moveDirection, out Vector3 bicycleSidestep))
+        {
+            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+            return;
+        }
+
         Vector3 sidewalkCorrection = ComputeSidewalkCorrection();
         Vector3 snapCorrection = ComputeSnapCorrectionVelocity();
-        Vector3 intendedVelocity = (moveDirection * moveSpeed) + sidewalkCorrection + snapCorrection;
+        Vector3 intendedVelocity = (moveDirection * moveSpeed) + sidewalkCorrection + snapCorrection + bicycleSidestep;
         Vector3 allowedVelocity = ClampToSidewalk(intendedVelocity);
 
         rb.linearVelocity = new Vector3(allowedVelocity.x, rb.linearVelocity.y, allowedVelocity.z);
+    }
+
+    // 近くに自転車がいるとき、正面から来るなら立ち止まり、それ以外は横によける
+    bool ShouldWaitForBicycle(Vector3 moveDirection, out Vector3 sidestep)
+    {
+        sidestep = Vector3.zero;
+
+        if (bicycleTransform == null)
+        {
+            BicycleController bicycle = FindAnyObjectByType<BicycleController>();
+            if (bicycle == null) return false;
+            bicycleTransform = bicycle.transform;
+            bicycleRb = bicycle.GetComponent<Rigidbody>();
+        }
+
+        Vector3 toBike = bicycleTransform.position - transform.position;
+        toBike.y = 0f;
+        float distance = toBike.magnitude;
+
+        if (distance > bicycleAvoidRadius || distance < 0.001f)
+        {
+            bicycleWaitTimer = 0f;
+            return false;
+        }
+
+        Vector3 bikeVelocity = bicycleRb != null ? bicycleRb.linearVelocity : Vector3.zero;
+        bikeVelocity.y = 0f;
+        bool bikeApproaching = bikeVelocity.magnitude > 0.5f && Vector3.Dot(bikeVelocity, -toBike) > 0f;
+
+        float ahead = Vector3.Dot(toBike, moveDirection);
+        float lateral = Vector3.Dot(toBike, Vector3.Cross(Vector3.up, moveDirection));
+
+        // 前方の通り道付近にいて、こちらへ向かってくる（または目の前にいる）なら待つ
+        bool inPath = ahead > 0f && ahead < bicycleWaitDistance && Mathf.Abs(lateral) < 1.5f;
+        if (inPath && (bikeApproaching || ahead < 1.5f) && bicycleWaitTimer < bicycleMaxWaitTime)
+        {
+            bicycleWaitTimer += Time.fixedDeltaTime;
+            return true;
+        }
+
+        if (!inPath) bicycleWaitTimer = 0f;
+
+        // 横断歩道上では横にそれず、待つだけにする
+        if (isCrossing) return false;
+
+        // 自転車と反対側へ、近いほど強くよける
+        Vector3 right = Vector3.Cross(Vector3.up, moveDirection);
+        float side = lateral >= 0f ? -1f : 1f;
+        float strength = 1f - distance / bicycleAvoidRadius;
+        sidestep = right * side * bicycleSidestepSpeed * strength;
+        return false;
     }
 
     Animator FindActiveAnimator()

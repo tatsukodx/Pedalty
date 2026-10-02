@@ -8,10 +8,10 @@ public class TrafficLightManager : MonoBehaviour
 
     [Header("車道の時間設定（秒）")]
     public float greenDuration  = 30f;
-    public float yellowDuration = 3f;
+    public float yellowDuration = 2f;
 
     [Header("歩車分離モードの設定（秒）")]
-    public float allRedDuration    = 2f;
+    public float allRedDuration    = 1f;
     public float pedGreenDuration  = 15f;
     public float pedBlinkDuration  = 5f;
 
