@@ -705,6 +705,29 @@ public sealed class GameFlowUI : MonoBehaviour
         countdownCoroutine = null;
     }
 
+    // ゴール画面のカードを上から落として、少し弾ませて止める（Time.timeScale = 0 なので実時間）
+    IEnumerator DropInResultsCard()
+    {
+        if (resultsPanel.transform.childCount == 0) yield break;
+        RectTransform card = resultsPanel.transform.GetChild(0) as RectTransform;
+        if (card == null) yield break;
+
+        Vector2 home = card.anchoredPosition;
+        Vector2 start = home + new Vector2(0f, 1200f);
+        const float duration = 0.6f;
+        float t = 0f;
+        while (t < duration)
+        {
+            t += Time.unscaledDeltaTime;
+            float k = Mathf.Clamp01(t / duration);
+            // 落ちてきて少し行き過ぎてから戻る（バウンド）
+            float eased = 1f + 2.7f * Mathf.Pow(k - 1f, 3f) + 1.7f * Mathf.Pow(k - 1f, 2f);
+            card.anchoredPosition = Vector2.LerpUnclamped(start, home, eased);
+            yield return null;
+        }
+        card.anchoredPosition = home;
+    }
+
     const float CountdownSlideDistance = 600f;
     const float CountdownDriftDistance = 40f;
 
@@ -788,6 +811,7 @@ public sealed class GameFlowUI : MonoBehaviour
         resultTimeText.text = "TIME  " + GameTimer.FormatTime(finalTime);
         resultFineText.text = $"現在の罰金総額  ￥{finalFine:N0}";
         SetOnlyPanel(resultsPanel);
+        StartCoroutine(DropInResultsCard());
     }
 
     void ShowRanking()
