@@ -54,7 +54,7 @@ public class TrafficViolationDetector : MonoBehaviour
         // 専用信号の交差点で、4本の横断帯の内側に囲まれた中央の車道部分（自転車が直接走ってはいけない範囲）
         public bool hasCore;
         public Rect core;
-        public float coreTravel;
+        public float coreTravel = -1f;
         public bool coreReported;
         public Vector3 lastCorePosition;
         public Rect outer;
@@ -73,6 +73,8 @@ public class TrafficViolationDetector : MonoBehaviour
     [SerializeField] private float bicyclePedCoreMaxTravel = 3f;
     [Tooltip("専用信号の交差点で信号を判定し始める位置。中央範囲からこの幅[m]（自転車道の幅）だけ内側の、車が走る部分に入った時に判定する")]
     [SerializeField] private float bicyclePedLaneInset = 1.5f;
+    [Tooltip("専用信号の交差点で、横断帯へ寄るために歩道や車道（歩行者用横断歩道の上など）にいてもよい範囲。交差点の外側へこの距離[m]まで")]
+    [SerializeField] private float bicyclePedApproachAllowance = 3f;
 
     private readonly List<IntersectionArea> intersections = new List<IntersectionArea>();
     private Transform player;
@@ -96,6 +98,14 @@ public class TrafficViolationDetector : MonoBehaviour
     // 違反していない場所を走っているか（テレポート先の記録に使う）
     public bool IsPlayerInLegalLane { get; private set; }
 
+    [Header("外側のレーン（車・歩行者のスポーン用）への進入")]
+    [Tooltip("スポーン地点のある道路区間にこの秒数いたら、警告を出して交差点の手前へ戻す")]
+    [SerializeField] private float wrongLaneDelay = 0.3f;
+
+    // 車や歩行者のスポーン地点を含む道路区間（自転車が入るとUターンできず詰むため進入禁止）
+    private readonly HashSet<Transform> outerRoadSections = new HashSet<Transform>();
+    private float wrongLaneTimer;
+
     private void Awake()
     {
         Instance = this;
@@ -112,6 +122,7 @@ public class TrafficViolationDetector : MonoBehaviour
         }
 
         BuildIntersections();
+        BuildOuterRoadSections();
     }
 
     private void BuildIntersections()
@@ -280,18 +291,70 @@ public class TrafficViolationDetector : MonoBehaviour
     {
         if (GameDebugMode.IsEnabled) return;
 
-        // 進行方向のすぐ先にある歩行者信号（渡る先の信号）の実際の表示で判定する。
-        // 見つからない場合だけ、信号機の内部状態から推測する
-        TrafficLight governing = FindGoverningPedLight(intersection.manager, heading);
+        // 直進方向の歩行者信号（自転車の進行方向と同じ向きに渡る横断歩道の信号）の表示で判定する。
+        // 横断歩道の両端の信号は連動しているので、連動グループの並びが進行方向と同じ向きのものを選ぶ。
+        // 見つからない場合は、信号機の内部状態（同じ方向の車両用信号のフェーズ）で判定する
+        TrafficLight governing = FindStraightPedLight(intersection.manager, travelingNS);
         bool red = governing != null
             ? governing.CurrentState != TrafficLightState.Green
             : IsRedForPlayerDirection(intersection.manager, true, travelingNS);
-        Debug.Log($"[TrafficViolationDetector] 専用信号の判定: 参照した信号={(governing != null ? governing.name + "(" + governing.CurrentState + ")" : "見つからず→内部状態で推測")} 赤={red}");
+        Debug.Log($"[TrafficViolationDetector] 専用信号の判定: 進行方向={(travelingNS ? "南北" : "東西")} 参照した信号={(governing != null ? governing.name + "(" + governing.CurrentState + ")" : "見つからず→信号機の状態で判定")} 赤={red}");
         if (!red) return;
         if (!violationsById.TryGetValue("bicycle_signal", out ViolationInfo violation)) return;
 
         // 横断を始める前（待っていた位置など）へ戻す
         ReportViolation(violation, true, null, 0f);
+    }
+
+    private TrafficLight FindStraightPedLight(TrafficLightManager manager, bool travelingNS)
+    {
+        TrafficLight best = null;
+        float bestDistance = float.MaxValue;
+
+        foreach (TrafficLight head in new[] { manager.pedNorthLight, manager.pedSouthLight, manager.pedEastLight, manager.pedWestLight })
+        {
+            if (head == null) continue;
+
+            // 連動している信号（横断歩道の反対側の端など）を集める
+            List<TrafficLight> group = new List<TrafficLight>();
+            CollectLinked(head, group);
+            if (group.Count < 2) continue;
+
+            float minX = float.MaxValue, maxX = float.MinValue, minZ = float.MaxValue, maxZ = float.MinValue;
+            Vector3 sum = Vector3.zero;
+            foreach (TrafficLight l in group)
+            {
+                Vector3 p = l.transform.position;
+                minX = Mathf.Min(minX, p.x); maxX = Mathf.Max(maxX, p.x);
+                minZ = Mathf.Min(minZ, p.z); maxZ = Mathf.Max(maxZ, p.z);
+                sum += p;
+            }
+
+            float spreadX = maxX - minX, spreadZ = maxZ - minZ;
+            if (Mathf.Max(spreadX, spreadZ) < 2f) continue;
+
+            // 並びの向き＝その横断歩道を渡る向き
+            bool groupNS = spreadZ > spreadX;
+            if (groupNS != travelingNS) continue;
+
+            // 同じ向きの横断歩道は交差点の両側に2本あるので、自転車に近い方を使う
+            Vector3 center = sum / group.Count;
+            Vector3 d = center - player.position;
+            d.y = 0f;
+            if (d.magnitude < bestDistance)
+            {
+                bestDistance = d.magnitude;
+                best = head;
+            }
+        }
+        return best;
+    }
+
+    private static void CollectLinked(TrafficLight light, List<TrafficLight> group)
+    {
+        if (light == null || group.Contains(light)) return;
+        group.Add(light);
+        if (light.linkedLights != null) foreach (TrafficLight l in light.linkedLights) CollectLinked(l, group);
     }
 
     private TrafficLight FindGoverningPedLight(TrafficLightManager manager, Vector3 heading)
@@ -326,6 +389,13 @@ public class TrafficViolationDetector : MonoBehaviour
             if (angle > 30f) continue;
 
             float score = angle * 0.5f + distance;
+
+            // 角の柱には直交する横断歩道用の信号も同じ位置に付いているため、
+            // 進行方向に正対している（正面か真後ろを向いている）信号を優先する
+            Vector3 face = light.transform.forward;
+            face.y = 0f;
+            float alignment = face.sqrMagnitude > 0.0001f ? Mathf.Abs(Vector3.Dot(face.normalized, heading)) : 0f;
+            if (alignment < 0.7f) score += 1000f;
             if (score < bestScore)
             {
                 bestScore = score;
@@ -340,7 +410,7 @@ public class TrafficViolationDetector : MonoBehaviour
     {
         if (!nearIntersection)
         {
-            intersection.coreTravel = 0f;
+            intersection.coreTravel = -1f;
             intersection.coreReported = false;
             return;
         }
@@ -348,15 +418,16 @@ public class TrafficViolationDetector : MonoBehaviour
         bool inCore = intersection.core.Contains(new Vector2(playerPosition.x, playerPosition.z));
         if (!inCore)
         {
-            intersection.coreTravel = 0f;
-            intersection.lastCorePosition = playerPosition;
+            intersection.coreTravel = -1f;
             return;
         }
 
-        Vector3 step = playerPosition - intersection.lastCorePosition;
-        step.y = 0f;
-        intersection.coreTravel += step.magnitude;
-        intersection.lastCorePosition = playerPosition;
+        // 中央範囲に入った地点（lastCorePosition）からどれだけ離れたかで見る。
+        // 走った距離を足し合わせると、縁で止まって待っているだけでも車体の小さな揺れが積もって違反になってしまう
+        if (intersection.coreTravel < 0f) intersection.lastCorePosition = playerPosition;
+        Vector3 moved = playerPosition - intersection.lastCorePosition;
+        moved.y = 0f;
+        intersection.coreTravel = moved.magnitude;
 
         bool recovering = player.GetComponent<BicycleRecovery>() is BicycleRecovery r && r.IsRecovering;
         if (intersection.coreReported || recovering || GameDebugMode.IsEnabled) return;
@@ -365,6 +436,7 @@ public class TrafficViolationDetector : MonoBehaviour
             && violationsById.TryGetValue("bike_crossing", out ViolationInfo crossingViolation))
         {
             intersection.coreReported = true;
+            Debug.Log($"[TrafficViolationDetector] 横断帯違反: 自転車の位置{playerPosition} 中央範囲に入った位置{intersection.lastCorePosition} 中央範囲{intersection.core}");
             ReportViolation(crossingViolation, true, intersection.center, intersectionRadius + 2f);
         }
     }
@@ -404,6 +476,73 @@ public class TrafficViolationDetector : MonoBehaviour
     {
         if (intersection.isBicyclePedestrian && intersection.bicycleCrosswalks.Count > 0) return true;
         return intersection.node != null && intersection.node.HasBikeCrossings;
+    }
+
+    private void BuildOuterRoadSections()
+    {
+        // 道路区間ごとに、レーン判定の箱をまとめた範囲を作る
+        Dictionary<Transform, Bounds> sectionBounds = new Dictionary<Transform, Bounds>();
+        foreach (Collider c in FindObjectsByType<Collider>(FindObjectsSortMode.None))
+        {
+            if (!(c.CompareTag("Road_L") || c.CompareTag("Road_R") || c.CompareTag("Sidewalk_L") || c.CompareTag("Sidewalk_R")
+                || c.CompareTag("BIkeLane_L") || c.CompareTag("BikeLane_R"))) continue;
+
+            Transform root = PlayerLaneDetector.GetRoadSectionRoot(c.transform);
+            if (root == null) continue;
+
+            if (sectionBounds.TryGetValue(root, out Bounds b)) { b.Encapsulate(c.bounds); sectionBounds[root] = b; }
+            else sectionBounds[root] = c.bounds;
+        }
+
+        List<Vector3> spawnPositions = new List<Vector3>();
+        foreach (CarSpawner spawner in FindObjectsByType<CarSpawner>(FindObjectsSortMode.None))
+            if (spawner.spawnPoints != null) foreach (Transform t in spawner.spawnPoints) if (t != null) spawnPositions.Add(t.position);
+        foreach (NPCSpawner spawner in FindObjectsByType<NPCSpawner>(FindObjectsSortMode.None))
+            if (spawner.spawnPoints != null) foreach (Transform t in spawner.spawnPoints) if (t != null) spawnPositions.Add(t.position);
+
+        // スタート地点・ゴールのある区間は対象外にする
+        List<Vector3> protectedPositions = new List<Vector3>();
+        if (player != null) protectedPositions.Add(player.position);
+        foreach (GoalTrigger goal in FindObjectsByType<GoalTrigger>(FindObjectsSortMode.None)) protectedPositions.Add(goal.transform.position);
+
+        foreach (KeyValuePair<Transform, Bounds> pair in sectionBounds)
+        {
+            if (ContainsAnyXZ(pair.Value, protectedPositions, 2f)) continue;
+            if (ContainsAnyXZ(pair.Value, spawnPositions, 2f)) outerRoadSections.Add(pair.Key);
+        }
+
+        Debug.Log($"[TrafficViolationDetector] 外側のレーン（スポーン用）として扱う道路区間: {outerRoadSections.Count} 箇所");
+    }
+
+    private static bool ContainsAnyXZ(Bounds b, List<Vector3> positions, float margin)
+    {
+        foreach (Vector3 p in positions)
+        {
+            if (p.x >= b.min.x - margin && p.x <= b.max.x + margin && p.z >= b.min.z - margin && p.z <= b.max.z + margin) return true;
+        }
+        return false;
+    }
+
+    // 外側のレーンに入ったら、赤い警告を出して交差点の手前（最後に違反していなかった位置）へ戻す
+    private bool CheckWrongLane()
+    {
+        bool onOuterRoad = laneDetector.currentRoadSection != null && outerRoadSections.Contains(laneDetector.currentRoadSection);
+        BicycleRecovery recovery = player != null ? player.GetComponent<BicycleRecovery>() : null;
+
+        if (!onOuterRoad || playerInsideIntersection || recovery == null || recovery.IsRecovering)
+        {
+            wrongLaneTimer = 0f;
+            return onOuterRoad;
+        }
+
+        wrongLaneTimer += Time.deltaTime;
+        if (wrongLaneTimer >= wrongLaneDelay)
+        {
+            wrongLaneTimer = 0f;
+            // 暗転→テレポート→暗転解除のあとに警告を出す
+            recovery.RecoverFromViolation(null, 0f, () => WrongLaneWarningUI.Show());
+        }
+        return true;
     }
 
     private CarIntersectionNode FindNearestNode(Vector3 center)
@@ -474,7 +613,11 @@ public class TrafficViolationDetector : MonoBehaviour
             if (intersection.hasCore)
             {
                 Rect approach = intersection.core;
-                approach.xMin -= 5.5f; approach.yMin -= 5.5f; approach.xMax += 5.5f; approach.yMax += 5.5f;
+                // 横断帯へ寄るための歩道通行だけを許す範囲（交差点の外側へ1mまで）。
+                // 広げすぎると、左折した先の歩道まで違反にならなくなる
+                float m = bicyclePedApproachAllowance;
+                approach.xMin = intersection.outer.xMin - m; approach.yMin = intersection.outer.yMin - m;
+                approach.xMax = intersection.outer.xMax + m; approach.yMax = intersection.outer.yMax + m;
                 if (approach.Contains(new Vector2(playerPosition.x, playerPosition.z))) playerNearBicyclePedCrossing = true;
 
                 CheckBicyclePedSignal(intersection, playerPosition);
@@ -678,11 +821,17 @@ public class TrafficViolationDetector : MonoBehaviour
 
         if (laneDetector == null) return;
 
-        ViolationInfo current = playerInsideIntersection ? null : FindLaneViolation(
+        // 外側のレーンにいる間はレーン違反を出さず、テレポート先としても記録しない
+        bool onOuterRoad = !GameDebugMode.IsEnabled && CheckWrongLane();
+
+        ViolationInfo current = (playerInsideIntersection || onOuterRoad) ? null : FindLaneViolation(
             laneDetector.currentArea, laneDetector.currentSide,
             laneDetector.bikeLaneExistsNearby, laneDetector.parkedCarNearby, laneDetector.sidewalkRidingAllowed);
 
-        IsPlayerInLegalLane = !playerInsideIntersection && current == null && laneDetector.currentArea != RoadAreaType.None;
+        // 歩道は例外（路上駐車・横断帯へ寄る時など）で違反にならない場合でも、テレポート先としては記録しない。
+        // 「自転車及び歩行者専用」の歩道だけは通常の通行場所なので記録する
+        bool onSidewalk = laneDetector.currentArea == RoadAreaType.Sidewalk && !laneDetector.sidewalkRidingAllowed;
+        IsPlayerInLegalLane = !playerInsideIntersection && !onOuterRoad && !onSidewalk && !playerNearBicyclePedCrossing && current == null && laneDetector.currentArea != RoadAreaType.None;
 
         BicycleRecovery recovery = player != null ? player.GetComponent<BicycleRecovery>() : null;
         bool recovering = recovery != null && recovery.IsRecovering;
@@ -723,8 +872,8 @@ public class TrafficViolationDetector : MonoBehaviour
         }
 
         // 「自転車及び歩行者専用」標識がある区間の歩道は通行できる
-        // 専用信号の交差点では、横断帯へ向かうために交差点手前の歩道部分を通ってよい
-        if (area == RoadAreaType.Sidewalk && playerNearBicyclePedCrossing)
+        // 専用信号の交差点では、横断帯へ向かうため（横断帯の手前で待つため）に交差点手前の歩道や車道にいてよい
+        if ((area == RoadAreaType.Sidewalk || area == RoadAreaType.Road) && playerNearBicyclePedCrossing)
         {
             return null;
         }
@@ -773,4 +922,29 @@ public class TrafficViolationDetector : MonoBehaviour
 
         penaltyController.ShowViolationPopup(violation);
     }
+
+#if UNITY_EDITOR
+    // プレイ中の Scene ビューに、専用信号の交差点の判定範囲を表示する
+    // 水色: 自転車横断帯として認識した範囲 / 赤: 中央の車道部分（ここを3m以上進むと横断帯違反）
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying) return;
+
+        foreach (IntersectionArea intersection in intersections)
+        {
+            Gizmos.color = Color.cyan;
+            foreach (Bounds b in intersection.bicycleCrosswalks)
+            {
+                Gizmos.DrawWireCube(new Vector3(b.center.x, b.center.y + 0.3f, b.center.z), new Vector3(b.size.x, 0.6f, b.size.z));
+            }
+
+            if (intersection.hasCore)
+            {
+                Gizmos.color = Color.red;
+                Rect c = intersection.core;
+                Gizmos.DrawWireCube(new Vector3(c.center.x, intersection.center.y + 0.3f, c.center.y), new Vector3(c.width, 0.6f, c.height));
+            }
+        }
+    }
+#endif
 }

@@ -39,6 +39,9 @@ public class PlayerLaneDetector : MonoBehaviour
     // 現在いるレーンの進行方向（自転車の向きに近い側へ揃えたもの）。テレポート時の向き補正に使う
     public Vector3 currentLaneForward = Vector3.zero;
 
+    // 現在いる道路区間（RoadSection のルート）
+    public Transform currentRoadSection;
+
     [Tooltip("この速さ(m/s)未満のときは進行方向が不安定なため、直前に判定した進行方向をそのまま使う")]
     public float minSpeedForDirection = 0.5f;
 
@@ -90,6 +93,7 @@ public class PlayerLaneDetector : MonoBehaviour
         RoadSide detectedSide = RoadSide.None;
         bool detectedRidingAllowed = false;
         Vector3 detectedLaneForward = Vector3.zero;
+        Transform detectedRoadSection = null;
         float closestDistance = float.MaxValue;
         System.Text.StringBuilder debugBuilder = showDebugOverlay ? new System.Text.StringBuilder() : null;
 
@@ -115,6 +119,7 @@ public class PlayerLaneDetector : MonoBehaviour
                 detectedSide = side;
                 detectedRidingAllowed = type == RoadAreaType.Sidewalk && hit.GetComponent<SidewalkRidingAllowed>() != null;
                 detectedLaneForward = GetLaneForward(hit.transform);
+                detectedRoadSection = GetRoadSectionRoot(hit.transform);
             }
         }
 
@@ -122,6 +127,7 @@ public class PlayerLaneDetector : MonoBehaviour
         currentSide = detectedSide;
         sidewalkRidingAllowed = detectedRidingAllowed;
         currentLaneForward = detectedLaneForward;
+        currentRoadSection = detectedRoadSection;
         if (debugBuilder != null) debugHits = debugBuilder.ToString();
 
         // センサー範囲から外れた道路の向き記憶は捨てる（次に入った時は改めて判定する）
@@ -284,6 +290,14 @@ public class PlayerLaneDetector : MonoBehaviour
         }
 
         return side;
+    }
+
+    // hitTransform: <RoadSectionRoot>/Areas/Left(or Right)/Aria_XXX_L(or R)
+    public static Transform GetRoadSectionRoot(Transform hitTransform)
+    {
+        Transform areas = hitTransform.parent != null ? hitTransform.parent.parent : null;
+        if (areas == null || areas.name != "Areas") return null;
+        return areas.parent;
     }
 
     // hitTransform: <RoadSectionRoot>/Areas/Left(or Right)/Aria_XXX_L(or R)

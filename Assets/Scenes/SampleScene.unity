@@ -2868,22 +2868,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 722995518}
     m_Modifications:
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 125
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 130
-      objectReference: {fileID: 0}
     - target: {fileID: 381452822003644846, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -2968,9 +2952,25 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 130
+      objectReference: {fileID: 0}
     - target: {fileID: 6275844294646266630, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_Name
       value: RoadSection_01 (63)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 125
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -17920,22 +17920,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 722995518}
     m_Modifications:
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 125
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 130
-      objectReference: {fileID: 0}
     - target: {fileID: 381452822003644846, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -18020,9 +18004,25 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 130
+      objectReference: {fileID: 0}
     - target: {fileID: 6275844294646266630, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_Name
       value: RoadSection_01 (59)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 125
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -18229,7 +18229,6 @@ MonoBehaviour:
   acceleration: 8
   deceleration: 3
   turnSpeed: 100
-  jumpForce: 13
   airPropulsionInfluence: 0.4
   wallBounceForce: 3
   respawnThresholdY: -10
@@ -18292,6 +18291,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLaneDetector
   sensorRadius: 1
+  showDebugOverlay: 1
   bikeLaneCheckRadius: 6
   parkedCarCheckRadius: 5
   currentArea: 0
@@ -18299,7 +18299,10 @@ MonoBehaviour:
   bikeLaneExistsNearby: 0
   parkedCarNearby: 0
   sidewalkRidingAllowed: 0
+  currentLaneForward: {x: 0, y: 0, z: 0}
+  currentRoadSection: {fileID: 0}
   minSpeedForDirection: 0.5
+  reverseAngleThreshold: 135
 --- !u!114 &415440748
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18320,6 +18323,7 @@ MonoBehaviour:
   invert: 0
   deadZone: 0.05
   expo: 1.5
+  sensitivity: 0.6
   smoothTau: 0.06
   dbgRaw: 0
   dbgNormalized: 0
@@ -18340,6 +18344,14 @@ MonoBehaviour:
   penaltyController: {fileID: 943265126}
   violationDataJson: {fileID: 4900000, guid: 9e922e2ce9fccb94797c7e53425f7be6, type: 3}
   intersectionRadius: 8
+  nodeSearchRadius: 15
+  bikeCrossingMargin: 0.5
+  bicyclePedCoreMaxTravel: 3
+  bicyclePedLaneInset: 1.5
+  bicyclePedSidewalkAllowance: 1
+  turnCheckMinSpeed: 1
+  laneViolationGraceTime: 1
+  wrongLaneDelay: 0.3
 --- !u!4 &416060335 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4243100736330820217, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
@@ -22335,22 +22347,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 722995518}
     m_Modifications:
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 125
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 130
-      objectReference: {fileID: 0}
     - target: {fileID: 381452822003644846, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -22435,37 +22431,33 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 130
+      objectReference: {fileID: 0}
     - target: {fileID: 6275844294646266630, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_Name
       value: RoadSection_01 (62)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 125
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 6557487791977022584, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
     - {fileID: 3253690475224542059, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7389401183797579229, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 521903341}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
---- !u!1 &521903340 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7389401183797579229, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-  m_PrefabInstance: {fileID: 521903339}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &521903341
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 521903340}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b267605becd8d344805727bf25e0d09, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SidewalkRidingAllowed
 --- !u!4 &522976886 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4243100736330820217, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
@@ -33277,22 +33269,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 722995518}
     m_Modifications:
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 125
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 130
-      objectReference: {fileID: 0}
     - target: {fileID: 381452822003644846, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -33377,9 +33353,25 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 130
+      objectReference: {fileID: 0}
     - target: {fileID: 6275844294646266630, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_Name
       value: RoadSection_01 (64)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 125
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -39365,6 +39357,10 @@ MonoBehaviour:
   descriptionText: {fileID: 1745937407}
   popupPenaltyAmountText: {fileID: 743157977}
   closeButton: {fileID: 1607537027}
+  dropDuration: 0.35
+  shakeDuration: 0.4
+  popupShakeAmount: 18
+  cameraShakeAmount: 0.12
 --- !u!4 &943265127
 Transform:
   m_ObjectHideFlags: 0
@@ -40435,22 +40431,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 722995518}
     m_Modifications:
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 125
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 130
-      objectReference: {fileID: 0}
     - target: {fileID: 381452822003644846, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -40535,9 +40515,25 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 130
+      objectReference: {fileID: 0}
     - target: {fileID: 6275844294646266630, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_Name
       value: RoadSection_01 (60)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 125
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -45005,22 +45001,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 722995518}
     m_Modifications:
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 125
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 130
-      objectReference: {fileID: 0}
     - target: {fileID: 381452822003644846, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -45105,37 +45085,33 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 130
+      objectReference: {fileID: 0}
     - target: {fileID: 6275844294646266630, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_Name
       value: RoadSection_01 (58)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 125
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 6557487791977022584, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
     - {fileID: 3253690475224542059, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7389401183797579229, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1085863483}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
---- !u!1 &1085863482 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7389401183797579229, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-  m_PrefabInstance: {fileID: 1085863481}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1085863483
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1085863482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b267605becd8d344805727bf25e0d09, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SidewalkRidingAllowed
 --- !u!4 &1086626368 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: cc0981408e7c8db4f9f80a57938fd5e3, type: 3}
@@ -45887,22 +45863,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 722995518}
     m_Modifications:
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 125
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 130
-      objectReference: {fileID: 0}
     - target: {fileID: 381452822003644846, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -45987,9 +45947,25 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 130
+      objectReference: {fileID: 0}
     - target: {fileID: 6275844294646266630, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_Name
       value: RoadSection_01 (39)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 125
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -59839,22 +59815,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 722995518}
     m_Modifications:
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 125
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 130
-      objectReference: {fileID: 0}
     - target: {fileID: 381452822003644846, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -59939,9 +59899,25 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 130
+      objectReference: {fileID: 0}
     - target: {fileID: 6275844294646266630, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_Name
       value: RoadSection_01 (47)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 125
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -66720,22 +66696,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 722995518}
     m_Modifications:
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 125
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 130
-      objectReference: {fileID: 0}
     - target: {fileID: 381452822003644846, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -66820,9 +66780,25 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 130
+      objectReference: {fileID: 0}
     - target: {fileID: 6275844294646266630, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_Name
       value: RoadSection_01 (65)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 125
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -69134,22 +69110,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 722995518}
     m_Modifications:
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 125
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 130
-      objectReference: {fileID: 0}
     - target: {fileID: 381452822003644846, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -69234,9 +69194,25 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 130
+      objectReference: {fileID: 0}
     - target: {fileID: 6275844294646266630, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_Name
       value: RoadSection_01 (61)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 125
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -86602,22 +86578,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 722995518}
     m_Modifications:
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 125
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.0000997
-      objectReference: {fileID: 0}
-    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 130
-      objectReference: {fileID: 0}
     - target: {fileID: 381452822003644846, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -86702,9 +86662,25 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 6017197916376033634, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 130
+      objectReference: {fileID: 0}
     - target: {fileID: 6275844294646266630, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
       propertyPath: m_Name
       value: RoadSection_01 (57)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5.0000997
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138868434981822074, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 125
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
