@@ -39,6 +39,12 @@ public class InputManager : MonoBehaviour
     enum ActiveButton { None, Right, Left }
     ActiveButton activeButton = ActiveButton.None;
 
+    [Header("車のスタック解消（左右同時押し）")]
+    [Tooltip("左右のボタンをこの秒数同時に押し続けると発動する")]
+    public float bothHoldSeconds = 0.5f;
+    float bothHoldTime = 0f;
+    bool bothTriggered = false;
+
     bool prevRight = false;
     bool prevLeft = false;
 
@@ -81,6 +87,22 @@ public class InputManager : MonoBehaviour
         }
 
         AnyButtonPressed = curRight || curLeft;
+
+        // 走行中に左右同時押しを少し続けると、最寄りの交差点で止まっている車を消す（車のスタック解消用）
+        if (curRight && curLeft && !isMenuState && !IsRideInputBlocked)
+        {
+            bothHoldTime += Time.unscaledDeltaTime;
+            if (!bothTriggered && bothHoldTime >= bothHoldSeconds)
+            {
+                bothTriggered = true;
+                StuckCarClearer.ClearNearestIntersection(bicycleController);
+            }
+        }
+        else
+        {
+            bothHoldTime = 0f;
+            bothTriggered = false;
+        }
 
         bool rightEdgeOn = curRight && !prevRight;
         bool leftEdgeOn = curLeft && !prevLeft;

@@ -87,6 +87,28 @@ public class BicycleRecovery : MonoBehaviour
         if (history.Count > maxSamples) history.RemoveAt(0);
     }
 
+    // テレポートはせず、暗転している間に処理だけ行う（スタックした車の削除など）
+    public void FadeAndRun(Action whileBlack)
+    {
+        if (IsRecovering) return;
+        StartCoroutine(FadeAndRunRoutine(whileBlack));
+    }
+
+    IEnumerator FadeAndRunRoutine(Action whileBlack)
+    {
+        IsRecovering = true;
+        bool wasEnabled = bicycle.ControlEnabled;
+        bicycle.SetControlEnabled(false);
+
+        yield return Fade(0f, 1f);
+        whileBlack?.Invoke();
+        yield return new WaitForSecondsRealtime(0.3f);
+        yield return Fade(1f, 0f);
+
+        if (wasEnabled) bicycle.SetControlEnabled(true);
+        IsRecovering = false;
+    }
+
     // 衝突時: 衝突地点から一定距離手前の安全な位置へ戻す
     public void RecoverFromCollision(Action onFinished = null)
     {

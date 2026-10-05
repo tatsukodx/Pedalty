@@ -70,6 +70,10 @@ public class CarController : MonoBehaviour
     // 歩行者以外の理由（信号・対向車線）で待機しているか
     public bool IsWaitingForNonPedestrianReason => isLightStopped || isYieldStopped;
 
+    // 信号・対向車・歩行者・自転車のいずれかを待って止まっている（スタック解消の対象判定に使う）
+    public bool IsWaiting => isLightStopped || isYieldStopped || isPedestrianStopped || lastObstacleAhead;
+    bool lastObstacleAhead = false;
+
     // 現在の速度から停止するまでに必要な距離（おおよそ）
     public float EstimatedBrakingDistance
     {
@@ -279,6 +283,7 @@ public class CarController : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRot, Time.fixedDeltaTime * turnLerpSpeed);
 
         bool obstacleAhead = HasObstacleAhead();
+        lastObstacleAhead = obstacleAhead;
         bool voluntaryStop = isLightStopped || isYieldStopped || isPedestrianStopped;
 
         float cruiseSpeed = isTurning ? moveSpeed * turnSpeedMultiplier : moveSpeed;
