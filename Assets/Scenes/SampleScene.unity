@@ -4213,7 +4213,7 @@ MonoBehaviour:
   bikeLaneSouth: {fileID: 58374418}
   bikeLaneEast: {fileID: 58374417}
   bikeLaneWest: {fileID: 58374416}
-  bikeLaneWidth: 14
+  bikeLaneWidth: 7
   bikeLaneDepth: 2
   bikeLaneHeight: 3
 --- !u!65 &75610557
@@ -24429,7 +24429,7 @@ MonoBehaviour:
   bikeLaneSouth: {fileID: 765230612}
   bikeLaneEast: {fileID: 765230611}
   bikeLaneWest: {fileID: 765230610}
-  bikeLaneWidth: 10
+  bikeLaneWidth: 7
   bikeLaneDepth: 2
   bikeLaneHeight: 3
 --- !u!65 &580389901
@@ -30052,7 +30052,7 @@ MonoBehaviour:
   bikeLaneSouth: {fileID: 1322142236}
   bikeLaneEast: {fileID: 1322142235}
   bikeLaneWest: {fileID: 1322142234}
-  bikeLaneWidth: 14
+  bikeLaneWidth: 7
   bikeLaneDepth: 2
   bikeLaneHeight: 3
 --- !u!65 &727530893
@@ -36907,7 +36907,7 @@ MonoBehaviour:
   bikeLaneSouth: {fileID: 782969326}
   bikeLaneEast: {fileID: 782969325}
   bikeLaneWest: {fileID: 782969324}
-  bikeLaneWidth: 10
+  bikeLaneWidth: 7
   bikeLaneDepth: 2
   bikeLaneHeight: 3
 --- !u!65 &873389803
@@ -56313,7 +56313,7 @@ MonoBehaviour:
   bikeLaneSouth: {fileID: 2124178597}
   bikeLaneEast: {fileID: 2124178596}
   bikeLaneWest: {fileID: 2124178595}
-  bikeLaneWidth: 10
+  bikeLaneWidth: 7
   bikeLaneDepth: 2
   bikeLaneHeight: 3
 --- !u!65 &1374207896
@@ -67471,7 +67471,7 @@ MonoBehaviour:
   bikeLaneSouth: {fileID: 1508133706}
   bikeLaneEast: {fileID: 1508133705}
   bikeLaneWest: {fileID: 1508133704}
-  bikeLaneWidth: 14
+  bikeLaneWidth: 7
   bikeLaneDepth: 2
   bikeLaneHeight: 3
 --- !u!65 &1621321579
