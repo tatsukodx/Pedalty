@@ -15,6 +15,6 @@
 // マグネットセンサ
 #define PIN_MAGNET 2
 #define MAGNET_STOP_MS 2000 // この時間パルスが無ければ MAGNET,0 を送る
-#define MAGNET_CHATTER_MS 200
+#define MAGNET_CHATTER_MS 300
 
 #endif
