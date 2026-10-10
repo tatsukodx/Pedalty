@@ -105,6 +105,46 @@ public class TrafficViolationDetector : MonoBehaviour
     // 車や歩行者のスポーン地点を含む道路区間（自転車が入るとUターンできず詰むため進入禁止）
     private readonly HashSet<Transform> outerRoadSections = new HashSet<Transform>();
     private float wrongLaneTimer;
+    private float legalStreak;
+
+    // テレポート先として記録してよい位置と向き。
+    // 「違反していない」という判定と、その時にいたレーンの情報を、必ず同じ瞬間の値でそろえて持つ。
+    // （別々のタイミングで読むと、自転車道から車道へ出た直後に「車道の位置」を記録してしまう）
+    public bool HasLegalSample { get; private set; }
+    public Vector3 LegalSamplePosition { get; private set; }
+    public Vector3 LegalSampleForward { get; private set; }
+
+    [Tooltip("車道を走ってよい道路（自転車道のない道路）へ戻す時、車道の左端からこの距離[m]の位置に置く")]
+    [SerializeField] private float roadEdgeOffset = 0.8f;
+
+    private void UpdateLegalSample()
+    {
+        HasLegalSample = false;
+        if (!IsPlayerInLegalLane || player == null) return;
+
+        Collider lane = laneDetector.currentAreaCollider;
+        Vector3 forward = laneDetector.currentLaneForward;
+        if (lane == null || forward == Vector3.zero) return;
+
+        // レーンの端で記録すると、戻った時に車体が隣の違反ゾーンへはみ出すため、
+        // レーンの中央の線の上に寄せる（進行方向の位置はそのまま）
+        Vector3 position = player.position;
+        Vector3 center = lane.bounds.center;
+        Vector3 snapped = center + forward * Vector3.Dot(position - center, forward);
+
+        // 車道の場合は中央だと車の通り道になるので、左端（路肩側）に寄せる
+        if (laneDetector.currentArea == RoadAreaType.Road && lane is BoxCollider box)
+        {
+            float halfWidth = Mathf.Abs(box.transform.lossyScale.x * box.size.x) * 0.5f;
+            Vector3 left = Vector3.Cross(forward, Vector3.up).normalized;
+            snapped += left * Mathf.Max(0f, halfWidth - roadEdgeOffset);
+        }
+
+        snapped.y = position.y;
+        LegalSamplePosition = snapped;
+        LegalSampleForward = forward;
+        HasLegalSample = true;
+    }
 
     private void Awake()
     {
@@ -831,7 +871,15 @@ public class TrafficViolationDetector : MonoBehaviour
         // 歩道は例外（路上駐車・横断帯へ寄る時など）で違反にならない場合でも、テレポート先としては記録しない。
         // 「自転車及び歩行者専用」の歩道だけは通常の通行場所なので記録する
         bool onSidewalk = laneDetector.currentArea == RoadAreaType.Sidewalk && !laneDetector.sidewalkRidingAllowed;
-        IsPlayerInLegalLane = !playerInsideIntersection && !onOuterRoad && !onSidewalk && !playerNearBicyclePedCrossing && current == null && laneDetector.currentArea != RoadAreaType.None;
+
+        // 路上駐車の例外で違反になっていないだけの場所（車道など）も、テレポート先には使わない
+        bool onParkedException = laneDetector.parkedCarNearby && laneDetector.currentArea != RoadAreaType.BikeLane;
+        bool legalNow = !playerInsideIntersection && !onOuterRoad && !onSidewalk && !onParkedException && !playerNearBicyclePedCrossing && current == null && laneDetector.currentArea != RoadAreaType.None;
+
+        // 正しいレーンに一瞬入っただけの位置は記録しない。0.5秒続けて正しい場所にいる時だけ記録対象にする
+        legalStreak = legalNow ? legalStreak + Time.deltaTime : 0f;
+        IsPlayerInLegalLane = legalStreak >= 0.5f && current == null && laneDetector.currentArea != RoadAreaType.None;
+        UpdateLegalSample();
 
         BicycleRecovery recovery = player != null ? player.GetComponent<BicycleRecovery>() : null;
         bool recovering = recovery != null && recovery.IsRecovering;

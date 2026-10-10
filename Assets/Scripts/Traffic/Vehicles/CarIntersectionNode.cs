@@ -61,6 +61,64 @@ public class CarIntersectionNode : MonoBehaviour
 
     private readonly HashSet<CarController> carsInTrigger = new HashSet<CarController>();
 
+    [Header("直交方向の車の通過待ち")]
+    [Tooltip("交差点内にこの秒数を超えて留まっている車は、通過待ちの対象から外す（居座った車を待ち続けて詰まるのを防ぐ）")]
+    public float crossTrafficMaxWait = 20f;
+
+    // 交差点内にいる車 →（入った時の進行方向が南北か, 入った時刻）
+    private struct EntryInfo
+    {
+        public bool isNS;
+        public float time;
+        // true = 実際に交差点に入った / false = 停止線を越えて向かってきている途中
+        public bool entered;
+    }
+
+    private readonly Dictionary<CarController, EntryInfo> entryInfos = new Dictionary<CarController, EntryInfo>();
+    private readonly List<CarController> entryRemoveBuffer = new List<CarController>();
+
+    // 停止線を越えて交差点へ向かっている車を、交差点に入る前から「通過中」として登録する
+    public void ReportCommitted(CarController car, bool isNS)
+    {
+        if (car == null || entryInfos.ContainsKey(car)) return;
+        entryInfos[car] = new EntryInfo { isNS = isNS, time = Time.time, entered = false };
+    }
+
+    // 停止線の近くで止まり直した車の登録を取り消す（すでに交差点に入った車は取り消さない）
+    public void CancelCommitted(CarController car)
+    {
+        if (car == null) return;
+        if (entryInfos.TryGetValue(car, out EntryInfo info) && !info.entered)
+        {
+            entryInfos.Remove(car);
+        }
+    }
+
+    // 直交方向から入った車が、まだ交差点を通過中か。
+    // waitingIsNS: 待っている側の車の進行方向が南北なら true
+    public bool HasCrossTraffic(bool waitingIsNS)
+    {
+        bool found = false;
+        entryRemoveBuffer.Clear();
+
+        foreach (KeyValuePair<CarController, EntryInfo> pair in entryInfos)
+        {
+            if (pair.Key == null)
+            {
+                entryRemoveBuffer.Add(pair.Key);
+                continue;
+            }
+
+            if (pair.Value.isNS == waitingIsNS) continue;
+            if (Time.time - pair.Value.time > crossTrafficMaxWait) continue;
+
+            found = true;
+        }
+
+        foreach (CarController car in entryRemoveBuffer) entryInfos.Remove(car);
+        return found;
+    }
+
     public bool IsCrosswalkLocked(Transform crosswalk)
     {
         if (crosswalk == null) return false;
@@ -92,6 +150,19 @@ public class CarIntersectionNode : MonoBehaviour
             // 以降 TrafficStopZone が信号の変化で止めてしまわないようにする
             car.SetIntersectionEntered(true);
             carsInTrigger.Add(car);
+
+            // 入った時の進行方向を覚えておく（曲がっている途中で向きが変わっても、入った時の方向で扱う）
+            bool known = entryInfos.TryGetValue(car, out EntryInfo existing);
+            if (!known || !existing.entered)
+            {
+                Vector3 entryForward = other.transform.forward;
+                entryInfos[car] = new EntryInfo
+                {
+                    isNS = known ? existing.isNS : Mathf.Abs(entryForward.z) >= Mathf.Abs(entryForward.x),
+                    time = Time.time,
+                    entered = true
+                };
+            }
             StartCoroutine(TurnSmoothly(car, other.transform));
         }
     }
@@ -102,15 +173,12 @@ public class CarIntersectionNode : MonoBehaviour
         if (car == null) return;
 
         carsInTrigger.Remove(car);
+        entryInfos.Remove(car);
 
-        if (activeCars.TryGetValue(car, out ActiveCarInfo info))
-        {
-            if (info.manager != null)
-            {
-                info.manager.ReportIntersectionExit(info.isLaneA);
-            }
-            activeCars.Remove(car);
-        }
+        // どちらの譲り合い管理に登録されていても確実に外す
+        if (nsYieldManager != null) nsYieldManager.ReportIntersectionExit(car);
+        if (ewYieldManager != null) ewYieldManager.ReportIntersectionExit(car);
+        activeCars.Remove(car);
     }
 
     private IEnumerator TurnSmoothly(CarController car, Transform carTransform)

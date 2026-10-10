@@ -42,6 +42,9 @@ public class PlayerLaneDetector : MonoBehaviour
     // 現在いる道路区間（RoadSection のルート）
     public Transform currentRoadSection;
 
+    // 現在いるレーンの判定の箱（テレポート先をレーンの中央に寄せるのに使う）
+    [System.NonSerialized] public Collider currentAreaCollider;
+
     [Tooltip("この速さ(m/s)未満のときは進行方向が不安定なため、直前に判定した進行方向をそのまま使う")]
     public float minSpeedForDirection = 0.5f;
 
@@ -95,6 +98,7 @@ public class PlayerLaneDetector : MonoBehaviour
         bool detectedRidingAllowed = false;
         Vector3 detectedLaneForward = Vector3.zero;
         Transform detectedRoadSection = null;
+        Collider detectedCollider = null;
         float closestDistance = float.MaxValue;
         System.Text.StringBuilder debugBuilder = showDebugOverlay ? new System.Text.StringBuilder() : null;
 
@@ -121,6 +125,7 @@ public class PlayerLaneDetector : MonoBehaviour
                 detectedRidingAllowed = type == RoadAreaType.Sidewalk && hit.GetComponent<SidewalkRidingAllowed>() != null;
                 detectedLaneForward = GetLaneForward(hit.transform);
                 detectedRoadSection = GetRoadSectionRoot(hit.transform);
+                detectedCollider = hit;
             }
         }
 
@@ -129,6 +134,7 @@ public class PlayerLaneDetector : MonoBehaviour
         sidewalkRidingAllowed = detectedRidingAllowed;
         currentLaneForward = detectedLaneForward;
         currentRoadSection = detectedRoadSection;
+        currentAreaCollider = detectedCollider;
         if (debugBuilder != null) debugHits = debugBuilder.ToString();
 
         // センサー範囲から外れた道路の向き記憶は捨てる（次に入った時は改めて判定する）

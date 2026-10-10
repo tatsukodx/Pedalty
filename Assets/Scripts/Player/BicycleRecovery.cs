@@ -27,7 +27,6 @@ public class BicycleRecovery : MonoBehaviour
 
     readonly List<SafePoint> history = new List<SafePoint>();
     BicycleController bicycle;
-    PlayerLaneDetector laneDetector;
     Rigidbody rb;
     Image fadeImage;
     float sampleTimer;
@@ -37,7 +36,6 @@ public class BicycleRecovery : MonoBehaviour
     void Awake()
     {
         bicycle = GetComponent<BicycleController>();
-        laneDetector = GetComponent<PlayerLaneDetector>();
         rb = GetComponent<Rigidbody>();
         CreateFader();
     }
@@ -80,10 +78,10 @@ public class BicycleRecovery : MonoBehaviour
         sampleTimer = 0f;
 
         TrafficViolationDetector detector = TrafficViolationDetector.Instance;
-        if (detector == null || !detector.IsPlayerInLegalLane) return;
-        if (laneDetector == null || laneDetector.currentLaneForward == Vector3.zero) return;
+        // 位置・向きは、違反判定と同じ瞬間にまとめて作られたものだけを使う
+        if (detector == null || !detector.HasLegalSample) return;
 
-        history.Add(new SafePoint { position = transform.position, laneForward = laneDetector.currentLaneForward });
+        history.Add(new SafePoint { position = detector.LegalSamplePosition, laneForward = detector.LegalSampleForward });
         if (history.Count > maxSamples) history.RemoveAt(0);
     }
 

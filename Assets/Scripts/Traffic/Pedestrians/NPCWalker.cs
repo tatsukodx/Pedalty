@@ -56,7 +56,7 @@ public class NPCWalker : MonoBehaviour
     private bool isTurningInPlace = false;
 
     [Header("自転車をよける・待つ")]
-    [Tooltip("この距離以内に自転車がいると反応する")]
+    [Tooltip("この距離以内に自転車がいる間、立ち止まって待つ")]
     public float bicycleAvoidRadius = 4f;
     [Tooltip("進行方向の前方この距離以内に、こちらへ向かってくる自転車がいれば立ち止まって待つ")]
     public float bicycleWaitDistance = 3f;
@@ -287,32 +287,12 @@ public class NPCWalker : MonoBehaviour
             return false;
         }
 
-        Vector3 bikeVelocity = bicycleRb != null ? bicycleRb.linearVelocity : Vector3.zero;
-        bikeVelocity.y = 0f;
-        bool bikeApproaching = bikeVelocity.magnitude > 0.5f && Vector3.Dot(bikeVelocity, -toBike) > 0f;
-
-        float ahead = Vector3.Dot(toBike, moveDirection);
-        float lateral = Vector3.Dot(toBike, Vector3.Cross(Vector3.up, moveDirection));
-
-        // 前方の通り道付近にいて、こちらへ向かってくる（または目の前にいる）なら待つ
-        bool inPath = ahead > 0f && ahead < bicycleWaitDistance && Mathf.Abs(lateral) < 1.5f;
-        if (inPath && (bikeApproaching || ahead < 1.5f) && bicycleWaitTimer < bicycleMaxWaitTime)
-        {
-            bicycleWaitTimer += Time.fixedDeltaTime;
-            return true;
-        }
-
-        if (!inPath) bicycleWaitTimer = 0f;
-
-        // 横断歩道上では横にそれず、待つだけにする
+        // 横断歩道を渡っている途中で止まると、車道の上に立ち続けて車や自転車の進路をふさぐので、
+        // 横断中だけは止まらずに渡りきる
         if (isCrossing) return false;
 
-        // 自転車と反対側へ、近いほど強くよける
-        Vector3 right = Vector3.Cross(Vector3.up, moveDirection);
-        float side = lateral >= 0f ? -1f : 1f;
-        float strength = 1f - distance / bicycleAvoidRadius;
-        sidestep = right * side * bicycleSidestepSpeed * strength;
-        return false;
+        // 自転車が近くにいる間は、よけずにその場で待ち続ける
+        return true;
     }
 
     Animator FindActiveAnimator()

@@ -17,6 +17,12 @@ public class CarTurnDecisionZone : MonoBehaviour
 
         if (car.PlannedTurnChoice != -1) return;
 
+        // 交差点へ向かってくる車だけを対象にする。
+        // 交差点から出ていく車がセンターライン寄りを走って、対向側のこのゾーンに触れた場合は無視する
+        Vector3 toCenter = intersection.transform.position - other.transform.position;
+        toCenter.y = 0f;
+        if (Vector3.Dot(other.transform.forward, toCenter) <= 0f) return;
+
         StartCoroutine(DecideAndWait(car, other.transform));
     }
 

@@ -72,6 +72,40 @@ public class CarController : MonoBehaviour
 
     // 信号・対向車・歩行者・自転車のいずれかを待って止まっている（スタック解消の対象判定に使う）
     public bool IsWaiting => isLightStopped || isYieldStopped || isPedestrianStopped || lastObstacleAhead;
+
+    // 停止ゾーン（信号・直交方向の通過待ち）から停止を指示されているか
+    public bool IsTrafficStopped => isLightStopped;
+
+    // 現在の走行速度[m/s]
+    public float CurrentSpeed => currentSpeed;
+
+    [Header("スタック時の自動削除")]
+    [Tooltip("この秒数のあいだ1m以上動けなかった車は、詰まりの原因になるので自動で消す（0で無効）。赤信号で待つ時間より十分長くしておくこと")]
+    public float maxStuckSeconds = 90f;
+    Vector3 stuckCheckPosition;
+    float stuckTimer;
+
+    // 長時間まったく動けない車を消す。ぶつかって絡み合った車などが残り続けて、交差点が詰まるのを防ぐ。
+    // 消えた分は CarSpawner が補充する。メニューや違反画面で止まっている間（Time.timeScale = 0）は数えない
+    void UpdateStuckWatchdog()
+    {
+        if (maxStuckSeconds <= 0f) return;
+
+        Vector3 p = transform.position;
+        if ((p - stuckCheckPosition).sqrMagnitude > 1f)
+        {
+            stuckCheckPosition = p;
+            stuckTimer = 0f;
+            return;
+        }
+
+        stuckTimer += Time.deltaTime;
+        if (stuckTimer >= maxStuckSeconds)
+        {
+            Debug.Log($"[CarController] {maxStuckSeconds:F0}秒動けなかった車を削除しました（位置 {p} / 理由 {stopReasonDebug}）");
+            Destroy(gameObject);
+        }
+    }
     bool lastObstacleAhead = false;
 
     // 現在の速度から停止するまでに必要な距離（おおよそ）
@@ -408,6 +442,7 @@ public class CarController : MonoBehaviour
     void Update()
     {
         UpdateBlinkers();
+        UpdateStuckWatchdog();
 
         if (transform.position.y < -10f)
         {
