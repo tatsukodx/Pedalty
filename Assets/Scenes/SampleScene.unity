@@ -4213,7 +4213,7 @@ MonoBehaviour:
   bikeLaneSouth: {fileID: 58374418}
   bikeLaneEast: {fileID: 58374417}
   bikeLaneWest: {fileID: 58374416}
-  bikeLaneWidth: 7
+  bikeLaneWidth: 6.5
   bikeLaneDepth: 2
   bikeLaneHeight: 3
 --- !u!65 &75610557
@@ -5219,6 +5219,23 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4c14ffc6a7f79e942885227ac141590c, type: 3}
+--- !u!1 &115860638 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7389401183797579229, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+  m_PrefabInstance: {fileID: 413528866}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &115860640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 115860638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b267605becd8d344805727bf25e0d09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SidewalkRidingAllowed
 --- !u!1 &116768319 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: e3c71c50de390ec4190b877211ba0717, type: 3}
@@ -18039,7 +18056,10 @@ PrefabInstance:
     - {fileID: 6557487791977022584, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
     - {fileID: 3253690475224542059, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7389401183797579229, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 115860640}
   m_SourcePrefab: {fileID: 100100000, guid: 1f7adab6ee13d90469e19cd1576b0491, type: 3}
 --- !u!1001 &413838321
 PrefabInstance:
@@ -24449,7 +24469,7 @@ MonoBehaviour:
   bikeLaneSouth: {fileID: 765230612}
   bikeLaneEast: {fileID: 765230611}
   bikeLaneWest: {fileID: 765230610}
-  bikeLaneWidth: 7
+  bikeLaneWidth: 6.5
   bikeLaneDepth: 2
   bikeLaneHeight: 3
 --- !u!65 &580389901
@@ -30072,7 +30092,7 @@ MonoBehaviour:
   bikeLaneSouth: {fileID: 1322142236}
   bikeLaneEast: {fileID: 1322142235}
   bikeLaneWest: {fileID: 1322142234}
-  bikeLaneWidth: 7
+  bikeLaneWidth: 6.5
   bikeLaneDepth: 2
   bikeLaneHeight: 3
 --- !u!65 &727530893
@@ -36927,7 +36947,7 @@ MonoBehaviour:
   bikeLaneSouth: {fileID: 782969326}
   bikeLaneEast: {fileID: 782969325}
   bikeLaneWest: {fileID: 782969324}
-  bikeLaneWidth: 7
+  bikeLaneWidth: 6.5
   bikeLaneDepth: 2
   bikeLaneHeight: 3
 --- !u!65 &873389803
@@ -56353,7 +56373,7 @@ MonoBehaviour:
   bikeLaneSouth: {fileID: 2124178597}
   bikeLaneEast: {fileID: 2124178596}
   bikeLaneWest: {fileID: 2124178595}
-  bikeLaneWidth: 7
+  bikeLaneWidth: 6.5
   bikeLaneDepth: 2
   bikeLaneHeight: 3
 --- !u!65 &1374207896
@@ -67511,7 +67531,7 @@ MonoBehaviour:
   bikeLaneSouth: {fileID: 1508133706}
   bikeLaneEast: {fileID: 1508133705}
   bikeLaneWest: {fileID: 1508133704}
-  bikeLaneWidth: 7
+  bikeLaneWidth: 6.5
   bikeLaneDepth: 2
   bikeLaneHeight: 3
 --- !u!65 &1621321579
@@ -72636,6 +72656,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   stuckHoldSeconds: 6
+  bothHoldSeconds: 0.5
 --- !u!114 &1749143479
 MonoBehaviour:
   m_ObjectHideFlags: 0

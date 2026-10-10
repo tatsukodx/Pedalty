@@ -59,6 +59,7 @@ public class PlayerLaneDetector : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        showDebugOverlay = false; // 本番用: 調査用の表示を強制的にオフにする
         SyncRoadAreasWithVisual();
     }
 
@@ -145,6 +146,9 @@ public class PlayerLaneDetector : MonoBehaviour
 
     void OnGUI()
     {
+        // 本番用: シーンの設定に関係なく、調査用の表示は出さない
+        return;
+#pragma warning disable CS0162
         if (!showDebugOverlay) return;
 
         string text = $"判定: {currentArea} / {currentSide}  自転車道近く:{bikeLaneExistsNearby}  駐車近く:{parkedCarNearby}\n位置: {transform.position}\n{debugHits}";
